@@ -82,12 +82,13 @@ def build():
         '<!-- nav:start -->\n<header class="bar g">\n  <div class="w">\n'
         '    <a class="brand" href="./" aria-label="ALENAFIT — на главную"><img class="brand-mark" src="img/brand/mark-light.svg" alt="" width="41" height="34"><span class="brand-text"><img class="brand-word" src="img/brand/wordmark-light.svg" alt="ALENAFIT" width="108" height="15"><small>сила без перегибов</small></span></a>\n'
         '    <nav class="tnav" aria-label="Разделы">' + "".join(top) + '</nav>\n'
+        '    <button class="inst-btn" type="button" data-pwa aria-label="Установить приложение на телефон" title="Установить приложение"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Приложение</span></button>\n'
         '    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span>Меню</button>\n'
         f'    <a class="btn btn-main" href="{START}" target="_blank" rel="noopener">СТАРТ</a>\n'
         '  </div>\n</header>\n'
         '<div class="mnav" id="mnav" hidden>\n  <nav class="mnav-in g" aria-label="Меню">\n'
-        '    <a class="m-home" href="./">Главная</a>\n    ' + "\n    ".join(mob) + '\n'
-        f'    <div class="m-cta"><a class="btn btn-main btn-wide" href="{START}" target="_blank" rel="noopener">Написать «СТАРТ»</a><button type="button" class="pwa-btn" data-pwa><img src="icons/icon-192.png" alt="" width="22" height="22">Установить приложение на телефон</button></div>\n'
+        '    <a class="m-home" href="./">Главная</a>\n    <button type="button" class="m-install" data-pwa><img src="icons/icon-192.png" alt="" width="40" height="40"><span><b>Приложение на телефон</b><small>Иконка на рабочем столе, работает без интернета</small></span></button>\n    ' + "\n    ".join(mob) + '\n'
+        f'    <div class="m-cta"><a class="btn btn-main btn-wide" href="{START}" target="_blank" rel="noopener">Написать «СТАРТ»</a></div>\n'
         '  </nav>\n</div>\n<!-- nav:end -->')
     return header
 
