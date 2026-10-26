@@ -43,7 +43,10 @@ def news():
             seen.add(title.lower())
             t = e.get("published_parsed") or e.get("updated_parsed")
             date = datetime.datetime(*t[:6]).date().isoformat() if t else None
-            items.append({"title": title, "link": link, "source": source, "lang": lang, "date": date})
+            summary = clean(e.get("summary", ""), 420)
+            if summary.lower().startswith(title.lower()[:40]):
+                summary = ""
+            items.append({"title": title, "summary": summary, "link": link, "source": source, "lang": lang, "date": date})
     items.sort(key=lambda x: x["date"] or "", reverse=True)
     return items[:LIMIT_NEWS]
 
@@ -61,7 +64,11 @@ def translate(items):
         cache = json.load(open(CACHE, encoding="utf-8"))
     except Exception:
         cache = {}
-    todo = [it["title"] for it in items if it.get("lang") == "en" and it["title"] not in cache]
+    texts = []
+    for it in items:
+        if it.get("lang") == "en":
+            texts += [it["title"]] + ([it["summary"]] if it.get("summary") else [])
+    todo = [t for t in dict.fromkeys(texts) if t not in cache]
     TR_STATUS.update(state="no_key" if not (key and folder) else ("cached" if not todo else "pending"),
                      has_key=bool(key), has_folder=bool(folder), folder_prefix=folder[:3])
     if todo and key and folder:
@@ -83,8 +90,10 @@ def translate(items):
     for it in items:
         if it["title"] in cache:
             it["title_ru"] = cache[it["title"]]
+        if it.get("summary") in cache:
+            it["summary_ru"] = cache[it["summary"]]
     os.makedirs(os.path.dirname(CACHE), exist_ok=True)
-    keep = {it["title"] for it in items}
+    keep = {it["title"] for it in items} | {it.get("summary") for it in items if it.get("summary")}
     json.dump({k: v for k, v in cache.items() if k in keep}, open(CACHE, "w", encoding="utf-8"), ensure_ascii=False)
     return items
 
