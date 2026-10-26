@@ -48,6 +48,39 @@ def news():
     return items[:LIMIT_NEWS]
 
 
+TR_URL = "https://translate.api.cloud.yandex.net/translate/v2/translate"
+CACHE = os.path.expanduser(os.environ.get("TR_CACHE", "~/tr-cache/translations.json"))
+
+
+def translate(items):
+    """Переводит новые заголовки через Яндекс Переводчик. Без ключа — оставляет оригинал.
+    Уже переведённые заголовки берутся из кэша, чтобы не платить за них повторно."""
+    key, folder = os.environ.get("YC_API_KEY", "").strip(), os.environ.get("YC_FOLDER_ID", "").strip()
+    try:
+        cache = json.load(open(CACHE, encoding="utf-8"))
+    except Exception:
+        cache = {}
+    todo = [it["title"] for it in items if it.get("lang") == "en" and it["title"] not in cache]
+    if todo and key and folder:
+        try:
+            r = requests.post(TR_URL, headers={"Authorization": f"Api-Key {key}"}, timeout=30,
+                              json={"folderId": folder, "texts": todo, "sourceLanguageCode": "en", "targetLanguageCode": "ru"})
+            r.raise_for_status()
+            for src, t in zip(todo, r.json().get("translations", [])):
+                if t.get("text"):
+                    cache[src] = t["text"]
+            print("translated", len(todo))
+        except Exception as e:  # перевод недоступен — показываем оригинал
+            print("translate fail", e)
+    for it in items:
+        if it["title"] in cache:
+            it["title_ru"] = cache[it["title"]]
+    os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+    keep = {it["title"] for it in items}
+    json.dump({k: v for k, v in cache.items() if k in keep}, open(CACHE, "w", encoding="utf-8"), ensure_ascii=False)
+    return items
+
+
 def channel(name):
     if not name:
         return []
@@ -81,6 +114,6 @@ def write(path, data):
 
 if __name__ == "__main__":
     ch = os.environ.get("TG_CHANNEL", "").strip().lstrip("@")
-    write("data/news.json", {"updated": NOW, "items": news()})
+    write("data/news.json", {"updated": NOW, "items": translate(news())})
     write("data/channel.json", {"updated": NOW, "channel": ch, "items": channel(ch)})
     print("done")

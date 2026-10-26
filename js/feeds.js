@@ -10,7 +10,7 @@
       if(!items.length){if(wrap&&wrap.hasAttribute('data-hide-empty'))wrap.hidden=true;else box.innerHTML='<p class="feed-empty">Свежие материалы появятся после ближайшего обновления — сайт обновляет их раз в день.</p>';return}
       box.innerHTML=items.slice(0,limit).map(function(it){
         if(kind==='channel')return '<a class="feed-item" href="'+esc(safeUrl(it.link))+'" target="_blank" rel="noopener"><div class="feed-meta"><span>Telegram</span><span>'+d(it.date)+'</span></div><p>'+esc(it.text)+'</p></a>';
-        return '<a class="feed-item" href="'+esc(safeUrl(it.link))+'" target="_blank" rel="noopener"><div class="feed-meta">'+(it.lang==='en'?'<span class="lang">EN</span>':'')+'<span>'+esc(it.source)+'</span><span>'+d(it.date)+'</span></div><h3>'+esc(it.title)+'</h3></a>';
+        var ru=it.title_ru;return '<a class="feed-item" href="'+esc(safeUrl(it.link))+'" target="_blank" rel="noopener"><div class="feed-meta">'+(ru?'<span class="lang">перевод</span>':(it.lang==='en'?'<span class="lang">EN</span>':''))+'<span>'+esc(it.source)+'</span><span>'+d(it.date)+'</span></div><h3>'+esc(ru||it.title)+'</h3>'+(ru?'<p class="orig">'+esc(it.title)+'</p>':'')+'</a>';
       }).join('');
       var up=wrap&&wrap.querySelector('[data-updated]');if(up&&data.updated)up.textContent='Обновлено автоматически: '+d(data.updated);
       if(wrap)wrap.hidden=false;

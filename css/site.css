@@ -391,3 +391,5 @@ details.cal summary{padding:14px 0;font-size:15px;color:var(--amber)}
 .feed-empty{color:var(--muted);font-size:15px}
 .updated{font-size:13px;color:var(--muted);margin-top:10px}
 @media (min-width:1024px){.feed{grid-template-columns:repeat(3,minmax(0,1fr))}.feed.cols2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.feed-item .orig{font-size:12.5px;-webkit-line-clamp:2}

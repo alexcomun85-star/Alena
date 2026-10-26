@@ -24,9 +24,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Кэш переводов
+        uses: actions/cache@v4
+        with:
+          path: ~/tr-cache
+          key: translations-${{ github.run_id }}
+          restore-keys: translations-
       - name: Собрать новости и посты канала
         env:
           TG_CHANNEL: ""   # ник нового канала без @, например gymmom_spb
+          YC_API_KEY: ${{ secrets.YC_API_KEY }}
+          YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
         run: |
           pip install feedparser==6.0.11 beautifulsoup4==4.12.3 requests==2.32.3
           python scripts/update_data.py
