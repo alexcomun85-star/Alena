@@ -54,7 +54,7 @@
   function pick(id){
     sel=all().find(function(x){return x.id===id});if(!sel)return;
     $('fSel').hidden=false;$('fSelName').textContent=sel.name;
-    $('fSelInfo').innerHTML='На 100 г'+(sel.st?' ('+esc(sel.st)+')':'')+': '+f(sel.k,0)+' ккал · Б '+f(sel.p)+' · Ж '+f(sel.f)+' · У '+f(sel.c)+(sel.src==='D'?' · домашнее блюдо, значения ориентировочные':sel.src==='L'?' · типичные значения с этикеток, сверяйте со своей упаковкой':sel.src==='O'?' · данные Open Food Facts':sel.fdc?' · <a href="https://fdc.nal.usda.gov/food-details/'+sel.fdc+'/nutrients" target="_blank" rel="noopener">USDA FDC '+sel.fdc+'</a>':sel.src==='U'?' · по USDA, запись уточняется':'');
+    $('fSelInfo').innerHTML='На 100 г'+(sel.st?' ('+esc(sel.st)+')':'')+': '+f(sel.k,0)+' ккал · Б '+f(sel.p)+' · Ж '+f(sel.f)+' · У '+f(sel.c)+(sel.src==='D'?' · домашнее блюдо, значения ориентировочные':sel.src==='L'?' · типичные значения с этикеток, сверяйте со своей упаковкой':sel.src==='O'?' · данные Open Food Facts':sel.fdc?' · <a href="https://fdc.nal.usda.gov/food-details/'+sel.fdc+'/nutrients" target="_blank" rel="noopener">USDA FDC '+sel.fdc+'</a>':sel.src==='U'?' · по USDA, сводное значение':'');
     $('fG').value=sel.pg||100;
     $('fPortions').innerHTML=(sel.pg?'<button type="button" class="chipbtn" data-g="'+sel.pg+'">'+esc(sel.pl||'порция')+' · '+sel.pg+' г</button>':'')+[50,100,150,200].map(function(g){return '<button type="button" class="chipbtn" data-g="'+g+'">'+g+' г</button>'}).join('');
     calcSel();$('fG').focus();
