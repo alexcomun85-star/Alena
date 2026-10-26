@@ -900,3 +900,11 @@ circle.lv{display:block}
 .portrait{border-radius:0;box-shadow:none;background:transparent;overflow:visible;position:relative;isolation:isolate}
 .portrait img{-webkit-mask-image:radial-gradient(ellipse 72% 70% at 50% 40%,#000 52%,rgba(0,0,0,.6) 70%,transparent 92%);mask-image:radial-gradient(ellipse 72% 70% at 50% 40%,#000 52%,rgba(0,0,0,.6) 70%,transparent 92%)}
 .portrait::before{content:"";position:absolute;inset:6% 4% 10%;z-index:-1;border-radius:50%;background:radial-gradient(closest-side,rgba(240,169,43,.22),rgba(44,110,95,.18) 60%,transparent);filter:blur(24px)}
+/* фикс пропорций картинок */
+.eat-teaser img,.hub-card img,.nut-img img,.kz-img img{height:auto}
+.eat-teaser img{aspect-ratio:1/1;object-fit:cover;max-width:200px;width:100%}
+.nut-img img{height:100%}
+.brand-word{width:auto!important;flex:none;max-width:none}
+.brand-text{flex:none}
+@media (max-width:899px){.eat-teaser{grid-template-columns:96px 1fr;align-items:start;gap:14px}.eat-teaser img{max-width:96px;border-radius:14px}.eat-teaser h2{font-size:22px;margin-top:6px}.eat-teaser .lede{font-size:15px}}
+@media (max-width:380px){.eat-teaser{grid-template-columns:1fr}.eat-teaser img{max-width:120px}}
