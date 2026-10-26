@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1e1a">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Алёна · Сила без перегибов</title>
+<meta name="description" content="Силовые тренировки и питание без крайностей. Онлайн-сопровождение и мини-группы в центре Санкт-Петербурга.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: продающая лента под телефон в стиле карточек канала. Порядок по ориентирам: результат → доверие → для кого → как работаем → тарифы → разборы → границы → вопросы → финальный шаг. Один призыв: «СТАРТ» в Telegram. */
+:root{
+  --bg:#132823; --band:#0d1e1a; --surface:#183530; --surface-2:#1f4038;
+  --teal:#2c6e5f; --amber:#f0a92b; --amber-ink:#132823;
+  --ink:#eef4f1; --muted:#a9c0b7; --line:#2a4740;
+  --display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --body:"Golos Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --r-lg:24px; --r-md:16px;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(64px + env(safe-area-inset-top,0px))}
+body{background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);-webkit-font-smoothing:antialiased;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--band)}
+.g{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.w{max-width:640px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.015em}
+h2{font-size:clamp(25px,7vw,36px);line-height:1.1;font-weight:800;margin-top:10px}
+h2 em,h1 em{font-style:normal;color:var(--amber)}
+h3{font-size:18px;line-height:1.25;font-weight:700}
+p{margin:0}
+a{color:inherit}
+.tag{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+.muted{color:var(--muted)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:8px}
+section{padding-block:56px 0}
+.lede{color:var(--muted);margin-top:12px;max-width:40ch}
+
+/* кнопки */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 16px var(--body);text-decoration:none;border-radius:999px;padding:14px 22px;min-height:52px;border:0;cursor:pointer}
+.btn-main{background:var(--amber);color:var(--amber-ink)}
+.btn-line{box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink)}
+.btn-wide{width:100%}
+@media (prefers-reduced-motion:no-preference){.btn{transition:transform .15s}.btn:active{transform:scale(.97)}}
+
+/* шапка */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--band) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .w{display:flex;align-items:center;justify-content:space-between;gap:12px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:0}
+.mono{flex:none;width:38px;height:38px;border-radius:50%;background:var(--amber);color:var(--amber-ink);display:grid;place-items:center;font:800 13px var(--display)}
+.brand b{display:block;font:700 13px/1.15 var(--display)}
+.brand small{display:block;font-size:12px;color:var(--muted)}
+.bar .btn{min-height:40px;padding:8px 16px;font-size:14px}
+
+/* первый экран */
+.hero{background:var(--band);padding-block:16px 40px;overflow:hidden;position:relative}
+.hero h1{font-size:clamp(32px,9.4vw,58px);line-height:1.06;font-weight:800;margin-top:14px}
+.hero .sub{font-size:18px;color:var(--muted);margin-top:18px;max-width:34ch}
+.hero .sub b{color:var(--ink);font-weight:600}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.reassure{font-size:14px;color:var(--muted);margin-top:14px}
+.hero-photo{position:relative;margin:0 0 -56px;aspect-ratio:1/1;max-width:100%;border-radius:28px 28px 0 0;overflow:hidden;isolation:isolate}
+.hero-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:40% 30%;filter:saturate(.85) contrast(1.05)}
+.hero-photo::before{content:"";position:absolute;inset:0;background:#2c6e5f;mix-blend-mode:color;opacity:.35;z-index:1}
+.hero-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,30,26,0) 45%,rgba(13,30,26,.75) 78%,var(--band) 100%);z-index:1}
+.ph-chip{position:absolute;left:14px;top:14px;z-index:2;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:rgba(13,30,26,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:999px;padding:7px 12px}
+.ph-stat{position:absolute;right:14px;top:14px;z-index:2;background:var(--amber);color:var(--amber-ink);border-radius:16px;padding:9px 13px;font-size:12px;font-weight:600;line-height:1.2;text-align:left}
+.ph-stat b{display:block;font:800 20px/1.05 var(--display)}
+.hero .tag,.hero h1{position:relative;z-index:2}
+.proof{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border-radius:var(--r-md);overflow:hidden;margin-top:24px}
+.proof div{background:var(--surface);padding:14px}
+.proof b{display:block;font:800 20px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.proof b small{font-size:13px;color:var(--amber);margin-left:3px}
+.proof span{display:block;font-size:13px;color:var(--muted);margin-top:6px;line-height:1.35}
+
+/* доверие */
+.about{display:grid;gap:18px;margin-top:22px}
+.portrait{justify-self:center;aspect-ratio:4/5;width:100%;max-width:280px;border-radius:180px 180px var(--r-lg) var(--r-lg);background:var(--teal);overflow:hidden;box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--amber)}
+.portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.about-text{display:grid;gap:14px;min-width:0}
+.creds{display:grid;margin-top:4px}
+.creds div{display:flex;justify-content:space-between;gap:14px;border-top:1px solid var(--line);padding:12px 0;font-size:15px}
+.creds div:last-child{border-bottom:1px solid var(--line)}
+.creds span{color:var(--muted);white-space:nowrap}
+
+/* для кого */
+.who{display:grid;gap:10px;margin-top:22px}
+.who article{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:18px;display:grid;gap:8px}
+.who .was{font-size:14px;color:var(--muted)}
+.who .will{display:grid;grid-template-columns:18px 1fr;gap:8px;font-weight:600}
+.who .will::before{content:"";width:12px;height:4px;border-radius:2px;background:var(--amber);margin-top:11px}
+
+/* как работаем: реальная последовательность, блины растут */
+.steps{display:grid;margin-top:22px}
+.step{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+.step:last-child{border-bottom:1px solid var(--line)}
+.step .pl{display:flex;justify-content:center}
+.step .pl i{display:block;border-radius:5px;background:var(--teal)}
+.step:last-child .pl i{background:var(--amber)}
+.step b{display:block;font-weight:600}
+.step span{font-size:15px;color:var(--muted)}
+
+/* тарифы */
+.plans{display:grid;gap:14px;margin-top:22px}
+.plan{border-radius:var(--r-lg);padding:24px 20px;display:grid;gap:18px;border:1px solid var(--line);background:var(--surface)}
+.plan.primary{background:var(--band);border:2px solid var(--amber)}
+.plan-head{display:grid;gap:8px}
+.chip{justify-self:start;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:var(--surface-2);color:var(--ink)}
+.plan.primary .chip{background:var(--amber);color:var(--amber-ink)}
+.price{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-variant-numeric:tabular-nums}
+.price b{font:800 40px/1 var(--display);color:var(--amber)}
+.price span{font-size:15px;color:var(--muted)}
+.plan ul{margin:0;padding:0;list-style:none;display:grid;gap:11px}
+.plan li{display:grid;grid-template-columns:20px 1fr;gap:8px;font-size:16px}
+.plan li::before{content:"";width:12px;height:4px;border-radius:2px;background:var(--amber);margin-top:11px}
+.fit{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fit div{background:var(--surface-2);border-radius:14px;padding:14px;font-size:14px;line-height:1.45;min-width:0}
+.fit b{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;color:var(--amber)}
+@media (max-width:360px){.fit{grid-template-columns:1fr}}
+.small{font-size:14px;color:var(--muted)}
+.slots{display:grid;gap:8px}
+.slot{display:grid;grid-template-columns:62px 1fr;gap:14px;align-items:center;background:var(--surface-2);border-radius:14px;padding:10px 14px 10px 10px}
+.day{width:62px;height:62px;border-radius:50%;background:var(--teal);display:grid;place-items:center;text-align:center;line-height:1}
+.day small{display:block;font:600 11px var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--amber)}
+.day b{font:700 14px var(--display);font-variant-numeric:tabular-nums}
+.slot strong{display:block;font-weight:600}
+.slot span{font-size:14px;color:var(--muted)}
+.pricepair{display:flex;gap:8px;flex-wrap:wrap}
+.pricepair span{background:var(--surface-2);border-radius:999px;padding:9px 15px;font-weight:600;font-size:15px}
+.pricepair b{color:var(--amber)}
+
+/* разборы */
+.rail{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin-top:16px;padding-bottom:10px;-webkit-overflow-scrolling:touch}
+.rail img{flex:0 0 76%;width:76%;max-width:300px;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:18px;scroll-snap-align:start;display:block}
+.rail-label{margin-top:28px;font-weight:600}
+
+/* графика исследований */
+.evid{display:grid;gap:12px;margin-top:22px}
+.ev{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;display:grid;gap:14px;min-width:0}
+.ev h3{font-size:17px}
+.ev h3 em{font-style:normal;color:var(--amber)}
+.ev svg{display:block;width:100%;height:auto;max-width:100%}
+.ev svg text{font-family:var(--body);fill:var(--ink)}
+.ev .src{font-size:12.5px;color:var(--muted);line-height:1.4;border-top:1px solid var(--line);padding-top:10px}
+.big{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.big b{font:800 34px/1 var(--display);color:var(--amber);font-variant-numeric:tabular-nums}
+.big span{font-size:14px;color:var(--muted)}
+
+/* иконки «для кого» */
+.who article{grid-template-columns:44px 1fr;column-gap:14px}
+.who .ico{grid-row:1/4;width:44px;height:44px}
+.who article>*:not(.ico){grid-column:2}
+
+/* схема прогрессии */
+.prog{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 16px 14px}
+.prog svg{display:block;width:100%;height:auto}
+.prog svg text{font-family:var(--body)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px;background:var(--amber)}
+.legend i.d{background:none;border-top:2px dashed var(--muted);height:0}
+
+/* фон первого экрана */
+.hero .w{position:relative}
+
+/* границы */
+.limits{margin-top:22px;border:1.5px dashed var(--line);border-radius:var(--r-lg);padding:20px;display:grid;gap:12px}
+.limits ul{margin:0;padding-left:20px;display:grid;gap:4px;font-size:15px}
+.limits p{font-size:15px;color:var(--muted)}
+
+/* вопросы */
+.faq{margin-top:18px}
+details{border-top:1px solid var(--line);padding:16px 0}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:700 22px/1 var(--display);color:var(--amber);transition:transform .2s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{color:var(--muted);font-size:15px;margin-top:10px}
+
+/* финал */
+.final{background:var(--band);margin-top:56px;padding-block:48px 40px}
+.final h2{font-size:clamp(28px,8vw,44px)}
+.final p{color:var(--muted);margin-top:14px;max-width:36ch}
+.contact{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.handle{font:600 17px var(--body);background:var(--surface-2);border-radius:999px;padding:13px 18px;user-select:all}
+.copy{font:600 14px var(--body);background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line);border:0;border-radius:999px;padding:13px 16px;cursor:pointer;min-height:48px}
+footer{background:var(--band);color:var(--muted);font-size:13px;padding-block:0 28px}
+footer .w{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:4px}
+
+/* липкая кнопка */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);transition:transform .25s}
+.dock .w{display:flex;gap:12px;align-items:center}
+.dock .btn{flex:1}
+.dock small{font-size:12px;color:var(--muted);line-height:1.3;max-width:104px}
+.dock.hide{transform:translateY(110%)}
+
+@media (min-width:720px){
+  .who{grid-template-columns:1fr 1fr}
+  .about{grid-template-columns:240px 1fr;align-items:start}
+  .proof{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .rail img{flex-basis:31%}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="bar g">
+  <div class="w">
+    <a class="brand" href="#top"><span class="mono" aria-hidden="true">АВ</span><span><b>Сила без перегибов</b><small>Алёна · тренер и нутрициолог</small></span></a>
+    <a class="btn btn-main" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">СТАРТ</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero g">
+    <div class="w">
+      <figure class="hero-photo">
+        <img src="img/hero_squat.jpg" alt="Алёна выполняет присед со штангой в зале" width="640" height="640" fetchpriority="high">
+        <span class="ph-chip">Тренер и нутрициолог</span>
+        <span class="ph-stat"><b>105 кг</b>становая тяга</span>
+      </figure>
+      <span class="tag">Онлайн и мини-группы в СПб</span>
+      <h1>Станьте сильнее <em>без жёстких диет</em> и&nbsp;тренировок на&nbsp;износ</h1>
+      <p class="sub">Силовые тренировки с упором на технику и питание без запретов. Для тех, кто <b>возвращается в зал</b> после паузы, совмещает спорт с работой или <b>боится травм</b>.</p>
+      <div class="cta">
+        <a class="btn btn-main" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
+        <a class="btn btn-line" href="#plans">Форматы и цены</a>
+      </div>
+      <p class="reassure">Сначала короткий созвон о вашей цели, потом решаете. Отвечаю с 9 до 21.</p>
+      <div class="proof" aria-label="Коротко обо мне">
+        <div><b>2 года</b><span>тренирую других</span></div>
+        <div><b>3</b><span>тренировки в неделю онлайн</span></div>
+        <div><b>до 6</b><span>человек в очной группе</span></div>
+        <div><b>5 000 ₽</b><span>первый месяц онлайн</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="g" id="about">
+    <div class="w">
+      <span class="tag">#обо_мне</span>
+      <h2>Привет, я Алёна. <em>Технику ставлю как в спорте</em></h2>
+      <div class="about">
+        <div class="portrait"><img src="img/portrait.jpg" alt="Портрет Алёны" width="400" height="500" loading="lazy"></div>
+        <div class="about-text">
+          <p>За плечами бодибилдинг и пауэрлифтинг: готовилась к соревнованиям в категории фитнес-бикини. Знаю, как устроены силовые тренировки и почему желание «сделать идеально» мешает заниматься регулярно.</p>
+          <p class="muted">Моя позиция простая: тренировки должны делать жизнь лучше, а не становиться второй работой.</p>
+          <div class="creds">
+            <div>Тренер-универсал, тренер групповых программ<span>Корус, 2025</span></div>
+            <div>Нутрициолог<span>2022</span></div>
+            <div>Подготовка к соревнованиям, фитнес-бикини<span>2022–2023</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="g" id="who">
+    <div class="w">
+      <span class="tag">#для_кого</span>
+      <h2>Узнали себя? <em>Вам сюда</em></h2>
+      <div class="who">
+        <article><svg class="ico" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#2c6e5f"/><path d="M11 29l7-7 5 5 9-10" stroke="#f0a92b" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M26 17h6v6" stroke="#f0a92b" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>Возвращаетесь после паузы</h3><p class="was">Страшно начинать заново и хочется наверстать всё сразу.</p><p class="will">Входим в нагрузку постепенно. Перерыв не обнуляет результат.</p></article>
+        <article><svg class="ico" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#2c6e5f"/><circle cx="22" cy="23" r="10" stroke="#eef4f1" stroke-width="3" fill="none"/><path d="M22 17v6l4 3" stroke="#f0a92b" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M19 10h6" stroke="#eef4f1" stroke-width="3" stroke-linecap="round"/></svg><h3>Мало времени</h3><p class="was">Работа и семья, на зал остаётся пара вечеров.</p><p class="will">3 тренировки в неделю, которые помещаются в ваш график.</p></article>
+        <article><svg class="ico" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#2c6e5f"/><rect x="9" y="20.5" width="26" height="3" rx="1.5" fill="#eef4f1"/><rect x="11" y="14" width="5" height="16" rx="2" fill="#f0a92b"/><rect x="28" y="14" width="5" height="16" rx="2" fill="#f0a92b"/></svg><h3>Боитесь техники и травм</h3><p class="was">Непонятно, правильно ли делаете присед и тягу.</p><p class="will">Разбираю видео ваших подходов. Сначала уверенность, потом веса.</p></article>
+        <article><svg class="ico" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#2c6e5f"/><circle cx="22" cy="22" r="11" stroke="#eef4f1" stroke-width="3" fill="none"/><path d="M22 11a11 11 0 0 1 11 11H22z" fill="#f0a92b"/></svg><h3>Устали от жёстких диет</h3><p class="was">Запреты, срывы и подсчёт каждой крошки.</p><p class="will">Разбор рациона и план питания без запретов на любимую еду.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="g" id="how">
+    <div class="w">
+      <span class="tag">#как_работаем</span>
+      <h2>По блину <em>за раз</em></h2>
+      <div class="steps">
+        <div class="step"><span class="pl"><i style="width:9px;height:22px"></i></span><p><b>Пишете «СТАРТ» в Telegram</b><span>Можно одним словом, остальное спрошу сама.</span></p></div>
+        <div class="step"><span class="pl"><i style="width:11px;height:32px"></i></span><p><b>Созвон на 15–20 минут</b><span>Цель, опыт, график, оборудование и ограничения.</span></p></div>
+        <div class="step"><span class="pl"><i style="width:13px;height:42px"></i></span><p><b>Подбираем формат</b><span>Онлайн или группа. Если не подойдёт ни один, скажу честно.</span></p></div>
+        <div class="step"><span class="pl"><i style="width:15px;height:52px"></i></span><p><b>Тренируемся и растём</b><span>Программа, разбор техники и корректировки без рывков.</span></p></div>
+      </div>
+      <figure class="prog" style="margin-inline:0;margin-bottom:0">
+        <svg viewBox="0 0 340 170" role="img" aria-label="Схема: нагрузка растёт ступенями и с разгрузочными неделями, а не рывками со срывами">
+          <line x1="30" y1="140" x2="330" y2="140" stroke="#2a4740" stroke-width="1.5"/>
+          <line x1="30" y1="20" x2="30" y2="140" stroke="#2a4740" stroke-width="1.5"/>
+          <line x1="30" y1="100" x2="330" y2="100" stroke="#2a4740" stroke-dasharray="2 5"/>
+          <line x1="30" y1="60" x2="330" y2="60" stroke="#2a4740" stroke-dasharray="2 5"/>
+          <polyline points="30,128 70,110 100,70 115,132 150,100 175,55 190,128 230,90 255,42 270,120 330,96" fill="none" stroke="#a9c0b7" stroke-width="2" stroke-dasharray="5 5" stroke-linejoin="round"/>
+          <path d="M30 128H72V114H114V100H156V108H174V92H216V78H258V86H276V68H318V54H330" fill="none" stroke="#f0a92b" stroke-width="3.5" stroke-linejoin="round"/>
+          <circle cx="330" cy="54" r="5" fill="#f0a92b"/>
+          <text x="22" y="26" font-size="11" fill="#a9c0b7" text-anchor="end" transform="rotate(-90 22 26)" dx="-34">нагрузка</text>
+          <text x="330" y="158" font-size="11" fill="#a9c0b7" text-anchor="end">недели</text>
+          <text x="156" y="124" font-size="10.5" fill="#f0a92b" text-anchor="middle">разгрузка</text>
+        </svg>
+        <div class="legend"><span><i></i>ступенями, с разгрузкой</span><span><i class="d"></i>рывками и срывами</span></div>
+        <figcaption class="small" style="margin-top:6px">Схема принципа, не данные клиента.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="g" id="plans">
+    <div class="w">
+      <span class="tag">#со_мной</span>
+      <h2>Форматы <em>и цены</em></h2>
+      <div class="plans">
+        <article class="plan primary">
+          <div class="plan-head">
+            <span class="chip">Из любого города</span>
+            <h3 style="font-size:22px">Онлайн-сопровождение</h3>
+            <div class="price"><b>5 000 ₽</b><span>первый месяц, далее 8 000 ₽/мес</span></div>
+          </div>
+          <ul>
+            <li>Программа на 3 тренировки в неделю под цель, опыт и оборудование: зал или дом</li>
+            <li>Проверка техники по видео после каждой тренировки в первый месяц</li>
+            <li>Разбор рациона и план питания без жёстких запретов</li>
+            <li>Ответы на вопросы в течение дня, с 9 до 21</li>
+            <li>Корректировка программы, если что-то не подходит</li>
+          </ul>
+          <div class="fit">
+            <div><b>Подойдёт</b>Хотите заниматься сами, но с планом и контролем техники.</div>
+            <div><b>Не подойдёт</b>Нужно лечение, реабилитация или результат «к пятнице».</div>
+          </div>
+          <p class="small">Одновременно веду 4–6 клиентов, чтобы хватало внимания каждому. Оплата по СБП или ссылке, чек самозанятой.</p>
+          <a class="btn btn-main btn-wide" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Записаться — «СТАРТ»</a>
+        </article>
+
+        <article class="plan">
+          <div class="plan-head">
+            <span class="chip">Очно · центр СПб</span>
+            <h3 style="font-size:22px">Мини-группы</h3>
+            <p class="small">Студия Sequoia D Anima, наб. р. Мойки, 62/2, м. Адмиралтейская. Все уровни подготовки.</p>
+          </div>
+          <div class="slots">
+            <div class="slot"><span class="day"><span><small>Ср</small><b>10:00</b></span></span><p><strong>Ягодицы + кор</strong><span>55 минут · до 6 человек</span></p></div>
+            <div class="slot"><span class="day"><span><small>Сб</small><b>11:00</b></span></span><p><strong>Ягодицы + кор</strong><span>55 минут · до 6 человек</span></p></div>
+            <div class="slot"><span class="day"><span><small>Сб</small><b>12:00</b></span></span><p><strong>Растяжка</strong><span>55 минут · до 5 человек</span></p></div>
+          </div>
+          <div class="pricepair"><span>Пробное — <b>800 ₽</b></span><span>Разовое — <b>1 500 ₽</b></span></div>
+          <a class="btn btn-line btn-wide" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Записаться на пробное</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="g">
+    <div class="w">
+      <span class="tag">#разбор · из канала</span>
+      <h2>Подход опирается <em>на исследования</em></h2>
+      <p class="lede">Три вывода, на которых строятся мои программы. Полные разборы — в канале.</p>
+      <div class="evid">
+        <article class="ev">
+          <h3>Перерыв <em>не обнуляет</em> результат</h3>
+          <svg viewBox="0 0 320 120" role="img" aria-label="Группа 1 тренировалась 20 недель подряд, группа 2 — 10 недель, пауза 10 недель, ещё 10 недель. Итог по силе и мышцам примерно одинаковый">
+            <text x="0" y="12" font-size="12" fill="#a9c0b7">Группа 1 · 20 недель подряд</text>
+            <rect x="0" y="20" width="270" height="26" rx="6" fill="#2c6e5f"/>
+            <rect x="276" y="20" width="44" height="26" rx="6" fill="#f0a92b"/>
+            <text x="298" y="37" font-size="11" font-weight="600" fill="#132823" text-anchor="middle">итог</text>
+            <text x="0" y="74" font-size="12" fill="#a9c0b7">Группа 2 · с паузой 10 недель</text>
+            <rect x="0" y="82" width="86" height="26" rx="6" fill="#2c6e5f"/>
+            <rect x="92" y="83" width="86" height="24" rx="6" fill="none" stroke="#a9c0b7" stroke-dasharray="4 4"/>
+            <text x="135" y="99" font-size="11" fill="#a9c0b7" text-anchor="middle">пауза</text>
+            <rect x="184" y="82" width="86" height="26" rx="6" fill="#2c6e5f"/>
+            <rect x="276" y="82" width="44" height="26" rx="6" fill="#f0a92b"/>
+            <text x="298" y="99" font-size="11" font-weight="600" fill="#132823" text-anchor="middle">итог</text>
+          </svg>
+          <div class="big"><b>≈5 недель</b><span>чтобы вернуть прежний уровень после паузы</span></div>
+          <p class="src">Университет Ювяскюля, Scand J Med Sci Sports, 2024. Участники — молодые люди без опыта силовых.</p>
+        </article>
+        <article class="ev">
+          <h3>До отказа <em>не обязательно</em></h3>
+          <svg viewBox="0 0 320 96" role="img" aria-label="Шкала повторов в запасе от 0 до 5: от 0 до 5 хватает для роста мышц, 3–5 с тяжёлым весом — для силы">
+            <g font-size="20" font-weight="700" text-anchor="middle">
+              <rect x="0" y="0" width="48" height="56" rx="8" fill="#f0a92b"/><text x="24" y="36" fill="#132823">0</text>
+              <rect x="54" y="0" width="48" height="56" rx="8" fill="#f0a92b"/><text x="78" y="36" fill="#132823">1</text>
+              <rect x="108" y="0" width="48" height="56" rx="8" fill="#f0a92b"/><text x="132" y="36" fill="#132823">2</text>
+              <rect x="162" y="0" width="48" height="56" rx="8" fill="#2c6e5f"/><rect x="162" y="0" width="48" height="28" rx="8" fill="#f0a92b"/><rect x="162" y="20" width="48" height="8" fill="#f0a92b"/><text x="186" y="36" fill="#eef4f1">3</text>
+              <rect x="216" y="0" width="48" height="56" rx="8" fill="#2c6e5f"/><text x="240" y="36" fill="#eef4f1">4</text>
+              <rect x="270" y="0" width="48" height="56" rx="8" fill="#2c6e5f"/><text x="294" y="36" fill="#eef4f1">5</text>
+            </g>
+            <rect x="0" y="70" width="10" height="10" rx="2" fill="#f0a92b"/><text x="16" y="79" font-size="11.5" fill="#a9c0b7">0–5 в запасе — для роста мышц</text>
+            <rect x="0" y="86" width="10" height="10" rx="2" fill="#2c6e5f"/><text x="16" y="95" font-size="11.5" fill="#a9c0b7">3–5 с тяжёлым весом — для силы</text>
+          </svg>
+          <div class="big"><b>55</b><span>исследований в метаанализе о повторах «в запасе»</span></div>
+          <p class="src">Robinson et al., Sports Medicine, 2024.</p>
+        </article>
+        <article class="ev">
+          <h3>Женщинам нужно <em>меньше</em>, чем кажется</h3>
+          <svg viewBox="0 0 320 84" role="img" aria-label="Минут умеренной активности в неделю для одинакового снижения риска ранней смерти: женщины 140, мужчины 300">
+            <text x="0" y="12" font-size="12" fill="#a9c0b7">Минут в неделю для одинаковой пользы</text>
+            <text x="0" y="41" font-size="12.5" fill="#eef4f1">Женщины</text>
+            <rect x="74" y="24" width="114" height="26" rx="6" fill="#f0a92b"/><text x="84" y="42" font-size="13" font-weight="700" fill="#132823">140</text>
+            <text x="0" y="75" font-size="12.5" fill="#eef4f1">Мужчины</text>
+            <rect x="74" y="58" width="246" height="26" rx="6" fill="#2c6e5f"/><text x="84" y="76" font-size="13" font-weight="700" fill="#eef4f1">300</text>
+          </svg>
+          <div class="big"><b>−19%</b><span>риск смерти у женщин, которые делают силовые (у мужчин −11%)</span></div>
+          <p class="src">Ji et al., JACC, 2024, около 400 000 человек. Наблюдательное исследование: связь, а не доказательство причины.</p>
+        </article>
+      </div>
+      <p class="rail-label">Как это выглядит в канале</p>
+      <div class="rail" aria-label="Примеры разборов">
+        <img src="img/01_pereryv.jpg" alt="Разбор: перерыв в тренировках не обнуляет результат" width="720" height="900">
+        <img src="img/02_zapas.jpg" alt="Разбор: тренироваться до отказа не обязательно" loading="lazy" width="720" height="900">
+        <img src="img/04_zhenshchiny.jpg" alt="Разбор: женщинам нужно меньше активности для той же пользы" loading="lazy" width="720" height="900">
+      </div>
+      <a class="btn btn-line btn-wide" style="margin-top:12px" href="https://t.me/gymmom_spb" target="_blank" rel="noopener">Читать канал</a>
+    </div>
+  </section>
+
+  <section class="g">
+    <div class="w">
+      <span class="tag">#честно</span>
+      <h2>Кому формат <em>не подойдёт</em></h2>
+      <div class="limits">
+        <ul>
+          <li>до 18 лет;</li>
+          <li>поздние сроки беременности;</li>
+          <li>воспалительные процессы в суставах и позвоночнике;</li>
+          <li>острые травмы без допуска врача.</li>
+        </ul>
+        <p>Я не врач и не заменяю лечение. При травмах, заболеваниях или трудностях с пищевым поведением сначала обратитесь к профильному специалисту, а тренировки согласуем с его рекомендациями.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="g" id="faq">
+    <div class="w">
+      <span class="tag">#вопрос</span>
+      <h2>Частые <em>вопросы</em></h2>
+      <div class="faq">
+        <details><summary>Нужен ли опыт?</summary><p>Нет. Программа строится от вашего уровня, технику разбираем с первых тренировок.</p></details>
+        <details><summary>Можно заниматься дома?</summary><p>Да. Программу собираю под то, что есть: зал, гантели дома или собственный вес.</p></details>
+        <details><summary>Как проходит проверка техники?</summary><p>В первый месяц после каждой тренировки присылаете видео последних секунд последнего подхода. Я смотрю и пишу, что поправить.</p></details>
+        <details><summary>А если пропущу неделю?</summary><p>Ничего страшного. Подстроим программу и вернёмся в ритм без «отработок».</p></details>
+        <details><summary>Будет план питания?</summary><p>Да, после разбора рациона. Без универсальных диет, «сушек» и запретов на любимую еду.</p></details>
+        <details><summary>Обещаете минус N килограммов?</summary><p>Нет. Результат зависит от регулярности, сна, питания и здоровья. Обещаю понятный план и внимание к технике.</p></details>
+        <details><summary>Как оплатить?</summary><p>По СБП или по ссылке. Я работаю как самозанятая и присылаю чек.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final g" id="start">
+    <div class="w">
+      <span class="tag">Первый шаг</span>
+      <h2>Начнём <em>с одного сообщения</em></h2>
+      <p>Напишите «СТАРТ» в Telegram — расскажу, какой формат подойдёт именно вам.</p>
+      <div class="contact">
+        <span class="handle" id="handle">@Gym_mom1988</span>
+        <button class="copy" type="button" id="copy">Скопировать</button>
+      </div>
+      <a class="btn btn-main btn-wide" style="margin-top:14px" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
+    </div>
+  </section>
+</main>
+
+<footer class="g"><div class="w"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span></div></footer>
+
+<div class="dock hide" id="dock">
+  <div class="w">
+    <a class="btn btn-main" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
+    <small>Ответ с 9 до 21</small>
+  </div>
+</div>
+
+<script>
+document.getElementById('copy').addEventListener('click',function(){
+  var b=this,el=document.getElementById('handle');
+  function ok(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Скопировать'},1600)}
+  function fb(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено'}
+  try{navigator.clipboard.writeText('@Gym_mom1988').then(ok,fb)}catch(e){fb()}
+});
+(function(){
+  var dock=document.getElementById('dock'),hero=document.querySelector('.hero'),fin=document.getElementById('start');
+  if(!('IntersectionObserver' in window)){dock.classList.remove('hide');return;}
+  var vis={hero:true,fin:false};
+  function upd(){dock.classList.toggle('hide',vis.hero||vis.fin)}
+  new IntersectionObserver(function(e){vis.hero=e[0].isIntersecting;upd()},{threshold:.25}).observe(hero);
+  new IntersectionObserver(function(e){vis.fin=e[0].isIntersecting;upd()},{threshold:.15}).observe(fin);
+})();
+</script>
+
+</body>
+</html>
