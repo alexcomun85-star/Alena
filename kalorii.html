@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1e1a">
+<title>Еда: калории и БЖУ без диет · Сила без перегибов</title>
+<meta name="description" content="Посчитать калории, белки, жиры и углеводы в обычной еде: 100+ привычных продуктов, свои продукты и поиск по штрихкоду. Без норм и запретов.">
+<link rel="canonical" href="https://alenafit.com/kalorii.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:url" content="https://alenafit.com/kalorii.html">
+<meta property="og:title" content="Еда: калории и БЖУ без диет · Сила без перегибов">
+<meta property="og:description" content="Посчитать калории, белки, жиры и углеводы в обычной еде: 100+ привычных продуктов, свои продукты и поиск по штрихкоду. Без норм и запретов.">
+<meta property="og:image" content="https://alenafit.com/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/site.css">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<header class="bar g">
+  <div class="w">
+    <a class="brand" href="./"><span class="mono" aria-hidden="true">АВ</span><span><b>Сила без перегибов</b><small>Алёна · тренер и нутрициолог</small></span></a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="./#plans">Цены</a><a href="nauka.html">Наука</a><a href="testy.html">Тесты</a><a href="servisy.html">Полезное</a><a href="novosti.html">Новости</a><a href="progress.html">Прогресс</a>
+    </nav>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span>Меню</button>
+    <a class="btn btn-main" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">СТАРТ</a>
+  </div>
+</header>
+<div class="mnav" id="mnav" hidden>
+  <nav class="mnav-in g" aria-label="Меню">
+    <a href="./">Главная</a>
+    <a href="./#plans">Форматы и цены</a>
+    <a href="./#quiz">Подобрать формат</a>
+    <a href="./#groups">Расписание групп</a>
+    <a href="nauka.html">Наука простым языком</a>
+    <a href="testy.html">Тесты за 5 минут</a>
+    <a href="servisy.html">Полезное: тренировка дня, таймер, дневник</a>
+    <a href="kalorii.html">Еда: калории и БЖУ</a>
+    <a href="novosti.html">Новости</a>
+    <a href="progress.html">Мой прогресс и отчёт в PDF</a>
+    <a href="./#faq">Частые вопросы</a>
+    <a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram ↗</a>
+    <a class="btn btn-main btn-wide" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
+  </nav>
+</div>
+
+<main id="top">
+  <section class="page-hero g">
+    <div class="w">
+      <a class="back" href="./">← На главную</a>
+      <span class="tag" style="display:block">#питание</span>
+      <h1>Еда: <em>калории и БЖУ</em></h1>
+      <p class="lede">Узнать, сколько калорий, белков, жиров и углеводов в обычной еде. Без норм, запретов и «перебора» — это ориентир, а не контроль.</p>
+      <div class="safety">
+        <h2>Прежде чем считать</h2>
+        <ul>
+          <li>Считать калории не обязательно. Для многих достаточно <a href="servisy.html#tarelka">тарелки без запретов</a>.</li>
+          <li>Если подсчёт вызывает тревогу, чувство вины или желание «наказать» себя тренировкой — лучше не считать.</li>
+          <li>При сложных отношениях с едой обратитесь к специалисту: психотерапевту или врачу, который работает с пищевым поведением.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="g" style="padding-top:24px">
+    <div class="w">
+
+      <article class="test" id="dobavit">
+        <span class="tag">Шаг 1</span>
+        <h2>Что вы <em>съели</em></h2>
+        <div class="test-body">
+          <div class="tool">
+            <div class="field"><label for="fQ">Найти продукт</label><input id="fQ" type="search" autocomplete="off" placeholder="гречка, творог, борщ…"></div>
+            <div class="fres" id="fRes" aria-live="polite"></div>
+          </div>
+          <div class="tool" id="fSel" hidden>
+            <h3 id="fSelName" style="font-size:18px;color:var(--amber)"></h3>
+            <p class="small" id="fSelInfo"></p>
+            <div class="chips-row" id="fPortions"></div>
+            <div class="calc-grid g2">
+              <div class="field"><label for="fG">Сколько, граммов</label><input id="fG" type="number" inputmode="decimal" min="1" max="3000"></div>
+              <div class="field"><label for="fMeal">Приём пищи</label><select id="fMeal"><option>Завтрак</option><option>Обед</option><option>Ужин</option><option>Перекус</option></select></div>
+            </div>
+            <p class="verdict" id="fSelCalc"></p>
+            <div class="btn-row"><button type="button" class="tbtn" id="fAdd">Добавить</button></div>
+          </div>
+        </div>
+        <p class="verdict" id="fMsg" aria-live="polite">Выберите продукт, укажите граммы и приём пищи.</p>
+      </article>
+
+      <article class="test" id="den">
+        <span class="tag">Шаг 2</span>
+        <h2>Итог <em>за день</em></h2>
+        <div class="field" style="max-width:240px"><label for="fDate">День</label><input id="fDate" type="date"></div>
+        <div class="nums" id="dTot"></div>
+        <div id="dBar"></div>
+        <div id="dList"></div>
+        <p class="quiz-note">Здесь нет нормы и «перебора» сознательно: потребности у всех разные. Белок полезно распределять по приёмам пищи — подробнее в разборе <a href="nauka.html#belok">«Сколько белка имеет смысл»</a>. Свой ориентир лучше подобрать с нутрициологом.</p>
+      </article>
+
+      <article class="test" id="svoy">
+        <span class="tag">Нет в списке?</span>
+        <h2>Добавить <em>свой продукт</em></h2>
+        <div class="test-body">
+          <div class="tool">
+            <h3 style="font-size:17px">По этикетке</h3>
+            <div class="field"><label for="cName">Название</label><input id="cName" autocomplete="off" placeholder="например, Сырок глазированный"></div>
+            <div class="calc-grid g4">
+              <div class="field"><label for="cK">Ккал на 100 г</label><input id="cK" type="number" inputmode="decimal" min="0" max="950"></div>
+              <div class="field"><label for="cP">Белки, г</label><input id="cP" type="number" inputmode="decimal" min="0" max="100"></div>
+              <div class="field"><label for="cF">Жиры, г</label><input id="cF" type="number" inputmode="decimal" min="0" max="100"></div>
+              <div class="field"><label for="cC">Углеводы, г</label><input id="cC" type="number" inputmode="decimal" min="0" max="100"></div>
+            </div>
+            <p class="small" id="cHint"></p>
+            <div class="btn-row"><button type="button" class="tbtn" id="cAdd">Сохранить продукт</button></div>
+            <p class="verdict" id="cMsg" aria-live="polite">Продукт появится в поиске в разделе «Мои продукты».</p>
+          </div>
+          <div class="tool">
+            <h3 style="font-size:17px">Найти в базе по названию или штрихкоду</h3>
+            <div class="field"><label for="oQ">Название или цифры штрихкода</label><input id="oQ" autocomplete="off" inputmode="search" placeholder="например, 4600605009504 или «сырок Б.Ю. Александров»"></div>
+            <div class="btn-row"><button type="button" class="tbtn" id="oBtn">Найти</button></div>
+            <p class="verdict" id="oMsg" aria-live="polite">Поиск по открытой базе Open Food Facts — там много товаров из российских магазинов.</p>
+            <div class="fres" id="oRes"></div>
+            <p class="small">Данные: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>, открытая база (лицензия ODbL). Её заполняют пользователи, поэтому сверяйте цифры с упаковкой.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="test" id="istochniki">
+        <span class="tag">Откуда цифры</span>
+        <h2>Источники <em>и точность</em></h2>
+        <p>Базовые продукты — по справочнику USDA FoodData Central (Министерство сельского хозяйства США). Молочные продукты и колбасы — по типичным значениям с российских этикеток (помечены ≈): у разных марок цифры отличаются, сверяйтесь со своей упаковкой. Домашние блюда — борщ, пельмени, плов, оливье, котлеты, сырники — ориентировочно (≈): всё зависит от рецепта. Калории своих продуктов без указанной энергетической ценности считаются по коэффициентам Этуотера: 4 ккал на грамм белков и углеводов, 9 — на грамм жиров.</p>
+        <p class="small">Записи хранятся только в этом браузере на этом устройстве и никуда не отправляются.</p>
+        <div class="btn-row"><button type="button" class="tbtn ghost" id="fWipe">Удалить все записи и мои продукты</button></div>
+      </article>
+
+    </div>
+  </section>
+  <section class="final g" id="start">
+    <div class="w">
+      <span class="tag">Первый шаг</span>
+      <h2>Питание <em>без крайностей</em></h2>
+      <p>На сопровождении разбираю рацион и составляю план питания без запретов. Напишите «СТАРТ».</p>
+      <a class="btn btn-main btn-wide" style="margin-top:18px" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
+    </div>
+  </section>
+</main>
+<footer class="g"><div class="w"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a></span></div></footer>
+<script src="js/food-db.js" defer></script>
+<script src="js/food.js" defer></script>
+<script src="js/nav.js" defer></script>
+</body>
+</html>
