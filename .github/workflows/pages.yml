@@ -1,0 +1,45 @@
+name: Сборка и публикация сайта
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 4 * * *"   # каждый день в 07:00 по Москве
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Собрать новости и посты канала
+        env:
+          TG_CHANNEL: ""   # ник нового канала без @, например gymmom_spb
+        run: |
+          pip install feedparser==6.0.11 beautifulsoup4==4.12.3 requests==2.32.3
+          python scripts/update_data.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

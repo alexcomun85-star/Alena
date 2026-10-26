@@ -1,0 +1,19 @@
+/* Подгружает автоматически обновляемые данные (data/*.json) в блоки с атрибутом data-feed. */
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function d(iso){if(!iso)return '';var p=iso.slice(0,10).split('-');return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:''}
+  function safeUrl(u){return /^https:\/\//.test(u||'')?u:'#'}
+  document.querySelectorAll('[data-feed]').forEach(function(box){
+    var kind=box.getAttribute('data-feed'),limit=+box.getAttribute('data-limit')||12,wrap=box.closest('[data-feed-section]');
+    fetch('data/'+kind+'.json',{cache:'no-cache'}).then(function(r){return r.ok?r.json():null}).then(function(data){
+      var items=(data&&data.items)||[];
+      if(!items.length){if(wrap&&wrap.hasAttribute('data-hide-empty'))wrap.hidden=true;else box.innerHTML='<p class="feed-empty">Свежие материалы появятся после ближайшего обновления — сайт обновляет их раз в день.</p>';return}
+      box.innerHTML=items.slice(0,limit).map(function(it){
+        if(kind==='channel')return '<a class="feed-item" href="'+esc(safeUrl(it.link))+'" target="_blank" rel="noopener"><div class="feed-meta"><span>Telegram</span><span>'+d(it.date)+'</span></div><p>'+esc(it.text)+'</p></a>';
+        return '<a class="feed-item" href="'+esc(safeUrl(it.link))+'" target="_blank" rel="noopener"><div class="feed-meta">'+(it.lang==='en'?'<span class="lang">EN</span>':'')+'<span>'+esc(it.source)+'</span><span>'+d(it.date)+'</span></div><h3>'+esc(it.title)+'</h3></a>';
+      }).join('');
+      var up=wrap&&wrap.querySelector('[data-updated]');if(up&&data.updated)up.textContent='Обновлено автоматически: '+d(data.updated);
+      if(wrap)wrap.hidden=false;
+    }).catch(function(){if(wrap&&wrap.hasAttribute('data-hide-empty'))wrap.hidden=true});
+  });
+})();

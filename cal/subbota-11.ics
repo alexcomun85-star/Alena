@@ -1,0 +1,36 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//alenafit.com//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Ягодицы + кор — мини-группа
+X-WR-TIMEZONE:Europe/Moscow
+BEGIN:VTIMEZONE
+TZID:Europe/Moscow
+BEGIN:STANDARD
+DTSTART:19700101T000000
+TZOFFSETFROM:+0300
+TZOFFSETTO:+0300
+TZNAME:MSK
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:subbota-11@alenafit.com
+DTSTAMP:20261026T090000Z
+DTSTART;TZID=Europe/Moscow:20261031T110000
+DTEND;TZID=Europe/Moscow:20261031T115500
+RRULE:FREQ=WEEKLY;BYDAY=SA
+SUMMARY:Ягодицы + кор — мини-группа
+LOCATION:Студия Sequoia D Anima\, наб. р. Мойки\, 62/2\, С
+ анкт-Петербург (м. Адмиралтейская)
+DESCRIPTION:Мини-группа Алёны «Сила без переги
+ бов»\, 55 минут. Записаться или отменить: Te
+ legram @Gym_mom1988. Сайт: https://alenafit.com
+URL:https://alenafit.com/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Ягодицы + кор — мини-группа
+TRIGGER:-PT2H
+END:VALARM
+END:VEVENT
+END:VCALENDAR
