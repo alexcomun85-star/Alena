@@ -954,3 +954,19 @@ circle.lv{display:block}
 /* шапка на узких экранах */
 @media (max-width:430px){.menu-btn{font-size:0;gap:0;padding:0 12px;min-width:44px;justify-content:center}.menu-btn .burger{margin:0}}
 @media (max-width:380px){.bar .inst-btn{display:none!important}}
+/* Жесты и карусели */
+.app-back{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;margin-right:4px;border:0;border-radius:50%;background:var(--surface-2);color:var(--ink);cursor:pointer}
+.app-back svg{width:20px;height:20px}
+.edge-back{position:fixed;left:-48px;top:50%;z-index:90;width:44px;height:44px;border-radius:50%;background:var(--surface-2);color:var(--muted);display:grid;place-items:center;transform:translate(0,-50%);transition:background .15s,color .15s;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.edge-back svg{width:22px;height:22px}
+.edge-back.ready{background:var(--amber);color:var(--amber-ink)}
+@media (max-width:719px){
+  .swipe{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px!important;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;padding-bottom:4px}
+  .swipe::-webkit-scrollbar{display:none}
+  .swipe>*{flex:0 0 86%;scroll-snap-align:start;min-width:0}
+  .swipe.hub3>*{flex-basis:80%}
+}
+.sw-dots{display:flex;justify-content:center;gap:6px;margin-top:12px}
+.sw-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:all .2s}
+.sw-dots i.on{width:20px;border-radius:4px;background:var(--amber)}
+@media (min-width:720px){.sw-dots{display:none}}
