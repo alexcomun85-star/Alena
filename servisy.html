@@ -42,7 +42,7 @@
     <a href="./#groups">Расписание групп</a>
     <a href="nauka.html">Наука простым языком</a>
     <a href="testy.html">Тесты за 5 минут</a>
-    <a href="servisy.html">Полезное: тренировка дня, таймер</a>
+    <a href="servisy.html">Полезное: тренировка дня, таймер, дневник</a>
     <a href="novosti.html">Новости</a>
     <a href="./#faq">Частые вопросы</a>
     <a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram ↗</a>
@@ -57,7 +57,7 @@
       <span class="tag" style="display:block">#полезное</span>
       <h1>Полезное <em>на каждый день</em></h1>
       <p class="lede">Инструменты для занятых: тренировка, когда некогда думать, таймер, простая схема питания и трекер привычек. Бесплатно, без регистрации, ничего не отправляется.</p>
-      <nav class="toc" aria-label="Сервисы"><a href="#trenirovka">Тренировка дня</a><a href="#taymer">Интервальный таймер</a><a href="#tarelka">Тарелка без запретов</a><a href="#treker">Трекер недели</a><a href="nauka.html#tsikl">Цикл и тренировки</a></nav>
+      <nav class="toc" aria-label="Сервисы"><a href="#trenirovka">Тренировка дня</a><a href="#taymer">Интервальный таймер</a><a href="#tarelka">Тарелка без запретов</a><a href="#treker">Трекер недели</a><a href="#dnevnik">Дневник по циклу</a><a href="nauka.html#tsikl">Цикл и тренировки: наука</a></nav>
     </div>
   </section>
 
@@ -154,6 +154,43 @@
         </div>
       </article>
 
+      <article class="test" id="dnevnik">
+        <span class="tag">Сервис 5 · подход по себе</span>
+        <h2>Дневник самочувствия <em>по циклу</em></h2>
+        <p>Исследования не находят общей закономерности между фазой цикла и силой, поэтому учёные советуют ориентироваться на свою картину. Отмечайте день цикла, энергию и как прошла тренировка — через 2–3 месяца станет видно, есть ли у вас дни, когда лучше снизить нагрузку.</p>
+        <div class="test-body">
+          <div class="tool" id="cyc">
+            <div class="field"><label for="cStart">Первый день последнего цикла</label><input id="cStart" type="date"></div>
+            <p class="small" id="cDayInfo">Укажите дату — день цикла посчитается сам.</p>
+            <div class="field"><label for="cDay">День цикла сегодня</label><input id="cDay" type="number" inputmode="numeric" min="1" max="60" placeholder="например, 3"></div>
+            <div class="field"><span class="flabel">Энергия сегодня</span>
+              <div class="opts" role="radiogroup" aria-label="Энергия">
+                <input type="radio" name="cEn" id="cEn1" value="1"><label for="cEn1">1 · нет сил</label>
+                <input type="radio" name="cEn" id="cEn2" value="2"><label for="cEn2">2</label>
+                <input type="radio" name="cEn" id="cEn3" value="3"><label for="cEn3">3 · обычно</label>
+                <input type="radio" name="cEn" id="cEn4" value="4"><label for="cEn4">4</label>
+                <input type="radio" name="cEn" id="cEn5" value="5"><label for="cEn5">5 · полна сил</label>
+              </div></div>
+            <div class="field"><span class="flabel">Тренировка</span>
+              <div class="opts" role="radiogroup" aria-label="Тренировка">
+                <input type="radio" name="cTr" id="cTr0" value="0"><label for="cTr0">Не было</label>
+                <input type="radio" name="cTr" id="cTr1" value="1"><label for="cTr1">Легко</label>
+                <input type="radio" name="cTr" id="cTr2" value="2"><label for="cTr2">Нормально</label>
+                <input type="radio" name="cTr" id="cTr3" value="3"><label for="cTr3">Тяжело</label>
+              </div></div>
+            <div class="btn-row"><button type="button" class="tbtn" id="cSave">Сохранить запись за сегодня</button></div>
+            <p class="verdict" id="cMsg" aria-live="polite">Записей пока нет.</p>
+          </div>
+          <div class="tool">
+            <h3 style="font-size:17px">Ваша картина</h3>
+            <div id="cChart"></div>
+            <div id="cList"></div>
+            <div class="btn-row"><button type="button" class="tbtn ghost" id="cWipe">Удалить все записи</button></div>
+          </div>
+        </div>
+        <p class="notice"><b>Записи хранятся только в этом браузере на этом устройстве</b> и никуда не отправляются — ни мне, ни кому-либо ещё. Если почистить данные браузера, они удалятся. Дневник — для настройки тренировок, а не для контрацепции, планирования беременности или медицинских решений. Сильная боль, очень обильные или нерегулярные циклы — повод обратиться к гинекологу.</p>
+      </article>
+
     </div>
   </section>
   <section class="final g" id="start">
@@ -235,6 +272,47 @@
   tb.addEventListener('change',function(e){if(e.target.id){data[e.target.id]=e.target.checked;try{localStorage.setItem(K,JSON.stringify(data))}catch(err){}sum()}});
   document.getElementById('trkClear').addEventListener('click',function(){data={};try{localStorage.removeItem(K)}catch(e){}tb.querySelectorAll('input').forEach(function(i){i.checked=false});sum()});
   sum();
+})();
+(function(){
+  /* 5. Дневник самочувствия по циклу — только localStorage этого браузера */
+  var KEY='cycle_diary_v1',KS='cycle_start_v1',data=[];
+  function load(){try{data=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){data=[]}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){return false}}
+  function today(){var d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+  var st=document.getElementById('cStart'),day=document.getElementById('cDay'),info=document.getElementById('cDayInfo'),msg=document.getElementById('cMsg');
+  if(!st)return;
+  try{st.value=localStorage.getItem(KS)||''}catch(e){}
+  st.max=today();
+  function calc(){if(!st.value){info.textContent='Укажите дату — день цикла посчитается сам.';return}
+    var diff=Math.round((new Date(today())-new Date(st.value))/864e5)+1;
+    if(diff<1||diff>60){info.textContent='Проверьте дату: день цикла получается '+diff+'.';return}
+    day.value=diff;info.textContent='Сегодня '+diff+'-й день цикла.';try{localStorage.setItem(KS,st.value)}catch(e){}}
+  st.addEventListener('change',calc);calc();
+  function v(n){var e=document.querySelector('input[name="'+n+'"]:checked');return e?+e.value:null}
+  var BUCK=[[1,5],[6,10],[11,15],[16,20],[21,25],[26,60]];
+  function render(){
+    var chart=document.getElementById('cChart'),list=document.getElementById('cList');
+    msg.textContent=data.length?'Записей: '+data.length+'.':'Записей пока нет.';
+    if(data.length<6){chart.innerHTML='<p class="small">Картина появится после 6 записей. Самые полезные выводы — через 2–3 цикла.</p>'}
+    else{chart.innerHTML='<div class="cbars">'+BUCK.map(function(b){var it=data.filter(function(x){return x.d>=b[0]&&x.d<=b[1]});
+      var avg=it.length?it.reduce(function(a,x){return a+x.e},0)/it.length:0,hard=it.filter(function(x){return x.t===3}).length;
+      var h=Math.round(avg/5*100);return '<div class="cbar"><div class="cbar-col"><div class="cbar-fill" style="height:'+h+'%"></div></div><b>'+(it.length?avg.toFixed(1).replace('.',','):'—')+'</b><span>дни '+b[0]+(b[1]>30?'+':'–'+b[1])+'</span><span class="ch">'+(hard?'тяжело: '+hard:'&nbsp;')+'</span></div>'}).join('')+'</div><p class="small">Столбик — средняя энергия от 1 до 5 в эти дни цикла. «Тяжело» — сколько тренировок прошли тяжело.</p>'}
+    var last=data.slice().sort(function(a,b){return a.date<b.date?1:-1}).slice(0,7);
+    var TR=['не было','легко','нормально','тяжело'];
+    list.innerHTML=last.length?'<ul class="clist">'+last.map(function(x){var p=x.date.split('-');return '<li><span>'+p[2]+'.'+p[1]+' · '+x.d+'-й день</span><span>энергия '+x.e+' · '+TR[x.t]+'</span></li>'}).join('')+'</ul>':'';
+  }
+  document.getElementById('cSave').addEventListener('click',function(){
+    var d=Math.round(+day.value),e=v('cEn'),t=v('cTr');
+    if(!(d>=1&&d<=60)){msg.textContent='Укажите день цикла от 1 до 60 или дату начала цикла.';day.focus();return}
+    if(e===null||t===null){msg.textContent='Отметьте энергию и тренировку.';return}
+    var dt=today();data=data.filter(function(x){return x.date!==dt});data.push({date:dt,d:d,e:e,t:t});
+    msg.textContent=save()?'Сохранено. Записей: '+data.length+'.':'Не удалось сохранить: браузер запрещает хранение данных (например, в режиме инкогнито).';
+    render();
+  });
+  var wipe=document.getElementById('cWipe'),armed=false;
+  wipe.addEventListener('click',function(){if(!armed){armed=true;wipe.textContent='Точно удалить? Нажмите ещё раз';setTimeout(function(){armed=false;wipe.textContent='Удалить все записи'},4000);return}
+    data=[];try{localStorage.removeItem(KEY);localStorage.removeItem(KS)}catch(e){}st.value='';day.value='';armed=false;wipe.textContent='Удалить все записи';calc();render()});
+  load();render();
 })();
 </script>
 </body>

@@ -458,3 +458,16 @@ details.cal summary{padding:14px 0;font-size:15px;color:var(--amber)}
 .opts input{left:0;top:0;pointer-events:none}
 .tool>*,.test>*,.test-body>*{min-width:0}
 .trk-scroll{max-width:100%}
+
+/* дневник цикла */
+.field input[type="date"]{color-scheme:dark}
+.cbars{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;align-items:end}
+.cbar{display:grid;gap:4px;text-align:center;font-size:12px}
+.cbar-col{height:110px;background:var(--surface);border-radius:8px;display:flex;align-items:flex-end;overflow:hidden}
+.cbar-fill{width:100%;background:var(--amber);border-radius:8px 8px 0 0}
+.cbar b{font:700 14px var(--display)}
+.cbar span{color:var(--muted);line-height:1.2}
+.cbar .ch{font-size:11px}
+.clist{list-style:none;margin:0;padding:0;display:grid}
+.clist li{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.clist li span:last-child{color:var(--muted)}
