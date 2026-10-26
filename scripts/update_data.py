@@ -132,8 +132,8 @@ def channel(name):
 ANSWER_TAGS = ("#вопрос", "#разбор")
 
 
-def answers(name, pages=6):
-    """Посты с тегами #вопрос / #разбор — для страницы «Спросить». Листаем ленту назад."""
+def answers(name, pages=6, tags=ANSWER_TAGS):
+    """Посты с нужными тегами (по умолчанию #вопрос / #разбор). Листаем ленту назад."""
     if not name:
         return []
     out, seen, before = [], set(), None
@@ -160,12 +160,12 @@ def answers(name, pages=6):
                 continue
             raw = clean(txt.decode_contents().replace("<br/>", " "), 5000)
             low = raw.lower()
-            if not any(t in low for t in ANSWER_TAGS):
+            if not any(t in low for t in tags):
                 continue
             seen.add(m["data-post"])
             tm = m.select_one("time[datetime]")
             out.append({
-                "tag": "разбор" if "#разбор" in low and "#вопрос" not in low else "вопрос",
+                "tag": next((t[1:] for t in tags if t in low), tags[0][1:]),
                 "text": clean(raw, 600),
                 "link": "https://t.me/" + m["data-post"],
                 "date": tm["datetime"][:10] if tm else None,
@@ -190,4 +190,5 @@ if __name__ == "__main__":
     write("data/news.json", {"updated": NOW, "translation": TR_STATUS, "items": items})
     write("data/channel.json", {"updated": NOW, "channel": ch, "items": channel(ch)})
     write("data/answers.json", {"updated": NOW, "channel": ch, "items": answers(ch)})
+    write("data/recipes.json", {"updated": NOW, "channel": ch, "items": answers(ch, tags=("#рецепт",))})
     print("done")
