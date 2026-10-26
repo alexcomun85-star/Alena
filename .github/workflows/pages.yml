@@ -34,7 +34,7 @@ jobs:
         env:
           TG_CHANNEL: ""   # ник нового канала без @, например gymmom_spb
           YC_API_KEY: ${{ secrets.YC_API_KEY }}
-          YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+          YC_FOLDER_ID: b1g1s0osh5lebv9esn5n   # ID каталога Yandex Cloud, не секрет
         run: |
           pip install feedparser==6.0.11 beautifulsoup4==4.12.3 requests==2.32.3
           python scripts/update_data.py
