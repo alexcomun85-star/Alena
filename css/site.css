@@ -393,3 +393,23 @@ details.cal summary{padding:14px 0;font-size:15px;color:var(--amber)}
 @media (min-width:1024px){.feed{grid-template-columns:repeat(3,minmax(0,1fr))}.feed.cols2{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 .feed-item .orig{font-size:12.5px;-webkit-line-clamp:2}
+
+/* мобильное меню */
+.menu-btn{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border:0;border-radius:999px;background:var(--surface-2);color:var(--ink);font:600 14px var(--body);cursor:pointer;margin-left:auto}
+.burger,.burger::before,.burger::after{display:block;width:16px;height:2px;border-radius:2px;background:currentColor;position:relative;transition:transform .2s}
+.burger::before,.burger::after{content:"";position:absolute;left:0}
+.burger::before{top:-5px}.burger::after{top:5px}
+.menu-open .burger{background:transparent}
+.menu-open .burger::before{transform:translateY(5px) rotate(45deg)}
+.menu-open .burger::after{transform:translateY(-5px) rotate(-45deg)}
+.bar .w{gap:10px}
+.mnav{position:fixed;inset:calc(60px + env(safe-area-inset-top,0px)) 0 0 0;z-index:35;background:var(--band);overflow-y:auto;overscroll-behavior:contain}
+.mnav-in{display:grid;padding-block:8px 32px}
+.mnav-in a:not(.btn){display:flex;align-items:center;min-height:56px;font:700 19px var(--display);text-decoration:none;color:var(--ink);border-bottom:1px solid var(--line)}
+.mnav-in a[aria-current="page"]{color:var(--amber)}
+.mnav-in .btn{margin-top:24px}
+.menu-open{overflow:hidden}
+.menu-open .dock{display:none}
+@media (min-width:1024px){.menu-btn,.mnav{display:none!important}.bar .w{gap:12px}}
+
+@media (max-width:480px){.brand small{display:none}.brand b{white-space:nowrap}}
