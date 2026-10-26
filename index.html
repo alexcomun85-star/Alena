@@ -22,7 +22,7 @@
 <meta name="description" content="Алёна — тренер и нутрициолог. Силовые тренировки и питание без крайностей: онлайн-сопровождение и мини-группы в центре Санкт-Петербурга.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20261026b">
+<link rel="stylesheet" href="css/site.css?v=20261026c">
 </head>
 <body>
 
@@ -31,7 +31,7 @@
   <div class="w">
     <a class="brand" href="./" aria-label="ALENAFIT — на главную"><img class="brand-mark" src="img/brand/mark-light.svg" alt="" width="41" height="34"><span class="brand-text"><img class="brand-word" src="img/brand/wordmark-light.svg" alt="ALENAFIT" width="108" height="15"><small>сила без перегибов</small></span></a>
     <nav class="nav" aria-label="Разделы">
-      <a href="./#plans">Цены</a><a href="nauka.html">Наука</a><a href="testy.html">Тесты</a><a href="servisy.html">Полезное</a><a href="novosti.html">Новости</a><a href="progress.html">Прогресс</a>
+      <a href="./#plans">Цены</a><a href="nauka.html">Наука</a><a href="testy.html">Тесты</a><a href="servisy.html">Полезное</a><a href="novosti.html">Новости</a><a href="progress.html">Прогресс</a><a href="vopros.html">Спросить</a>
     </nav>
     <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span>Меню</button>
     <a class="btn btn-main" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">СТАРТ</a>
@@ -49,6 +49,9 @@
     <a href="kalorii.html">Еда: калории и БЖУ</a>
     <a href="novosti.html">Новости</a>
     <a href="progress.html">Мой прогресс и отчёт в PDF</a>
+    <a href="vozvrat.html">План возвращения после паузы</a>
+    <a href="zal.html">Карта зала для новичка</a>
+    <a href="vopros.html">Спросить анонимно</a>
     <a href="./#faq">Частые вопросы</a>
     <a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram ↗</a>
     <a class="btn btn-main btn-wide" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
@@ -349,6 +352,30 @@
     </div>
   </section>
 
+  <section class="g" id="novichkam">
+    <div class="w">
+      <span class="tag">#новичкам · #после_паузы</span>
+      <h2>Возвращаетесь в зал <em>или идёте впервые?</em></h2>
+      <div class="duo">
+        <a class="duo-card" href="vozvrat.html"><b>План на 4 недели</b><span>Четыре вопроса — и готовый план возвращения после паузы: упражнения, подходы, как прибавлять. Сохраняется в PDF.</span><i>Собрать план →</i></a>
+        <a class="duo-card" href="zal.html"><b>Карта зала</b><span>Нажмите на зону и узнайте, что это за тренажёр, как его настроить и какую ошибку делают чаще всего.</span><i>Открыть карту →</i></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="g" id="ask">
+    <div class="w">
+      <div class="teaser">
+        <div>
+          <span class="tag">#вопрос</span>
+          <h2>О чём рассказать <em>в канале?</em></h2>
+          <p class="lede">Предложите тему или задайте вопрос анонимно — без имени и контактов. Ответы на частые вопросы собираются на сайте.</p>
+        </div>
+        <a class="btn btn-main" href="vopros.html">Спросить анонимно</a>
+      </div>
+    </div>
+  </section>
+
   <section class="g" id="tools">
     <div class="w">
       <div class="teaser">
@@ -405,7 +432,7 @@
   </section>
 </main>
 
-<footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a></span></div></footer>
+<footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a></span></div></footer>
 
 <div class="dock hide" id="dock">
   <div class="w">
@@ -457,7 +484,7 @@ document.getElementById('copy').addEventListener('click',function(){
 })();
 </script>
 
-<script src="js/feeds.js?v=20261026b" defer></script>
-<script src="js/nav.js?v=20261026b" defer></script>
+<script src="js/feeds.js?v=20261026c" defer></script>
+<script src="js/nav.js?v=20261026c" defer></script>
 </body>
 </html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1e1a">
+<title>Карта зала для новичка · Сила без перегибов</title>
+<meta name="description" content="Интерактивная схема тренажёрного зала: для чего каждая зона, как настроить тренажёр, частые ошибки и чем заменить. Чек-лист первого визита и правила зала.">
+<link rel="canonical" href="https://alenafit.com/zal.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:url" content="https://alenafit.com/zal.html">
+<meta property="og:title" content="Карта зала для новичка · Сила без перегибов">
+<meta property="og:description" content="Интерактивная схема тренажёрного зала: для чего каждая зона, как настроить тренажёр, частые ошибки и чем заменить. Чек-лист первого визита и правила зала.">
+<meta property="og:image" content="https://alenafit.com/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/site.css?v=20261026c">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<header class="bar g">
+  <div class="w">
+    <a class="brand" href="./" aria-label="ALENAFIT — на главную"><img class="brand-mark" src="img/brand/mark-light.svg" alt="" width="41" height="34"><span class="brand-text"><img class="brand-word" src="img/brand/wordmark-light.svg" alt="ALENAFIT" width="108" height="15"><small>сила без перегибов</small></span></a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="./#plans">Цены</a><a href="nauka.html">Наука</a><a href="testy.html">Тесты</a><a href="servisy.html">Полезное</a><a href="novosti.html">Новости</a><a href="progress.html">Прогресс</a><a href="vopros.html">Спросить</a>
+    </nav>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span>Меню</button>
+    <a class="btn btn-main" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">СТАРТ</a>
+  </div>
+</header>
+<div class="mnav" id="mnav" hidden>
+  <nav class="mnav-in g" aria-label="Меню">
+    <a href="./">Главная</a>
+    <a href="./#plans">Форматы и цены</a>
+    <a href="./#quiz">Подобрать формат</a>
+    <a href="./#groups">Расписание групп</a>
+    <a href="nauka.html">Наука простым языком</a>
+    <a href="testy.html">Тесты за 5 минут</a>
+    <a href="servisy.html">Полезное: тренировка дня, таймер, дневник</a>
+    <a href="kalorii.html">Еда: калории и БЖУ</a>
+    <a href="novosti.html">Новости</a>
+    <a href="progress.html">Мой прогресс и отчёт в PDF</a>
+    <a href="vozvrat.html">План возвращения после паузы</a>
+    <a href="zal.html">Карта зала для новичка</a>
+    <a href="vopros.html">Спросить анонимно</a>
+    <a href="./#faq">Частые вопросы</a>
+    <a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram ↗</a>
+    <a class="btn btn-main btn-wide" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
+  </nav>
+</div>
+
+<main id="top">
+  <section class="page-hero g">
+    <div class="w">
+      <a class="back" href="./">← На главную</a>
+      <span class="tag" style="display:block">#техника · для новичков</span>
+      <h1>Карта зала <em>для новичка</em></h1>
+      <p class="lede">Что это за железо и как к нему подойти. Нажмите на зону — узнаете, для чего она, как настроить тренажёр, какую ошибку делают чаще всего и чем заменить, если всё занято.</p>
+      <nav class="toc" aria-label="Разделы страницы"><a href="#karta">Карта</a><a href="#pervyj">Первый визит</a><a href="#etiket">Правила зала</a><a href="vozvrat.html">План на 4 недели</a></nav>
+    </div>
+  </section>
+
+  <section class="g" style="padding-top:24px">
+    <div class="w">
+      <article class="test" id="karta">
+        <span class="tag">Интерактивная схема</span>
+        <h2>Выберите <em>зону</em></h2>
+        <div class="gym-grid">
+          <div class="gym-map-wrap">
+            <svg class="gym-map" id="gymMap" viewBox="0 0 360 470" role="group" aria-label="Схема тренажёрного зала"></svg>
+            <div class="gym-legend"><span><i class="lv lv1"></i>можно с первого дня</span><span><i class="lv lv2"></i>после 2–4 недель</span><span><i class="lv lv3"></i>лучше с тренером</span></div>
+          </div>
+          <div class="gym-card" id="gymCard" aria-live="polite"></div>
+        </div>
+        <p class="quiz-note">Схема условная: в каждом зале расстановка своя, но зоны почти везде одинаковые. Если не уверены в настройке — попросите дежурного тренера показать, это нормально.</p>
+      </article>
+
+      <article class="test" id="pervyj">
+        <span class="tag">Чек-лист</span>
+        <h2>Первый визит: <em>что взять и как пройти</em></h2>
+        <div class="two-col">
+          <div class="tool">
+            <h3 style="font-size:17px">С собой</h3>
+            <ul class="chk">
+              <li>Сменная обувь с плоской устойчивой подошвой</li>
+              <li>Удобная одежда, в которой не жалко присесть глубоко</li>
+              <li>Вода и небольшое полотенце</li>
+              <li>План на тренировку — например, <a href="vozvrat.html">план на 4 недели</a> или <a href="servisy.html#trenirovka">тренировка дня</a></li>
+            </ul>
+          </div>
+          <div class="tool">
+            <h3 style="font-size:17px">Порядок</h3>
+            <ol>
+              <li>5–7 минут разминки на кардио: велосипед или дорожка</li>
+              <li>Сначала упражнения на ноги и спину, потом руки и кор</li>
+              <li>Первые подходы — с весом легче, чем кажется нужным</li>
+              <li>Запишите веса: в следующий раз будет от чего прибавлять</li>
+            </ol>
+          </div>
+        </div>
+      </article>
+
+      <article class="test" id="etiket">
+        <span class="tag">Чтобы было спокойно</span>
+        <h2>Неписаные <em>правила зала</em></h2>
+        <ul class="chk">
+          <li><b>Спрашивать нормально.</b> «Сколько подходов осталось?» и «Можно поработать по очереди?» — обычные вопросы в зале.</li>
+          <li><b>Возвращайте на место</b> гантели, диски и рукоятки — по весу, туда, откуда взяли.</li>
+          <li><b>Протирайте</b> скамью и сиденье после себя: в зале обычно есть салфетки или спрей.</li>
+          <li><b>Не стойте между человеком и зеркалом</b> во время его подхода — он следит за техникой.</li>
+          <li><b>На вас никто не смотрит</b> так пристально, как кажется. Все заняты своими подходами.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+  <section class="final g" id="start">
+    <div class="w">
+      <span class="tag">Первый шаг</span>
+      <h2>Хотите программу <em>под себя?</em></h2>
+      <p>Напишите «СТАРТ» в Telegram — подберу нагрузку под ваш опыт и график.</p>
+      <a class="btn btn-main btn-wide" style="margin-top:18px" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
+    </div>
+  </section>
+</main>
+<footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a></span></div></footer>
+<script src="js/nav.js?v=20261026c" defer></script>
+<script src="js/gym.js?v=20261026c" defer></script>
+</body>
+</html>

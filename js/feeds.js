@@ -7,8 +7,9 @@
     var kind=box.getAttribute('data-feed'),limit=+box.getAttribute('data-limit')||12,wrap=box.closest('[data-feed-section]');
     fetch('data/'+kind+'.json',{cache:'no-cache'}).then(function(r){return r.ok?r.json():null}).then(function(data){
       var items=(data&&data.items)||[];
-      if(!items.length){if(wrap&&wrap.hasAttribute('data-hide-empty'))wrap.hidden=true;else box.innerHTML='<p class="feed-empty">Свежие материалы появятся после ближайшего обновления — сайт обновляет их раз в день.</p>';return}
+      if(!items.length){if(wrap&&wrap.hasAttribute('data-hide-empty'))wrap.hidden=true;else box.innerHTML=box.hasAttribute('data-empty')?'<p class="feed-empty">'+esc(box.getAttribute('data-empty'))+'</p>':'<p class="feed-empty">Свежие материалы появятся после ближайшего обновления — сайт обновляет их раз в день.</p>';return}
       box.innerHTML=items.slice(0,limit).map(function(it){
+        if(kind==='answers')return '<a class="feed-item ans-item" href="'+esc(safeUrl(it.link))+'" target="_blank" rel="noopener"><div class="feed-meta"><span class="lang">#'+esc(it.tag||'вопрос')+'</span><span>'+d(it.date)+'</span></div><p>'+esc(it.text)+'</p><span class="ans-more">Читать в канале ↗</span></a>';
         if(kind==='channel')return '<a class="feed-item" href="'+esc(safeUrl(it.link))+'" target="_blank" rel="noopener"><div class="feed-meta"><span>Telegram</span><span>'+d(it.date)+'</span></div><p>'+esc(it.text)+'</p></a>';
         var ru=it.title_ru,sum=it.summary_ru||(it.lang!=='en'?it.summary:''),u=safeUrl(it.link);
         var tr='https://translate.yandex.ru/translate?url='+encodeURIComponent(u)+'&lang=en-ru';

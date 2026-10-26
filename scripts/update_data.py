@@ -129,6 +129,55 @@ def channel(name):
     return list(reversed(posts))[:LIMIT_POSTS]
 
 
+ANSWER_TAGS = ("#вопрос", "#разбор")
+
+
+def answers(name, pages=6):
+    """Посты с тегами #вопрос / #разбор — для страницы «Спросить». Листаем ленту назад."""
+    if not name:
+        return []
+    out, seen, before = [], set(), None
+    for _ in range(pages):
+        url = f"https://t.me/s/{name}" + (f"?before={before}" if before else "")
+        try:
+            r = requests.get(url, headers=UA, timeout=20)
+            r.raise_for_status()
+        except Exception as e:
+            print("answers fail", e)
+            break
+        soup = BeautifulSoup(r.text, "html.parser")
+        msgs = soup.select(".tgme_widget_message[data-post]")
+        if not msgs:
+            break
+        ids = []
+        for m in msgs:
+            try:
+                ids.append(int(m["data-post"].rsplit("/", 1)[1]))
+            except (ValueError, IndexError):
+                pass
+            txt = m.select_one(".tgme_widget_message_text")
+            if not txt or m["data-post"] in seen:
+                continue
+            raw = clean(txt.decode_contents().replace("<br/>", " "), 5000)
+            low = raw.lower()
+            if not any(t in low for t in ANSWER_TAGS):
+                continue
+            seen.add(m["data-post"])
+            tm = m.select_one("time[datetime]")
+            out.append({
+                "tag": "разбор" if "#разбор" in low and "#вопрос" not in low else "вопрос",
+                "text": clean(raw, 600),
+                "link": "https://t.me/" + m["data-post"],
+                "date": tm["datetime"][:10] if tm else None,
+            })
+        new_before = min(ids) if ids else None
+        if not new_before or new_before == before or new_before <= 1:
+            break
+        before = new_before
+    out.sort(key=lambda x: x["date"] or "", reverse=True)
+    return out[:40]
+
+
 def write(path, data):
     os.makedirs("data", exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
@@ -140,4 +189,5 @@ if __name__ == "__main__":
     items = translate(news())
     write("data/news.json", {"updated": NOW, "translation": TR_STATUS, "items": items})
     write("data/channel.json", {"updated": NOW, "channel": ch, "items": channel(ch)})
+    write("data/answers.json", {"updated": NOW, "channel": ch, "items": answers(ch)})
     print("done")
