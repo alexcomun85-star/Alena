@@ -934,6 +934,7 @@ circle.lv{display:block}
 .pwa-card img{border-radius:16px}
 .pwa-card h3{font-size:20px}
 .pwa-card ol{padding-left:20px;display:grid;gap:6px;font-size:15.5px}
+.pwa-card .tbtn{justify-self:start}.pwa-card p{margin:0}
 .pwa-card p{color:var(--muted);font-size:14px}
 .pwa-x{position:absolute;right:12px;top:10px;width:40px;height:40px;border:0;border-radius:50%;background:var(--surface);color:var(--ink);font-size:24px;cursor:pointer}
 @media (min-width:700px){.pwa-sheet{place-items:center}}

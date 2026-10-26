@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0d1e1a">
-<link rel="manifest" href="manifest.webmanifest">
+<script>/* режим «простой ярлык» (Samsung/Яндекс): без манифеста браузер не собирает отдельное приложение */try{if(localStorage.getItem('pwa_shortcut')!=='1'){var m=document.createElement('link');m.rel='manifest';m.href='manifest.webmanifest';document.head.appendChild(m)}}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ALENAFIT">
@@ -28,7 +28,7 @@
 <meta name="description" content="Алёна — тренер и нутрициолог. Силовые тренировки и питание без крайностей: онлайн-сопровождение и мини-группы в центре Санкт-Петербурга.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20261027e">
+<link rel="stylesheet" href="css/site.css?v=20261027f">
 </head>
 <body>
 
@@ -463,7 +463,7 @@ if(location.hash==='#channel'){sel(tabs[1]);setTimeout(function(){document.getEl
 </script>
 <script src="js/feeds.js?v=20261026e" defer></script>
 <script src="js/nav.js?v=20261026f" defer></script>
-<script src="js/pwa.js?v=2" defer></script>
+<script src="js/pwa.js?v=3" defer></script>
 <script src="js/gestures.js?v=1" defer></script>
 </body>
 </html>
