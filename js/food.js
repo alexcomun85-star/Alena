@@ -11,8 +11,27 @@
   function today(){var d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
   function n(v){v=String(v==null?'':v).replace(',','.').trim();return v===''?null:+v}
   function atwater(p,fa,c){return p*4+fa*9+c*4}
+  /* Проверка пищевой ценности на 100 г.
+     Б, Ж, У — конечные числа от 0 до 100; сумма не больше 100 г + 1,5 г допуска
+     (на этикетке каждое из трёх значений может быть округлено до целого — до 0,5 г вверх).
+     Калории — от 0 до 910 (чистый жир по Этуотеру — 900 ккал, плюс округление).
+     Расхождение калорий с формулой 4–9–4 — только предупреждение: справочники и этикетки
+     используют свои коэффициенты и по-разному учитывают клетчатку. Исходные цифры не меняем. */
+  var SUM_TOL=1.5,KMAX=910;
+  function checkFood(k,p,fa,c){
+    var bad=function(v){return v!=null&&!(typeof v==='number'&&isFinite(v)&&v>=0&&v<=100)};
+    if(bad(p)||bad(fa)||bad(c))return {err:'Белки, жиры и углеводы — числа от 0 до 100 г на 100 г продукта, без минуса.'};
+    var sum=(p||0)+(fa||0)+(c||0);
+    if(sum>100+SUM_TOL)return {err:'Белки + жиры + углеводы = '+f(sum)+' г, а в 100 г продукта не может быть больше 100 г. Проверьте, что цифры указаны на 100 г, а не на упаковку или порцию.'};
+    if(k!=null&&!(typeof k==='number'&&isFinite(k)&&k>=0&&k<=KMAX))return {err:'Калории — от 0 до 900 на 100 г, без минуса.'};
+    var warn='';
+    if(k!=null&&p!=null&&fa!=null&&c!=null){var a=atwater(p,fa,c),d=Math.abs(k-a);
+      if(d>Math.max(25,0.2*Math.max(k,a)))warn='Калории заметно отличаются от расчёта по БЖУ (≈ '+f(a,0)+' ккал). Так бывает из-за клетчатки, сахарозаменителей или особых коэффициентов, но стоит сверить с этикеткой.'}
+    return {err:'',warn:warn};
+  }
   var MEALS=['Завтрак','Обед','Ужин','Перекус'];
-  var DB=(window.FOOD_DB||[]).map(function(r,i){return {id:'b'+i,name:r[0],k:r[1],p:r[2],f:r[3],c:r[4],cat:r[5],src:r[6],pg:r[7],pl:r[8]}});
+  var META=window.FOOD_META||{};
+  var DB=(window.FOOD_DB||[]).map(function(r,i){var m=META[r[0]]||[];return {id:'b'+i,name:r[0],k:r[1],p:r[2],f:r[3],c:r[4],cat:r[5],src:r[6],pg:r[7],pl:r[8],st:m[0]||'',fdc:m[1]||''}});
   function all(){return S.custom.map(function(c){return Object.assign({src:c.src0||'C',cat:'Мои продукты'},c)}).concat(DB)}
   var sel=null,date=today();
   $('fDate').value=date;$('fDate').max=today();
@@ -35,7 +54,7 @@
   function pick(id){
     sel=all().find(function(x){return x.id===id});if(!sel)return;
     $('fSel').hidden=false;$('fSelName').textContent=sel.name;
-    $('fSelInfo').textContent='На 100 г: '+f(sel.k,0)+' ккал · Б '+f(sel.p)+' · Ж '+f(sel.f)+' · У '+f(sel.c)+(sel.src==='D'?' · домашнее блюдо, значения ориентировочные':sel.src==='L'?' · типичные значения с этикеток, сверяйте со своей упаковкой':sel.src==='O'?' · данные Open Food Facts':'');
+    $('fSelInfo').innerHTML='На 100 г'+(sel.st?' ('+esc(sel.st)+')':'')+': '+f(sel.k,0)+' ккал · Б '+f(sel.p)+' · Ж '+f(sel.f)+' · У '+f(sel.c)+(sel.src==='D'?' · домашнее блюдо, значения ориентировочные':sel.src==='L'?' · типичные значения с этикеток, сверяйте со своей упаковкой':sel.src==='O'?' · данные Open Food Facts':sel.fdc?' · <a href="https://fdc.nal.usda.gov/food-details/'+sel.fdc+'/nutrients" target="_blank" rel="noopener">USDA FDC '+sel.fdc+'</a>':sel.src==='U'?' · по USDA, запись уточняется':'');
     $('fG').value=sel.pg||100;
     $('fPortions').innerHTML=(sel.pg?'<button type="button" class="chipbtn" data-g="'+sel.pg+'">'+esc(sel.pl||'порция')+' · '+sel.pg+' г</button>':'')+[50,100,150,200].map(function(g){return '<button type="button" class="chipbtn" data-g="'+g+'">'+g+' г</button>'}).join('');
     calcSel();$('fG').focus();
@@ -54,17 +73,20 @@
 
   /* ---- свой продукт ---- */
   ['cK','cP','cF','cC'].forEach(function(id){$(id).addEventListener('input',hint)});
-  function hint(){var p=n($('cP').value),fa=n($('cF').value),c=n($('cC').value);
+  function hint(){var p=n($('cP').value),fa=n($('cF').value),c=n($('cC').value),ck=checkFood(n($('cK').value),p,fa,c);
+    if(ck.err||ck.warn){$('cHint').textContent=ck.err||ck.warn;return}
     $('cHint').textContent=(p!=null&&fa!=null&&c!=null)?'По БЖУ получается ≈ '+f(atwater(p,fa,c),0)+' ккал на 100 г (коэффициенты Этуотера: белки и углеводы — 4, жиры — 9 ккал/г).':'Если калорий нет на упаковке, оставьте поле пустым — посчитаю по белкам, жирам и углеводам.'}
   hint();
   $('cAdd').addEventListener('click',function(){
-    var name=$('cName').value.trim(),k=n($('cK').value),p=n($('cP').value)||0,fa=n($('cF').value)||0,c=n($('cC').value)||0;
+    var name=$('cName').value.trim(),k=n($('cK').value),p0=n($('cP').value),f0=n($('cF').value),c0=n($('cC').value);
     if(!name){$('cMsg').textContent='Укажите название.';return}
+    if(name.length>100){$('cMsg').textContent='Название — до 100 символов.';return}
+    var ck=checkFood(k,p0,f0,c0);if(ck.err){$('cMsg').textContent=ck.err+' Продукт не сохранён.';return}
+    var p=p0||0,fa=f0||0,c=c0||0;
     if(k==null){if(!(p||fa||c)){$('cMsg').textContent='Укажите калории или хотя бы белки, жиры и углеводы.';return}k=atwater(p,fa,c)}
-    if(!(k>=0&&k<=950)||p>100||fa>100||c>100){$('cMsg').textContent='Проверьте цифры: значения на 100 г не могут быть больше 100 г, а калорий — больше 900.';return}
     var item={id:'c'+Date.now(),name:name,k:k,p:p,f:fa,c:c,pg:100,pl:'100 г'};S.custom.unshift(item);save();
     ['cName','cK','cP','cF','cC'].forEach(function(id){$(id).value=''});hint();
-    $('cMsg').textContent='Продукт «'+name+'» сохранён в «Мои продукты».';pick(item.id);showRes();
+    $('cMsg').textContent='Продукт «'+name+'» сохранён в «Мои продукты».'+(ck.warn?' '+ck.warn:'');pick(item.id);showRes();
   });
 
   /* ---- Open Food Facts ---- */
@@ -73,7 +95,8 @@
     var pr=offNum(nu,'proteins_100g'),fa=offNum(nu,'fat_100g'),ca=offNum(nu,'carbohydrates_100g');
     if(k==null&&pr!=null&&fa!=null&&ca!=null)k=atwater(pr,fa,ca);
     var name=(p.product_name_ru||p.product_name||'').trim();if(p.brands)name+=' ('+String(p.brands).split(',')[0].trim()+')';
-    return k==null||!name?null:{name:name,k:k,p:pr||0,f:fa||0,c:ca||0,code:p.code||''}}
+    if(k==null||!name||checkFood(k,pr,fa,ca).err)return null;
+    return {name:name,k:k,p:pr||0,f:fa||0,c:ca||0,code:p.code||''}}
   var offRes=[];
   $('oBtn').addEventListener('click',function(){
     var t=$('oQ').value.trim();if(!t){$('oMsg').textContent='Введите название или штрихкод.';return}
@@ -84,7 +107,7 @@
     fetch(url,ctl?{signal:ctl.signal}:{}).then(function(r){return r.json()}).then(function(j){clearTimeout(tm);
       var arr=isCode?(j&&j.product?[j.product]:[]):((j&&j.products)||[]);
       offRes=arr.map(offItem).filter(Boolean);
-      if(!offRes.length){$('oMsg').textContent='Ничего не нашлось с указанной пищевой ценностью. Попробуйте другое название или внесите продукт вручную по этикетке.';return}
+      if(!offRes.length){$('oMsg').textContent='Ничего не нашлось с корректной пищевой ценностью. Попробуйте другое название или внесите продукт вручную по этикетке.';return}
       $('oMsg').textContent='Нашлось: '+offRes.length+'. Проверьте цифры по своей упаковке — базу заполняют пользователи.';
       $('oRes').innerHTML=offRes.map(function(x,i){return '<button type="button" class="fr" data-i="'+i+'"><span>'+esc(x.name)+'</span><small>'+f(x.k,0)+' ккал · Б '+f(x.p)+' · Ж '+f(x.f)+' · У '+f(x.c)+'</small></button>'}).join('');
     }).catch(function(){clearTimeout(tm);$('oMsg').textContent='База Open Food Facts сейчас не отвечает. Попробуйте позже или внесите продукт вручную по этикетке.'});

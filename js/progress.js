@@ -2,7 +2,83 @@
   'use strict';
   var KEY='progress_v1';
   var D={lifts:[],tests:[],act:[],body:[],name:''};
-  function load(){try{var x=JSON.parse(localStorage.getItem(KEY)||'null');if(x&&typeof x==='object')D=Object.assign(D,x)}catch(e){}}
+  var BKEY='progress_v1_backup';
+  var loadNote='';
+  /* Загрузка: если в хранилище оказались повреждённые записи (например, после старой версии импорта),
+     исходные данные сначала копируются в резервную копию, а на экран выводятся только корректные записи. */
+  function load(){var raw=null;try{raw=localStorage.getItem(KEY)}catch(e){}
+    if(!raw)return;var x;try{x=JSON.parse(raw)}catch(e){x=null}
+    if(!x||typeof x!=='object'||Array.isArray(x)){keepLoadBackup(raw);loadNote='Сохранённые данные повреждены. Исходная версия сохранена в браузере резервной копией.';return}
+    try{D=validate(x,false);return}catch(e){}
+    var c=validate(x,true);keepLoadBackup(raw);D=c.data;
+    loadNote='Часть сохранённых записей содержит недопустимые значения ('+c.skipped+') и скрыта. Исходная версия сохранена в браузере резервной копией.'}
+  function readBackup(){try{var b=JSON.parse(localStorage.getItem(BKEY)||'null');return b&&typeof b.data==='string'?b:null}catch(e){return null}}
+  /* при загрузке не затираем копию, сделанную пользователем перед импортом/удалением */
+  function keepLoadBackup(raw){var b=readBackup();if(b&&b.reason!=='load'){try{localStorage.setItem(BKEY+'_load',raw)}catch(e){}return}keepBackup(raw,'load')}
+  function keepBackup(rawJson,reason){try{localStorage.setItem(BKEY,JSON.stringify({at:new Date().toISOString(),reason:reason,data:rawJson}));return true}catch(e){return false}}
+
+  /* ---- проверка данных: общая для ввода, загрузки и импорта ---- */
+  var LIM={w:[0,500],r:[1,30],s:[1,20],srt:[0,10],chair:[0,60],steps:[0,60000],min:[0,2000],days:[0,7],waist:[30,250],hips:[30,250],weight:[25,300]};
+  var MAXREC=5000;
+  function isDate(v){if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v))return false;var d=new Date(v+'T00:00:00Z');return !isNaN(d)&&d.toISOString().slice(0,10)===v&&v>='2000-01-01'&&v<='2100-12-31'}
+  function inR(v,k,int){var a=LIM[k];return typeof v==='number'&&isFinite(v)&&v>=a[0]&&v<=a[1]&&(!int||Math.round(v)===v)}
+  function opt(v,k,int){return v===null||v===undefined||inR(v,k,int)}
+  function Bad(t){this.message=t}
+  /* lenient=true — вернуть только корректные записи (для загрузки); иначе — ошибка на первой же неверной записи */
+  function validate(x,lenient){
+    if(!x||typeof x!=='object'||Array.isArray(x))throw new Bad('файл не похож на копию журнала');
+    if(!Array.isArray(x.lifts)&&!lenient)throw new Bad('нет раздела «Силовые» (lifts)');
+    var out={lifts:[],tests:[],act:[],body:[],name:''},skipped=0;
+    var secs={lifts:'Силовые',tests:'Тесты',act:'Активность',body:'Замеры'};
+    Object.keys(secs).forEach(function(k){
+      var v=x[k];if(v===undefined){if(k==='lifts'&&!lenient)throw new Bad('нет раздела «Силовые»');return}
+      if(!Array.isArray(v)){if(lenient){skipped++;return}throw new Bad('раздел «'+secs[k]+'» должен быть списком записей')}
+      if(v.length>MAXREC&&!lenient)throw new Bad('в разделе «'+secs[k]+'» слишком много записей');
+      var weeks={};
+      v.forEach(function(r,i){var err=checkRec(k,r);
+        if(!err&&k==='act'){if(weeks[r.week])err='неделя '+r.week+' повторяется';weeks[r.week]=1}
+        if(err){if(lenient){skipped++;return}throw new Bad('«'+secs[k]+'», запись '+(i+1)+': '+err)}
+        out[k].push(clean(k,r))});
+    });
+    if(x.name!==undefined&&x.name!==null){if(typeof x.name!=='string'||x.name.length>100){if(!lenient)throw new Bad('имя должно быть строкой до 100 символов')}else out.name=x.name}
+    return lenient?{data:out,skipped:skipped}:out;
+  }
+  function checkRec(k,r){
+    if(!r||typeof r!=='object'||Array.isArray(r))return 'запись должна быть объектом';
+    if(k==='lifts'){
+      if(!isDate(r.date))return 'неверная дата';
+      if(typeof r.ex!=='string'||!r.ex.trim()||r.ex.length>100)return 'нет названия упражнения или оно длиннее 100 символов';
+      if(!inR(r.w,'w')||r.w<=0)return 'вес — число больше 0 и не больше 500 кг';
+      if(!inR(r.r,'r',1))return 'повторы — целое число от 1 до 30';
+      if(!inR(r.s,'s',1))return 'подходы — целое число от 1 до 20';
+    }else if(k==='tests'){
+      if(!isDate(r.date))return 'неверная дата';
+      if(!opt(r.srt,'srt'))return '«сесть-встать» — от 0 до 10';
+      if(!opt(r.chair,'chair',1))return 'подъёмы со стула — целое число от 0 до 60';
+      if(!(r.bal==null||r.bal===0||r.bal===1||r.bal===2))return 'баланс — 0, 1 или 2';
+      if(r.srt==null&&r.chair==null&&r.bal==null)return 'пустая запись';
+    }else if(k==='act'){
+      if(!isDate(r.week))return 'неверная дата недели';
+      if(!opt(r.steps,'steps'))return 'шаги — от 0 до 60 000 в день';
+      if(!opt(r.min,'min'))return 'минуты силовых — от 0 до 2 000 в неделю';
+      if(!opt(r.days,'days',1))return 'дни с силовыми — целое число от 0 до 7';
+      if(r.steps==null&&r.min==null&&r.days==null)return 'пустая запись';
+    }else{
+      if(!isDate(r.date))return 'неверная дата';
+      if(!opt(r.waist,'waist'))return 'талия — от 30 до 250 см';
+      if(!opt(r.hips,'hips'))return 'бёдра — от 30 до 250 см';
+      if(!opt(r.weight,'weight'))return 'вес — от 25 до 300 кг';
+      if(r.waist==null&&r.hips==null&&r.weight==null)return 'пустая запись';
+    }
+    return '';
+  }
+  function nn(v){return v==null?null:v}
+  function clean(k,r){
+    if(k==='lifts')return {date:r.date,ex:r.ex.trim(),w:r.w,r:r.r,s:r.s};
+    if(k==='tests')return {date:r.date,srt:nn(r.srt),chair:nn(r.chair),bal:nn(r.bal)};
+    if(k==='act')return {week:r.week,steps:nn(r.steps),min:nn(r.min),days:nn(r.days)};
+    return {date:r.date,waist:nn(r.waist),hips:nn(r.hips),weight:nn(r.weight)};
+  }
   function save(){try{localStorage.setItem(KEY,JSON.stringify(D));return true}catch(e){return false}}
   function $(id){return document.getElementById(id)}
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -10,7 +86,7 @@
   function r2(x){return Math.sign(x)*Math.round(Math.abs(x)*100+1e-9)/100}
   function f(x,dec){if(x==null||!isFinite(x))return '—';return r2(x).toFixed(dec==null?2:dec).replace('.',',').replace(/,00$/,'').replace(/(,\d)0$/,'$1')}
   function fd(iso){var p=iso.split('-');return p[2]+'.'+p[1]+'.'+p[0]}
-  function num(id){var v=$(id).value.replace(',','.');return v===''?null:+v}
+  function num(id){var v=$(id).value.replace(',','.').trim();return v===''?null:+v}
   function pct(a,b){return a?((b-a)/a*100):null}
   /* Формулы: Эпли (1985) и Бжицки (1993) */
   function epley(w,r){return r===1?w:w*(1+r/30)}
@@ -23,6 +99,8 @@
   $('pAdd').addEventListener('click',function(){
     var ex=$('pEx').value.trim(),w=num('pW'),r=num('pR'),s=num('pS'),dt=$('pDate').value||today();
     if(!ex){msg('pMsg','Укажите упражнение.');return}
+    if(ex.length>100){msg('pMsg','Название упражнения — до 100 символов.');return}
+    if(!isDate(dt)){msg('pMsg','Проверьте дату.');return}
     if(!(w>0&&w<=500)){msg('pMsg','Вес — от 0,5 до 500 кг. Для упражнений с собственным весом впишите 1.');return}
     if(!(r>=1&&r<=30&&Math.round(r)===r)){msg('pMsg','Повторы — целое число от 1 до 30.');return}
     if(!(s>=1&&s<=20&&Math.round(s)===s)){msg('pMsg','Подходы — целое число от 1 до 20.');return}
@@ -32,8 +110,8 @@
   });
   $('tAdd').addEventListener('click',function(){
     var srt=num('tSrt'),ch=num('tChair'),bal=$('tBal').value,dt=$('tDate').value||today();
-    if(srt!==null&&!(srt>=0&&srt<=10)){msg('tMsg','«Сесть-встать» — от 0 до 10.');return}
-    if(ch!==null&&!(ch>=0&&ch<=60)){msg('tMsg','Подъёмы со стула — от 0 до 60.');return}
+    if(srt!==null&&!inR(srt,'srt')){msg('tMsg','«Сесть-встать» — от 0 до 10.');return}
+    if(ch!==null&&!inR(ch,'chair',1)){msg('tMsg','Подъёмы со стула — от 0 до 60.');return}
     if(srt===null&&ch===null&&!bal){msg('tMsg','Заполните хотя бы один тест.');return}
     D.tests.push({date:dt,srt:srt,chair:ch,bal:bal===''?null:+bal});
     msg('tMsg',save()?'Результаты тестов записаны.':'Не удалось сохранить в браузере.');renderAll();
@@ -42,6 +120,10 @@
     var st=num('aSteps'),m=num('aMin'),d=num('aDays'),wk=$('aWeek').value;
     if(!wk){msg('aMsg','Выберите неделю.');return}
     if(st===null&&m===null&&d===null){msg('aMsg','Заполните хотя бы одно поле.');return}
+    if(!opt(st,'steps')){msg('aMsg','Шаги — среднее за день, от 0 до 60 000. Запись не сохранена.');return}
+    if(!opt(m,'min')){msg('aMsg','Минуты силовых за неделю — от 0 до 2 000. Запись не сохранена.');return}
+    if(!opt(d,'days',1)){msg('aMsg','Дней с силовыми — целое число от 0 до 7. Запись не сохранена.');return}
+    if(d===0&&m>0){msg('aMsg','Указаны минуты силовых, но 0 дней с силовыми. Проверьте цифры — запись не сохранена.');return}
     D.act=D.act.filter(function(x){return x.week!==wk});
     D.act.push({week:wk,steps:st,min:m,days:d});D.act.sort(function(a,b){return a.week<b.week?-1:1});
     msg('aMsg',save()?'Неделя записана.':'Не удалось сохранить в браузере.');renderAll();
@@ -49,6 +131,8 @@
   $('bAdd').addEventListener('click',function(){
     var w=num('bWaist'),h=num('bHips'),kg=num('bWeight'),dt=$('bDate').value||today();
     if(w===null&&h===null&&kg===null){msg('bMsg','Заполните хотя бы одно поле.');return}
+    if(!opt(w,'waist')||!opt(h,'hips')){msg('bMsg','Обхваты — от 30 до 250 см. Замеры не сохранены.');return}
+    if(!opt(kg,'weight')){msg('bMsg','Вес — от 25 до 300 кг. Замеры не сохранены.');return}
     D.body.push({date:dt,waist:w,hips:h,weight:kg});msg('bMsg',save()?'Замеры записаны.':'Не удалось сохранить в браузере.');renderAll();
   });
   (function(){var d=new Date(),day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('aWeek').value=d.toISOString().slice(0,10)})();
@@ -76,11 +160,11 @@
   }
   function bars(items,label){
     if(!items.length)return '';
-    var W=320,H=150,L=8,B=24,mx=Math.max.apply(0,items.map(function(i){return i.y}).concat([7000]));
+    var W=320,H=160,L=8,B=24,T=22,mx=Math.max.apply(0,items.map(function(i){return i.y}).concat([7000]));
     var bw=Math.min(36,(W-2*L)/items.length-6),out='';
-    items.forEach(function(it,i){var h=it.y/mx*(H-B-14),x=L+i*((W-2*L)/items.length)+3;out+='<rect class="'+(it.y>=7000?'ch-bar-ok':'ch-bar')+'" x="'+x.toFixed(1)+'" y="'+(H-B-h).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="4"/><text class="ch-t" x="'+(x+bw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle">'+it.label+'</text>'});
-    var y7=H-B-7000/mx*(H-B-14);
-    return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(label)+'">'+out+'<line class="ch-ref" x1="0" x2="'+W+'" y1="'+y7+'" y2="'+y7+'"/><text class="ch-t" x="'+W+'" y="'+(y7-4)+'" text-anchor="end">7 000 шагов</text></svg>';
+    items.forEach(function(it,i){var h=it.y/mx*(H-B-T),x=L+i*((W-2*L)/items.length)+3;out+='<rect class="'+(it.y>=7000?'ch-bar-ok':'ch-bar')+'" x="'+x.toFixed(1)+'" y="'+(H-B-h).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="4"/><text class="ch-t" x="'+(x+bw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle">'+it.label+'</text>'});
+    var y7=H-B-7000/mx*(H-B-T);
+    return '<svg class="chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(label)+'">'+out+'<line class="ch-ref" x1="0" x2="'+W+'" y1="'+y7.toFixed(1)+'" y2="'+y7.toFixed(1)+'"/><text class="ch-t ch-reft" x="'+(W-2)+'" y="'+(y7-5).toFixed(1)+'" text-anchor="end">7 000 шагов</text></svg>';
   }
 
   /* ---- расчёты ---- */
@@ -88,7 +172,8 @@
     var by={};D.lifts.forEach(function(l){(by[l.ex]=by[l.ex]||[]).push(l)});
     return Object.keys(by).map(function(ex){
       var a=by[ex].slice().sort(function(x,y){return x.date<y.date?-1:1});
-      var days={};a.forEach(function(l){var e=e1rm(l.w,l.r);if(!days[l.date]||e>days[l.date].e)days[l.date]={e:e};(days[l.date].ton=(days[l.date].ton||0)+l.w*l.r*l.s)});
+      /* за день: лучший расчётный максимум и тоннаж всех записей — считаются независимо */
+      var days={};a.forEach(function(l){var d=days[l.date]||(days[l.date]={e:-Infinity,ton:0});d.e=Math.max(d.e,e1rm(l.w,l.r));d.ton+=l.w*l.r*l.s});
       var pts=Object.keys(days).sort().map(function(d){return {x:d,y:days[d].e,ton:days[d].ton}});
       var first=pts[0],last=pts[pts.length-1],best=pts.reduce(function(m,p){return p.y>m.y?p:m},pts[0]);
       return {ex:ex,pts:pts,first:first,last:last,best:best,gain:pct(first.y,last.y),tgain:pct(first.ton,last.ton),n:a.length};
@@ -155,7 +240,7 @@
     var inc=$('rBody').checked;
     $('report').innerHTML='<header class="r-head"><div><p class="r-brand">Алёна · Сила без перегибов · alenafit.com</p><h1>Отчёт о прогрессе'+(name?': '+esc(name):'')+'</h1><p>Период: '+fd(dates[0])+' — '+fd(dates[dates.length-1])+' · сформирован '+fd(today())+'</p></div></header>'+
       '<section><h2>Силовые</h2>'+liftsHtml(true)+'</section><section><h2>Функциональные тесты</h2>'+testsHtml()+'</section><section><h2>Активность</h2>'+actHtml()+'</section>'+(inc?'<section><h2>Замеры</h2>'+bodyHtml()+'</section>':'')+
-      '<section class="r-notes"><h2>Как считали</h2><p>Расчётный максимум на 1 повтор (1ПМ) — среднее по формулам Эпли (1985): вес × (1 + повторы / 30) и Бжицки (1993): вес × 36 / (37 − повторы). Точнее всего при 1–10 повторах. Для каждой даты берётся лучший подход.</p><p>Тоннаж — вес × повторы × подходы за тренировку. Прирост — (последнее − первое) / первое × 100%, округление до сотых.</p><p>Ориентиры: ВОЗ — силовые от 2 дней в неделю; 7 000 шагов в день — обзор Ding et al., The Lancet Public Health, 2025. Тест «сесть-встать» — Araújo et al., 2025.</p><p>Отчёт не является медицинским документом.</p></section>';
+      '<section class="r-notes"><h2>Как считали</h2><p>Расчётный максимум на 1 повтор (1ПМ) — среднее по формулам Эпли (1985): вес × (1 + повторы / 30) и Бжицки (1993): вес × 36 / (37 − повторы). Точнее всего при 1–10 повторах. Для каждой даты берётся лучший подход.</p><p>Тоннаж — сумма «вес × повторы × подходы» по всем записям упражнения за день. Прирост — (последнее − первое) / первое × 100%, округление до сотых.</p><p>Ориентиры: ВОЗ — силовые от 2 дней в неделю; 7 000 шагов в день — обзор Ding et al., The Lancet Public Health, 2025. Тест «сесть-встать» — Araújo et al., 2025.</p><p>Отчёт не является медицинским документом.</p></section>';
     msg('pdfMsg','В окне печати выберите «Сохранить как PDF».');
     setTimeout(function(){window.print()},50);
   });
@@ -165,11 +250,42 @@
     a.href=URL.createObjectURL(blob);a.download='progress-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
     msg('bkMsg','Файл с копией сохранён в загрузки.');
   });
-  $('impFile').addEventListener('change',function(){var fl=this.files[0];if(!fl)return;var rd=new FileReader();
-    rd.onload=function(){try{var x=JSON.parse(rd.result);if(!x||!Array.isArray(x.lifts))throw 0;D={lifts:x.lifts||[],tests:x.tests||[],act:x.act||[],body:x.body||[],name:x.name||''};save();renderAll();msg('bkMsg','Данные восстановлены из файла.')}catch(e){msg('bkMsg','Не получилось прочитать файл. Выберите файл progress-….json, сохранённый на этой странице.')}};
+  function counts(d){return 'силовые — '+d.lifts.length+', тесты — '+d.tests.length+', активность — '+d.act.length+', замеры — '+d.body.length}
+  function backupUi(){var b=readBackup(),box=$('bkRestore');if(!box)return;
+    if(!b){box.hidden=true;return}
+    var when=new Date(b.at),label={'import':'до импорта','wipe':'до удаления','restore':'до возврата копии','load':'исходная версия с ошибками'}[b.reason]||'';
+    $('bkInfo').textContent='Резервная копия '+label+' от '+(isNaN(when)?'—':when.toLocaleString('ru-RU',{dateStyle:'short',timeStyle:'short'}))+'.';
+    $('bkBack').hidden=b.reason==='load';box.hidden=false}
+  $('impFile').addEventListener('change',function(){var inp=this,fl=inp.files[0];if(!fl)return;
+    var fail=function(t){inp.value='';msg('bkMsg','Файл не принят: '+t+'. Ваши текущие данные не изменены.')};
+    if(fl.size>5e6){fail('файл слишком большой');return}
+    var rd=new FileReader();
+    rd.onerror=function(){fail('не удалось прочитать файл')};
+    rd.onload=function(){
+      var x,clean;
+      try{x=JSON.parse(rd.result)}catch(e){fail('это не файл копии журнала (повреждённый JSON)');return}
+      try{clean=validate(x,false)}catch(e){fail(e instanceof Bad?e.message:'неизвестная ошибка проверки');return}
+      if(!window.confirm('Импорт заменит текущие записи.\n\nСейчас: '+counts(D)+'.\nВ файле: '+counts(clean)+'.\n\nТекущие данные сохранятся резервной копией — их можно вернуть кнопкой «Вернуть предыдущие данные». Продолжить?')){inp.value='';msg('bkMsg','Импорт отменён. Данные не изменены.');return}
+      var prev=JSON.stringify(D);
+      if(!keepBackup(prev,'import')){fail('браузер не дал сохранить резервную копию текущих данных');return}
+      D=clean;
+      if(!save()){D=JSON.parse(prev);try{localStorage.setItem(KEY,prev)}catch(e){}fail('браузер не дал сохранить данные');return}
+      try{renderAll()}catch(e){D=JSON.parse(prev);try{localStorage.setItem(KEY,prev)}catch(e2){}renderAll();fail('не удалось показать данные');return}
+      inp.value='';if(D.name)$('rName').value=D.name;backupUi();
+      msg('bkMsg','Данные восстановлены из файла: '+counts(D)+'. Предыдущие данные сохранены — их можно вернуть.');
+    };
     rd.readAsText(fl)});
+  $('bkBack').addEventListener('click',function(){var b=readBackup();if(!b)return;var x;
+    try{x=validate(JSON.parse(b.data),false)}catch(e){msg('bkMsg','Резервная копия повреждена, вернуть её нельзя. Текущие данные не изменены.');return}
+    if(!window.confirm('Вернуть данные из резервной копии ('+counts(x)+')?\nТекущие данные ('+counts(D)+') станут новой резервной копией.'))return;
+    var cur=JSON.stringify(D);if(!keepBackup(cur,'restore')){msg('bkMsg','Браузер не дал сохранить копию текущих данных. Ничего не изменено.');return}
+    D=x;if(!save()){D=JSON.parse(cur);msg('bkMsg','Не удалось сохранить. Ничего не изменено.');return}
+    $('rName').value=D.name||'';renderAll();backupUi();msg('bkMsg','Предыдущие данные возвращены.')});
+  $('bkDl').addEventListener('click',function(){var b=readBackup();if(!b)return;
+    var blob=new Blob([b.data],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='progress-backup-'+String(b.at).slice(0,10)+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)});
   var wipe=$('wipeBtn'),armed=false;
   wipe.addEventListener('click',function(){if(!armed){armed=true;wipe.textContent='Точно удалить всё? Нажмите ещё раз';setTimeout(function(){armed=false;wipe.textContent='Удалить все данные'},4000);return}
-    D={lifts:[],tests:[],act:[],body:[],name:''};try{localStorage.removeItem(KEY)}catch(e){}armed=false;wipe.textContent='Удалить все данные';renderAll();msg('bkMsg','Все данные удалены.')});
-  load();if(D.name)$('rName').value=D.name;renderAll();
+    var had=D.lifts.length+D.tests.length+D.act.length+D.body.length;if(had)keepBackup(JSON.stringify(D),'wipe');
+    D={lifts:[],tests:[],act:[],body:[],name:''};try{localStorage.removeItem(KEY)}catch(e){}armed=false;wipe.textContent='Удалить все данные';renderAll();backupUi();msg('bkMsg','Все данные удалены.'+(had?' Если это ошибка — нажмите «Вернуть предыдущие данные».':''))});
+  load();if(D.name)$('rName').value=D.name;renderAll();backupUi();if(loadNote)msg('bkMsg',loadNote);
 })();
