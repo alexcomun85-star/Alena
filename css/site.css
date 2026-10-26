@@ -607,3 +607,12 @@ details.body-block[open]>summary h2::after{content:" −"}
 
 .ph-stat{max-width:46%}
 .ph-chip{max-width:48%}
+
+/* hero: плашки не закрывают лицо — стопкой в правом нижнем углу фото */
+.hero-photo .ph-chip,.hero-photo .ph-stat{top:auto;left:auto;right:14px;max-width:none}
+.hero-photo .ph-stat{bottom:72px}
+.hero-photo .ph-chip{bottom:154px;font-size:11px;padding:6px 11px}
+@media (min-width:900px){
+  .hero-photo .ph-stat{bottom:20px}
+  .hero-photo .ph-chip{bottom:102px}
+}
