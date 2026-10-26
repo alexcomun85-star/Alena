@@ -895,3 +895,4 @@ circle.lv{display:block}
 #trOut a{color:var(--amber)}
 @media (min-width:900px){.soft-cta{grid-template-columns:1fr auto;padding:18px 22px}.path-grid{grid-template-columns:repeat(3,1fr);align-items:stretch}}
 .soft-wrap{padding-top:24px!important}
+.hero-photo::before{opacity:.1}.hero-photo img{filter:saturate(.95) contrast(1.03)}
