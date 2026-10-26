@@ -589,3 +589,18 @@ details.body-block[open]>summary h2::after{content:" −"}
 .meal li span:nth-child(2){color:var(--muted);white-space:nowrap}
 .meal .del{border:0;background:var(--surface-2);color:var(--ink);width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer}
 #den .nums{margin-top:14px}
+
+/* логотип */
+.brand{gap:10px}
+.brand-mark{height:34px;width:auto;flex:none;display:block}
+.brand-text{display:grid;gap:3px;min-width:0}
+.brand-word{display:block;height:14px;width:auto}
+.brand-text small{display:block;font-size:11.5px;color:var(--muted);letter-spacing:.02em}
+.foot-logo{display:block;width:150px;height:auto;margin-bottom:14px}
+.manifest .w{position:relative}
+.m-watermark{position:absolute;right:-30px;top:-10px;width:min(52vw,380px);height:auto;opacity:.08;pointer-events:none}
+@media (min-width:1024px){.brand-mark{height:38px}.brand-word{height:16px}.m-watermark{right:0;top:-40px;opacity:.1}}
+
+.manifest{overflow:hidden}
+
+@media (max-width:480px){.brand-text small{display:none}}
