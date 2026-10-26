@@ -1,0 +1,26 @@
+{
+  "name": "ALENAFIT — сила без перегибов",
+  "short_name": "ALENAFIT",
+  "description": "Тренировки, питание и полезные инструменты Алёны: тренировка дня, таймер, прогресс, рецепты.",
+  "lang": "ru",
+  "dir": "ltr",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#132823",
+  "theme_color": "#0d1e1a",
+  "categories": ["health", "fitness", "lifestyle"],
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "Тренировка дня", "url": "./servisy.html#trenirovka", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "Интервальный таймер", "url": "./servisy.html#taymer", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "Мой прогресс", "url": "./progress.html", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "Калории и БЖУ", "url": "./kalorii.html", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]}
+  ]
+}

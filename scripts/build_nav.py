@@ -87,7 +87,7 @@ def build():
         '  </div>\n</header>\n'
         '<div class="mnav" id="mnav" hidden>\n  <nav class="mnav-in g" aria-label="Меню">\n'
         '    <a class="m-home" href="./">Главная</a>\n    ' + "\n    ".join(mob) + '\n'
-        f'    <div class="m-cta"><a class="btn btn-main btn-wide" href="{START}" target="_blank" rel="noopener">Написать «СТАРТ»</a></div>\n'
+        f'    <div class="m-cta"><a class="btn btn-main btn-wide" href="{START}" target="_blank" rel="noopener">Написать «СТАРТ»</a><button type="button" class="pwa-btn" data-pwa><img src="icons/icon-192.png" alt="" width="22" height="22">Установить приложение на телефон</button></div>\n'
         '  </nav>\n</div>\n<!-- nav:end -->')
     return header
 
