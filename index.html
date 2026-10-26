@@ -208,6 +208,31 @@ footer .w{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:4px
 .dock small{font-size:12px;color:var(--muted);line-height:1.3;max-width:104px}
 .dock.hide{transform:translateY(110%)}
 
+
+/* подбор формата */
+.quiz{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;display:grid;gap:22px}
+.quiz fieldset{border:0;margin:0;padding:0;display:grid;gap:10px;min-width:0}
+.quiz legend{font-weight:600;margin-bottom:10px;padding:0}
+.quiz legend span{color:var(--amber);font-family:var(--display);font-size:13px;margin-right:8px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts input{position:absolute;opacity:0;width:1px;height:1px}
+.opts label{cursor:pointer;border-radius:999px;padding:11px 16px;min-height:44px;display:inline-flex;align-items:center;font-size:15px;box-shadow:inset 0 0 0 1.5px var(--line);background:var(--bg)}
+.opts input:checked+label{background:var(--amber);color:var(--amber-ink);box-shadow:none;font-weight:600}
+.opts input:focus-visible+label{outline:3px solid var(--amber);outline-offset:2px}
+.quiz-note{font-size:14px;color:var(--muted)}
+.result{border-radius:var(--r-md);background:var(--band);border:2px solid var(--amber);padding:20px;display:grid;gap:10px}
+.result h3{font-size:20px;color:var(--amber)}
+.result p{font-size:15px}
+.result .btn{justify-self:start;margin-top:6px}
+.result .small{color:var(--muted)}
+.maplink{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--amber);text-decoration:none;min-height:44px}
+.maplink:hover{text-decoration:underline}
+@media (min-width:1024px){
+  #quiz .w{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);column-gap:56px;align-items:start}
+  #quiz .tag,#quiz h2,#quiz .lede{grid-column:1}
+  #quiz .quiz{grid-column:2;grid-row:1/span 4;margin-top:0;padding:28px}
+}
+
 .nav{display:none}
 
 @media (min-width:720px){
@@ -348,6 +373,42 @@ footer .w{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:4px
     </div>
   </section>
 
+  <section class="g" id="quiz">
+    <div class="w">
+      <span class="tag">#подбор</span>
+      <h2>Какой формат <em>вам подойдёт?</em></h2>
+      <p class="lede">Четыре вопроса — и подскажу, с чего начать. Ответы никуда не отправляются.</p>
+      <form class="quiz" id="quizForm" novalidate>
+        <fieldset><legend><span>1/4</span>Где вам удобнее тренироваться?</legend>
+          <div class="opts">
+            <input type="radio" name="place" id="q1a" value="self"><label for="q1a">В своём зале или дома</label>
+            <input type="radio" name="place" id="q1b" value="studio"><label for="q1b">В студии в центре СПб</label>
+            <input type="radio" name="place" id="q1c" value="unsure"><label for="q1c">Пока не знаю</label>
+          </div></fieldset>
+        <fieldset><legend><span>2/4</span>Какой у вас опыт?</legend>
+          <div class="opts">
+            <input type="radio" name="exp" id="q2a" value="new"><label for="q2a">Не занималась или очень давно</label>
+            <input type="radio" name="exp" id="q2b" value="pause"><label for="q2b">Занималась, сейчас перерыв</label>
+            <input type="radio" name="exp" id="q2c" value="regular"><label for="q2c">Тренируюсь регулярно</label>
+          </div></fieldset>
+        <fieldset><legend><span>3/4</span>Сколько тренировок в неделю реально?</legend>
+          <div class="opts">
+            <input type="radio" name="freq" id="q3a" value="1-2"><label for="q3a">1–2</label>
+            <input type="radio" name="freq" id="q3b" value="3"><label for="q3b">3</label>
+            <input type="radio" name="freq" id="q3c" value="more"><label for="q3c">Больше</label>
+          </div></fieldset>
+        <fieldset><legend><span>4/4</span>Что для вас важнее всего?</legend>
+          <div class="opts">
+            <input type="radio" name="goal" id="q4a" value="tech"><label for="q4a">Поставить технику</label>
+            <input type="radio" name="goal" id="q4b" value="food"><label for="q4b">Питание без жёстких диет</label>
+            <input type="radio" name="goal" id="q4c" value="habit"><label for="q4c">Регулярность и поддержка</label>
+          </div></fieldset>
+        <p class="quiz-note" id="quizHint">Ответьте на все вопросы, чтобы увидеть подсказку.</p>
+        <div class="result" id="quizResult" hidden aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+
   <section class="g" id="how">
     <div class="w">
       <span class="tag">#как_работаем</span>
@@ -408,6 +469,7 @@ footer .w{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:4px
             <span class="chip">Очно · центр СПб</span>
             <h3 style="font-size:22px">Мини-группы</h3>
             <p class="small">Студия Sequoia D Anima, наб. р. Мойки, 62/2, м. Адмиралтейская. Все уровни подготовки.</p>
+            <a class="maplink" href="https://yandex.ru/maps/?text=%D0%A1%D0%B0%D0%BD%D0%BA%D1%82-%D0%9F%D0%B5%D1%82%D0%B5%D1%80%D0%B1%D1%83%D1%80%D0%B3%2C%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%20%D1%80%D0%B5%D0%BA%D0%B8%20%D0%9C%D0%BE%D0%B9%D0%BA%D0%B8%2C%2062/2" target="_blank" rel="noopener">Как добраться — открыть в Яндекс.Картах →</a>
           </div>
           <div class="slots">
             <div class="slot"><span class="day"><span><small>Ср</small><b>10:00</b></span></span><p><strong>Ягодицы + кор</strong><span>55 минут · до 6 человек</span></p></div>
@@ -554,6 +616,32 @@ document.getElementById('copy').addEventListener('click',function(){
   function upd(){dock.classList.toggle('hide',vis.hero||vis.fin)}
   new IntersectionObserver(function(e){vis.hero=e[0].isIntersecting;upd()},{threshold:.25}).observe(hero);
   new IntersectionObserver(function(e){vis.fin=e[0].isIntersecting;upd()},{threshold:.15}).observe(fin);
+})();
+
+(function(){
+  var form=document.getElementById('quizForm');if(!form)return;
+  var out=document.getElementById('quizResult'),hint=document.getElementById('quizHint');
+  var TG='https://t.me/Gym_mom1988';
+  var R={
+    online:{t:'Онлайн-сопровождение',p:'Программа под ваш зал или дом, проверка техники по видео после каждой тренировки в первый месяц и разбор питания.',price:'Первый месяц — 5 000 ₽, далее 8 000 ₽.'},
+    group:{t:'Мини-группы в студии',p:'Тренировка до 6 человек, я рядом и поправляю технику вживую. Среда 10:00, суббота 11:00 и 12:00, м. Адмиралтейская.',price:'Пробное занятие — 800 ₽.'},
+    trial:{t:'Начните с пробного занятия',p:'Если пока не знаете формат, приходите на пробное в группу: посмотрим технику вживую и решим, как продолжать — в студии или онлайн.',price:'Пробное занятие — 800 ₽.'}
+  };
+  function val(n){var e=form.querySelector('input[name="'+n+'"]:checked');return e?e.value:null}
+  function upd(){
+    var place=val('place'),exp=val('exp'),freq=val('freq'),goal=val('goal');
+    if(!(place&&exp&&freq&&goal)){out.hidden=true;hint.hidden=false;return}
+    var key=place==='self'?'online':place==='studio'?'group':(exp==='regular'?'online':'trial');
+    var extra=[];
+    if(goal==='food'&&key!=='online')extra.push('Разбор питания входит в онлайн-сопровождение — его можно совместить с группой, обсудим на созвоне.');
+    if(freq==='1-2'&&key==='online')extra.push('Программа рассчитана на 3 тренировки в неделю. Если реально 1–2, скажите об этом на созвоне — честно скажу, что получится.');
+    var r=R[key];
+    out.innerHTML='<h3>'+r.t+'</h3><p>'+r.p+'</p><p><b>'+r.price+'</b></p>'+extra.map(function(x){return '<p class="small">'+x+'</p>'}).join('')+
+      '<a class="btn btn-main" href="'+TG+'" target="_blank" rel="noopener">Написать «СТАРТ»</a><p class="small">Это подсказка. Окончательно формат выберем вместе на коротком созвоне.</p>';
+    out.hidden=false;hint.hidden=true;
+  }
+  form.addEventListener('change',upd);
+  form.addEventListener('submit',function(e){e.preventDefault()});
 })();
 </script>
 
