@@ -1,10 +1,11 @@
 /* ALENAFIT — работа как приложение и без интернета.
-   Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия.
+   Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
+   а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-v3';
+const VERSION = 'alenafit-v4';
 const CORE = [
   './', './index.html', './servisy.html', './progress.html', './kalorii.html', './vozvrat.html',
-  './zal.html', './korzina.html', './recepty.html', './golod.html', './pitanie.html', './404.html',
+  './zal.html', './korzina.html', './recepty.html', './golod.html', './pitanie.html', './offline.html',
   './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
   './img/brand/mark-light.svg', './img/brand/wordmark-light.svg', './img/brand/logo-light.svg'
 ];
@@ -31,7 +32,7 @@ self.addEventListener('fetch', e => {
       fetch(req).then(res => {
         if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
         return res;
-      }).catch(() => caches.match(req, { ignoreSearch: isPage }).then(r => r || (isPage ? caches.match('./index.html') : Response.error())))
+      }).catch(() => caches.match(req, { ignoreSearch: isPage }).then(r => r || (isPage ? caches.match('./offline.html') : Response.error())))
     );
     return;
   }
