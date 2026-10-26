@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1e1a">
+<title>Мой прогресс: журнал и отчёт в PDF · Сила без перегибов</title>
+<meta name="description" content="Журнал прогресса: расчётный максимум и тоннаж в силовых, результаты тестов, активность и замеры. Графики динамики и отчёт в PDF.">
+<link rel="canonical" href="https://alenafit.com/progress.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:url" content="https://alenafit.com/progress.html">
+<meta property="og:title" content="Мой прогресс: журнал и отчёт в PDF · Сила без перегибов">
+<meta property="og:description" content="Журнал прогресса: расчётный максимум и тоннаж в силовых, результаты тестов, активность и замеры. Графики динамики и отчёт в PDF.">
+<meta property="og:image" content="https://alenafit.com/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/site.css">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<header class="bar g">
+  <div class="w">
+    <a class="brand" href="./"><span class="mono" aria-hidden="true">АВ</span><span><b>Сила без перегибов</b><small>Алёна · тренер и нутрициолог</small></span></a>
+    <nav class="nav" aria-label="Разделы">
+      <a href="./#plans">Цены</a><a href="nauka.html">Наука</a><a href="testy.html">Тесты</a><a href="servisy.html">Полезное</a><a href="novosti.html">Новости</a><a href="progress.html">Прогресс</a>
+    </nav>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span>Меню</button>
+    <a class="btn btn-main" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">СТАРТ</a>
+  </div>
+</header>
+<div class="mnav" id="mnav" hidden>
+  <nav class="mnav-in g" aria-label="Меню">
+    <a href="./">Главная</a>
+    <a href="./#plans">Форматы и цены</a>
+    <a href="./#quiz">Подобрать формат</a>
+    <a href="./#groups">Расписание групп</a>
+    <a href="nauka.html">Наука простым языком</a>
+    <a href="testy.html">Тесты за 5 минут</a>
+    <a href="servisy.html">Полезное: тренировка дня, таймер, дневник</a>
+    <a href="novosti.html">Новости</a>
+    <a href="progress.html">Мой прогресс и отчёт в PDF</a>
+    <a href="./#faq">Частые вопросы</a>
+    <a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram ↗</a>
+    <a class="btn btn-main btn-wide" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
+  </nav>
+</div>
+
+<main id="top">
+  <section class="page-hero g">
+    <div class="w">
+      <a class="back" href="./">← На главную</a>
+      <span class="tag" style="display:block">#прогресс</span>
+      <h1>Мой <em>прогресс</em></h1>
+      <p class="lede">Записывайте результаты — сайт посчитает показатели по общепринятым формулам, построит графики и соберёт отчёт, который можно сохранить в PDF и показать тренеру.</p>
+      <nav class="toc" aria-label="Разделы журнала"><a href="#silovye">Силовые</a><a href="#testy">Тесты</a><a href="#aktivnost">Активность</a><a href="#zamery">Замеры</a><a href="#otchet">Отчёт в PDF</a></nav>
+      <p class="notice"><b>Данные хранятся только в этом браузере на этом устройстве</b> и никуда не отправляются. Чтобы не потерять их при смене телефона, сохраните копию в файл — кнопка внизу страницы.</p>
+    </div>
+  </section>
+
+  <section class="g" style="padding-top:24px">
+    <div class="w">
+
+      <article class="test" id="silovye">
+        <span class="tag">Блок 1</span>
+        <h2>Силовые: <em>максимум и тоннаж</em></h2>
+        <div class="test-body">
+          <div class="tool">
+            <div class="field"><label for="pEx">Упражнение</label><input id="pEx" list="exList" autocomplete="off" placeholder="например, Гоблет-присед"><datalist id="exList"></datalist></div>
+            <div class="calc-grid g4">
+              <div class="field"><label for="pW">Вес, кг</label><input id="pW" type="number" inputmode="decimal" step="0.5" min="0.5" max="500" placeholder="20"></div>
+              <div class="field"><label for="pR">Повторы</label><input id="pR" type="number" inputmode="numeric" min="1" max="30" placeholder="10"></div>
+              <div class="field"><label for="pS">Подходы</label><input id="pS" type="number" inputmode="numeric" min="1" max="20" placeholder="3"></div>
+              <div class="field"><label for="pDate">Дата</label><input id="pDate" type="date"></div>
+            </div>
+            <div class="btn-row"><button type="button" class="tbtn" id="pAdd">Добавить подход</button></div>
+            <p class="verdict" id="pMsg" aria-live="polite">Записывайте лучший рабочий подход в упражнении. Если подходы разные, добавьте каждый — для даты возьмётся лучший.</p>
+          </div>
+          <div class="tool" id="vLifts"></div>
+        </div>
+      </article>
+
+      <article class="test" id="testy">
+        <span class="tag">Блок 2 · раз в месяц</span>
+        <h2>Функциональные <em>тесты</em></h2>
+        <div class="test-body">
+          <div class="tool">
+            <p class="small">Как проводить тесты — на странице <a href="testy.html">«Тесты»</a>.</p>
+            <div class="calc-grid g4">
+              <div class="field"><label for="tSrt">«Сесть-встать», баллы</label><input id="tSrt" type="number" inputmode="decimal" step="0.5" min="0" max="10" placeholder="0–10"></div>
+              <div class="field"><label for="tChair">Подъёмы со стула за 30 с</label><input id="tChair" type="number" inputmode="numeric" min="0" max="60" placeholder="например, 14"></div>
+              <div class="field"><label for="tBal">Баланс 10 секунд</label><select id="tBal"><option value="">не делала</option><option value="2">получилось на обеих ногах</option><option value="1">на одной ноге</option><option value="0">не получилось</option></select></div>
+              <div class="field"><label for="tDate">Дата</label><input id="tDate" type="date"></div>
+            </div>
+            <div class="btn-row"><button type="button" class="tbtn" id="tAdd">Добавить результаты</button></div>
+            <p class="verdict" id="tMsg" aria-live="polite">Заполните те тесты, которые делали.</p>
+          </div>
+          <div class="tool" id="vTests"></div>
+        </div>
+      </article>
+
+      <article class="test" id="aktivnost">
+        <span class="tag">Блок 3 · раз в неделю</span>
+        <h2>Активность <em>за неделю</em></h2>
+        <div class="test-body">
+          <div class="tool">
+            <div class="calc-grid g4">
+              <div class="field"><label for="aWeek">Неделя, с понедельника</label><input id="aWeek" type="date"></div>
+              <div class="field"><label for="aSteps">Шагов в день, в среднем</label><input id="aSteps" type="number" inputmode="numeric" min="0" max="60000" placeholder="например, 6500"></div>
+              <div class="field"><label for="aMin">Минут силовых за неделю</label><input id="aMin" type="number" inputmode="numeric" min="0" max="2000" placeholder="например, 60"></div>
+              <div class="field"><label for="aDays">Дней с силовыми</label><input id="aDays" type="number" inputmode="numeric" min="0" max="7" placeholder="например, 2"></div>
+            </div>
+            <div class="btn-row"><button type="button" class="tbtn" id="aAdd">Записать неделю</button></div>
+            <p class="verdict" id="aMsg" aria-live="polite">Средние шаги видно в приложении «Здоровье» или в фитнес-браслете.</p>
+          </div>
+          <div class="tool" id="vAct"></div>
+        </div>
+      </article>
+
+      <details class="test body-block" id="zamery">
+        <summary><span class="tag">Блок 4 · по желанию</span><h2>Замеры <em>тела</em></h2></summary>
+        <div class="test-body">
+          <div class="tool">
+            <p class="small">Необязательный блок. Если цифры на сантиметровой ленте или весах вызывают тревогу — пропустите его: прогресс отлично виден по силе и тестам.</p>
+            <div class="calc-grid g4">
+              <div class="field"><label for="bWaist">Талия, см</label><input id="bWaist" type="number" inputmode="decimal" step="0.5" min="30" max="250"></div>
+              <div class="field"><label for="bHips">Бёдра, см</label><input id="bHips" type="number" inputmode="decimal" step="0.5" min="30" max="250"></div>
+              <div class="field"><label for="bWeight">Вес, кг</label><input id="bWeight" type="number" inputmode="decimal" step="0.1" min="25" max="300"></div>
+              <div class="field"><label for="bDate">Дата</label><input id="bDate" type="date"></div>
+            </div>
+            <div class="btn-row"><button type="button" class="tbtn" id="bAdd">Добавить замеры</button></div>
+            <p class="verdict" id="bMsg" aria-live="polite">Замеряйте в одно время, например утром, раз в 2–4 недели.</p>
+          </div>
+          <div class="tool" id="vBody"></div>
+        </div>
+      </details>
+
+      <article class="test" id="otchet">
+        <span class="tag">Отчёт</span>
+        <h2>Сохранить отчёт <em>в PDF</em></h2>
+        <div class="test-body">
+          <div class="tool">
+            <div class="field"><label for="rName">Имя для отчёта (необязательно)</label><input id="rName" autocomplete="off" placeholder="например, Мария"></div>
+            <label class="check"><input type="checkbox" id="rBody"> Включить замеры тела в отчёт</label>
+            <div class="btn-row"><button type="button" class="tbtn" id="pdfBtn">Сохранить отчёт в PDF</button></div>
+            <p class="verdict" id="pdfMsg" aria-live="polite">Откроется окно печати. Выберите «Сохранить как PDF»: на iPhone — значок «Поделиться» → «Сохранить в Файлы», на Android — принтер «Сохранить как PDF».</p>
+          </div>
+          <div class="tool">
+            <h3 style="font-size:17px">Последние записи</h3>
+            <div id="vLog"></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="test" id="kopiya">
+        <span class="tag">Резервная копия</span>
+        <h2>Не потерять <em>данные</em></h2>
+        <div class="btn-row">
+          <button type="button" class="tbtn" id="expBtn">Сохранить копию в файл</button>
+          <label class="tbtn ghost file-btn" for="impFile">Восстановить из файла</label><input type="file" id="impFile" accept="application/json,.json" class="sr-only">
+          <button type="button" class="tbtn ghost" id="wipeBtn">Удалить все данные</button>
+        </div>
+        <p class="verdict" id="bkMsg" aria-live="polite">Копия — это файл progress-ДАТА.json. Его можно перенести на новый телефон и восстановить здесь.</p>
+      </article>
+
+    </div>
+  </section>
+  <div id="report" class="report" aria-hidden="true"></div>
+  <section class="final g" id="start">
+    <div class="w">
+      <span class="tag">Первый шаг</span>
+      <h2>Покажите отчёт <em>тренеру</em></h2>
+      <p>Пришлите PDF-отчёт и напишите «СТАРТ» — подскажу, как двигаться дальше.</p>
+      <a class="btn btn-main btn-wide" style="margin-top:18px" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
+    </div>
+  </section>
+</main>
+<footer class="g"><div class="w"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a></span></div></footer>
+<script src="js/progress.js" defer></script>
+<script src="js/nav.js" defer></script>
+</body>
+</html>
