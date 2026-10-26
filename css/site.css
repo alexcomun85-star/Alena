@@ -1005,3 +1005,14 @@ circle.lv{display:block}
 .tabs [role=tab][aria-selected=true]{background:var(--amber);color:var(--amber-ink)}
 .tabs [role=tab]:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 .tab-panel{margin-top:6px}
+
+/* Крупный шрифт в настройках телефона: длинные слова переносятся, а не вылезают за карточки */
+body{overflow-wrap:break-word}
+h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto}
+@media (max-width:719px){.cat-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,9em),1fr))}}
+.creds span{text-align:right}
+.about-text,.about-text>*{min-width:0}
+@media (max-width:479px){.creds div{flex-direction:column;gap:2px}.creds span{white-space:normal;text-align:left}}
+.bz-stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,6.6em),1fr))}
+.slot{grid-template-columns:auto 1fr}
+.day{width:auto;height:auto;min-width:62px;min-height:62px;aspect-ratio:1;padding:6px}
