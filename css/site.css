@@ -604,3 +604,6 @@ details.body-block[open]>summary h2::after{content:" −"}
 .manifest{overflow:hidden}
 
 @media (max-width:480px){.brand-text small{display:none}}
+
+.ph-stat{max-width:46%}
+.ph-chip{max-width:48%}
