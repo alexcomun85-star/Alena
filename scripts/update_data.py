@@ -49,6 +49,7 @@ def news():
 
 
 TR_URL = "https://translate.api.cloud.yandex.net/translate/v2/translate"
+TR_STATUS = {"state": "not_run"}
 CACHE = os.path.expanduser(os.environ.get("TR_CACHE", "~/tr-cache/translations.json"))
 
 
@@ -61,17 +62,24 @@ def translate(items):
     except Exception:
         cache = {}
     todo = [it["title"] for it in items if it.get("lang") == "en" and it["title"] not in cache]
+    TR_STATUS.update(state="no_key" if not (key and folder) else ("cached" if not todo else "pending"),
+                     has_key=bool(key), has_folder=bool(folder), folder_prefix=folder[:3])
     if todo and key and folder:
         try:
             r = requests.post(TR_URL, headers={"Authorization": f"Api-Key {key}"}, timeout=30,
                               json={"folderId": folder, "texts": todo, "sourceLanguageCode": "en", "targetLanguageCode": "ru"})
+            if r.status_code != 200:
+                TR_STATUS.update(state="error", http=r.status_code, message=r.text[:300])
             r.raise_for_status()
             for src, t in zip(todo, r.json().get("translations", [])):
                 if t.get("text"):
                     cache[src] = t["text"]
             print("translated", len(todo))
+            TR_STATUS.update(state="ok", translated=len(todo))
         except Exception as e:  # перевод недоступен — показываем оригинал
             print("translate fail", e)
+            if TR_STATUS.get("state") != "error":
+                TR_STATUS.update(state="error", message=str(e)[:300])
     for it in items:
         if it["title"] in cache:
             it["title_ru"] = cache[it["title"]]
@@ -114,6 +122,7 @@ def write(path, data):
 
 if __name__ == "__main__":
     ch = os.environ.get("TG_CHANNEL", "").strip().lstrip("@")
-    write("data/news.json", {"updated": NOW, "items": translate(news())})
+    items = translate(news())
+    write("data/news.json", {"updated": NOW, "translation": TR_STATUS, "items": items})
     write("data/channel.json", {"updated": NOW, "channel": ch, "items": channel(ch)})
     print("done")
