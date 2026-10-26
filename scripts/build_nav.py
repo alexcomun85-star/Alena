@@ -19,6 +19,7 @@ MENU = [
         ("servisy.html#trenirovka", "Тренировка дня", "Готовая тренировка на 15–40 минут"),
         ("vozvrat.html", "План возвращения", "Если была пауза: 4 недели и PDF"),
         ("zal.html", "Карта зала", "Что за тренажёр и как его настроить"),
+        ("odezhda.html", "Одежда и обувь", "Что надеть и как стирать, чтобы не пахло"),
         ("progress.html", "Мой прогресс", "Журнал, графики и отчёт в PDF"),
         ("servisy.html", "Все инструменты", "Таймер, трекер, дневник по циклу"),
     ], ("vozvrat.html", "Возвращаетесь после паузы?", "Соберите план на 4 недели за минуту")),
@@ -65,7 +66,7 @@ def build():
         top.append(
             f'<div class="dd" data-group="{k}"><button class="dd-btn" type="button" aria-expanded="false" '
             f'aria-controls="dd-{k}">{title}<i class="chev" aria-hidden="true"></i></button>'
-            f'<div class="dd-panel" id="dd-{k}" hidden><div class="dd-grid">{links}'
+            f'<div class="dd-panel" id="dd-{k}" hidden><div class="dd-grid"><div class="dd-links">{links}</div>'
             f'<a class="dd-promo" href="{ph}"{ext(ph)}>{icon(k)}<b>{pt}</b><span>{pd}</span><i>Перейти →</i></a>'
             f'</div></div></div>')
         mlinks = "".join(

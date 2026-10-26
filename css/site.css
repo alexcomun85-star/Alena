@@ -846,3 +846,11 @@ circle.lv{display:block}
 .m-cta{position:sticky;bottom:0;padding:16px 0 calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,transparent,var(--band) 30%);margin-top:16px}
 .m-cta .btn{margin-top:0!important}
 .mg summary::after{content:none!important;display:none!important}
+@media (min-width:1024px){
+  .dd-grid{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+  .dd-links{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
+  .dd-grid .dd-link:nth-child(n){grid-column:auto}
+  .dd-promo{grid-column:2;grid-row:1}
+}
+.kz-static .chk{display:grid;gap:6px;margin:0}
+@media (min-width:900px){#stirka .steps3{grid-template-columns:1fr 1fr}}.kz-static{margin-top:20px}.kz-static .kz-g{background:var(--surface);border:1px solid var(--line)}
