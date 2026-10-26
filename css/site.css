@@ -875,3 +875,23 @@ circle.lv{display:block}
 #gzOut a{color:var(--amber)}
 @media (min-width:900px){.lvl-grid{grid-template-columns:repeat(4,1fr)}.lvl-grid.lvl-3{grid-template-columns:repeat(3,1fr)}.inv-grid{grid-template-columns:repeat(3,1fr)}.acc-grid{grid-template-columns:repeat(3,1fr)}}
 @media (min-width:900px){.inv .nut-dl{grid-template-columns:1fr;gap:10px}}
+/* Мягкий CTA и тренер */
+.soft-cta{margin-top:16px;background:linear-gradient(135deg,var(--surface-2),var(--surface));border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:var(--r-lg);padding:16px 18px;display:grid;gap:12px;align-items:center}
+.soft-cta b{display:block;font:700 17px var(--display)}
+.soft-cta span{display:block;color:var(--muted);font-size:14.5px;margin-top:4px}
+.soft-btns{display:flex;flex-wrap:wrap;gap:8px}
+.soft-btns .btn{min-height:44px;padding:10px 18px;font-size:14.5px}
+.path-grid{display:grid;gap:12px;margin-top:20px}
+.path{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;display:grid;gap:10px;align-content:start}
+.path-main{border:2px solid var(--amber)}
+.path-h{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+.path-p{font:800 26px var(--display)}
+.path-p small{display:block;font:500 13.5px var(--body);color:var(--muted);margin-top:4px}
+.path dl{margin:0;display:grid;gap:4px}
+.path dt{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:6px}
+.path dd{margin:0;font-size:15px}
+.path .btn{margin-top:8px}
+.inv p{color:var(--muted);font-size:15px}
+#trOut a{color:var(--amber)}
+@media (min-width:900px){.soft-cta{grid-template-columns:1fr auto;padding:18px 22px}.path-grid{grid-template-columns:repeat(3,1fr);align-items:stretch}}
+.soft-wrap{padding-top:24px!important}
