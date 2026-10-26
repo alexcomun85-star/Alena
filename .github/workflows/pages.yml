@@ -32,7 +32,7 @@ jobs:
           restore-keys: translations-
       - name: Собрать новости и посты канала
         env:
-          TG_CHANNEL: ""   # ник нового канала без @, например gymmom_spb
+          TG_CHANNEL: "alena_gymmom"   # ник канала без @
           YC_API_KEY: ${{ secrets.YC_API_KEY }}
           YC_FOLDER_ID: b1g1s0osh5lebv9esn5n   # ID каталога Yandex Cloud, не секрет
         run: |
