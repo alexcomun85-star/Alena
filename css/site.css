@@ -908,3 +908,12 @@ circle.lv{display:block}
 .brand-text{flex:none}
 @media (max-width:899px){.eat-teaser{grid-template-columns:96px 1fr;align-items:start;gap:14px}.eat-teaser img{max-width:96px;border-radius:14px}.eat-teaser h2{font-size:22px;margin-top:6px}.eat-teaser .lede{font-size:15px}}
 @media (max-width:380px){.eat-teaser{grid-template-columns:1fr}.eat-teaser img{max-width:120px}}
+/* Анонс с фото: плавный переход фото в фон карточки */
+.eat-teaser.eat-photo{position:relative;overflow:hidden;display:block;padding:0;isolation:isolate}
+.eat-photo img{display:block;width:100%!important;max-width:none!important;height:300px!important;aspect-ratio:auto!important;object-fit:cover;object-position:50% 22%;border-radius:0!important;filter:brightness(1.18) contrast(1.02);-webkit-mask-image:linear-gradient(180deg,#000 55%,transparent 100%);mask-image:linear-gradient(180deg,#000 55%,transparent 100%)}
+.eat-photo>div{position:relative;margin-top:-56px;padding:0 20px 22px}
+@media (min-width:900px){
+  .eat-photo{min-height:340px}
+  .eat-photo img{position:absolute;right:0;top:0;width:46%!important;height:100%!important;object-position:50% 30%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 38%);mask-image:linear-gradient(90deg,transparent 0,#000 38%)}
+  .eat-photo>div{margin:0;padding:40px 44px;max-width:58%}
+}
