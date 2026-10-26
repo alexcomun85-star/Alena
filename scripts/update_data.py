@@ -100,11 +100,17 @@ def channel(name):
         return []
     soup = BeautifulSoup(r.text, "html.parser")
     posts = []
+    seen = set()
     for m in soup.select(".tgme_widget_message[data-post]"):
+        if "service_message" in (m.get("class") or []):  # «канал создан», «сообщение закреплено»
+            continue
         txt = m.select_one(".tgme_widget_message_text")
         if not txt:
             continue
         text = clean(txt.decode_contents().replace("<br/>", " "), 280)
+        if not text or text in seen or re.match(r"(channel created|канал создан|.*\b(pinned|закрепил))", text, re.I):
+            continue
+        seen.add(text)
         tm = m.select_one("time[datetime]")
         posts.append({
             "text": text,
