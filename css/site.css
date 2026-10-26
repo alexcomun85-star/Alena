@@ -896,3 +896,7 @@ circle.lv{display:block}
 @media (min-width:900px){.soft-cta{grid-template-columns:1fr auto;padding:18px 22px}.path-grid{grid-template-columns:repeat(3,1fr);align-items:stretch}}
 .soft-wrap{padding-top:24px!important}
 .hero-photo::before{opacity:.1}.hero-photo img{filter:saturate(.95) contrast(1.03)}
+/* Портрет: плавный переход в фон вместо арки и кольца */
+.portrait{border-radius:0;box-shadow:none;background:transparent;overflow:visible;position:relative;isolation:isolate}
+.portrait img{-webkit-mask-image:radial-gradient(ellipse 72% 70% at 50% 40%,#000 52%,rgba(0,0,0,.6) 70%,transparent 92%);mask-image:radial-gradient(ellipse 72% 70% at 50% 40%,#000 52%,rgba(0,0,0,.6) 70%,transparent 92%)}
+.portrait::before{content:"";position:absolute;inset:6% 4% 10%;z-index:-1;border-radius:50%;background:radial-gradient(closest-side,rgba(240,169,43,.22),rgba(44,110,95,.18) 60%,transparent);filter:blur(24px)}
