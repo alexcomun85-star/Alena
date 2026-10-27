@@ -154,6 +154,8 @@ def t_fold(browser):
         if width == 768:
             check('Fold: мобильное меню остаётся открытым в промежуточной ширине', True, p.is_visible('#mnav'))
         else:
+            # matchMedia emits its change event after the viewport resize returns.
+            p.wait_for_function("!document.body.classList.contains('menu-open')")
             check(f'Fold {width}: скрытое меню не блокирует прокрутку', False,
                   p.evaluate("document.body.classList.contains('menu-open')"))
         check(f'Fold {width}: введённый текст сохранён', 'Сохранить при раскрытии', p.input_value('#cName'))
