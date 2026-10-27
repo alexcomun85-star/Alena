@@ -827,9 +827,9 @@ circle.lv{display:block}
   .dd-promo span{font-size:14px;color:var(--muted)}
   .dd-promo i{font-style:normal;color:var(--amber);font-weight:700;margin-top:6px}
   .dd-promo:hover{background:var(--teal)}
-  .dd-grid .dd-link:nth-child(1){grid-column:1}.dd-grid .dd-link:nth-child(2){grid-column:2}
-  .dd-grid .dd-link:nth-child(3){grid-column:1}.dd-grid .dd-link:nth-child(4){grid-column:2}
-  .dd-grid .dd-link:nth-child(5){grid-column:1/span 2}
+  .dd-grid .dd-links>.pin-wrap:nth-child(1){grid-column:1}.dd-grid .dd-links>.pin-wrap:nth-child(2){grid-column:2}
+  .dd-grid .dd-links>.pin-wrap:nth-child(3){grid-column:1}.dd-grid .dd-links>.pin-wrap:nth-child(4){grid-column:2}
+  .dd-grid .dd-links>.pin-wrap:nth-child(5){grid-column:1/span 2}
 }
 @media (min-width:1024px) and (max-width:1180px){.brand-text small{display:none}.dd-btn{padding:0 10px}}
 
@@ -857,7 +857,7 @@ circle.lv{display:block}
 @media (min-width:1024px){
   .dd-grid{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
   .dd-links{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
-  .dd-grid .dd-link:nth-child(n){grid-column:auto}
+  .dd-grid .dd-links>.pin-wrap:nth-child(n){grid-column:auto}
   .dd-promo{grid-column:2;grid-row:1}
 }
 .kz-static .chk{display:grid;gap:6px;margin:0}
@@ -1041,3 +1041,64 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenat
 @media print{.dock{display:none!important}}
 /* Режим приложения: кнопка «назад» + логотип не помещаются на узком экране — оставляем знак без надписи */
 @media (max-width:479px){.bar .w:has(.app-back) .brand-text{display:none}}
+
+/* «Мой зал»: звёздочки в меню, кнопка в шапке, блок в мобильном меню, страница */
+.pin-wrap{position:relative;min-width:0}
+.pin-wrap>a{padding-right:48px!important}
+.pin{position:absolute;top:50%;right:6px;transform:translateY(-50%);width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:none;color:var(--muted);cursor:pointer;opacity:.75}
+.pin svg{width:20px;height:20px}
+.pin:hover,.pin:focus-visible{opacity:1;color:var(--amber);background:var(--surface)}
+.pin.on{opacity:1;color:var(--amber)}
+.pin.on svg,.zal-opt.on svg{fill:currentColor}
+.zal-btn{display:none;position:relative;align-items:center;justify-content:center;gap:6px;min-height:40px;min-width:40px;padding:0 10px;border-radius:999px;background:var(--surface-2);color:var(--amber);font:600 14px var(--body);text-decoration:none;flex:none}
+.zal-btn svg{width:20px;height:20px;flex:none}
+.zal-btn span{display:none}
+.zal-n{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--amber);color:var(--amber-ink,#132823);font:700 11px/18px var(--body);font-style:normal;text-align:center}
+.zal-n[hidden]{display:none}
+@media (min-width:720px){.zal-btn{display:inline-flex;margin-left:auto}.zal-btn~.inst-btn,.zal-btn~.menu-btn{margin-left:0}}
+@media (min-width:1024px){.zal-btn{margin-left:0;margin-right:8px;order:2}}
+@media (min-width:1440px){.zal-btn span{display:inline}}
+.home-btn{position:relative}
+.home-btn .zal-n{top:-2px;right:-2px}
+.zal-dock svg{color:var(--amber)}
+.dock .w{gap:10px}
+@media (max-width:420px){.dock small{display:none}}
+.m-zal{border-bottom:1px solid var(--line);padding:6px 0 12px}
+.m-zal-head{display:flex;align-items:center;gap:14px;padding:8px 0;text-decoration:none;color:var(--ink);position:relative}
+.m-zal-head svg{width:30px;height:30px;color:var(--amber);flex:none;margin-left:5px}
+.m-zal-head b{display:block;font:700 18px var(--display);color:var(--amber)}
+.m-zal-head small{display:block;font-size:13px;color:var(--muted)}
+.m-zal-head .zal-n{position:static;margin-left:auto}
+.m-zal-links{display:flex;flex-wrap:wrap;gap:8px;padding-left:49px}
+.m-zal-links:empty{display:none}
+.mnav-in .m-zal-links a{display:inline-flex!important;align-items:center;min-height:38px!important;padding:6px 14px;border:1px solid var(--line)!important;border-radius:999px;font:600 14px var(--body)!important;color:var(--ink);text-decoration:none}
+.zal-toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);z-index:110;max-width:calc(100% - 32px);padding:12px 18px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-size:14.5px;box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.zal-toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.zal-toast a{color:var(--amber)}
+@media (min-width:1024px){.zal-toast{bottom:32px}}
+.zal-list{display:grid;gap:8px;margin-top:14px}
+.zal-item{display:flex;align-items:stretch;gap:6px;background:var(--surface-2);border-radius:16px;padding:6px}
+.zal-go{flex:1;min-width:0;display:grid;gap:2px;padding:10px 12px;border-radius:12px;text-decoration:none;color:var(--ink)}
+.zal-go b{font:700 16px var(--display)}
+.zal-go span{font-size:13.5px;color:var(--muted)}
+.zal-go:hover,.zal-go:focus-visible{background:var(--surface)}
+.zal-ctl{display:flex;align-items:center;gap:2px}
+.zal-ctl button{width:40px;height:40px;border:0;border-radius:50%;background:none;color:var(--muted);font:600 18px var(--body);cursor:pointer}
+.zal-ctl button:hover:not(:disabled),.zal-ctl button:focus-visible{background:var(--surface);color:var(--ink)}
+.zal-ctl button:disabled{opacity:.3;cursor:default}
+.zal-empty{padding:18px;border:1px dashed var(--line);border-radius:16px;color:var(--muted);margin:14px 0 0}
+.zal-group{margin-top:18px}
+.zal-group h3{font:700 13px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.zal-opts{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(min(100%,15em),1fr))}
+.zal-opt{display:flex;align-items:flex-start;gap:10px;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:none;color:var(--ink);cursor:pointer;font:inherit}
+.zal-opt svg{width:22px;height:22px;flex:none;color:var(--muted);margin-top:1px}
+.zal-opt b{display:block;font:600 15.5px var(--body)}
+.zal-opt small{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.zal-opt.on{border-color:var(--amber);background:var(--surface)}
+.zal-opt.on svg{color:var(--amber)}
+.zal-opt:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+@media print{.zal-toast,.pin{display:none!important}}
+.mnav-in .m-zal-head{border:0!important;min-height:auto!important;font:inherit!important;padding:8px 0!important}
+.m-zal-head small{font-weight:400}
+@media (min-width:1024px){.brand{flex:none}}
+@media (min-width:1024px) and (max-width:1439px){.inst-btn span{display:none}.inst-btn{min-width:40px;padding:0}}

@@ -5,7 +5,7 @@
 const VERSION = 'alenafit-v6';
 const CORE = [
   './', './index.html', './servisy.html', './progress.html', './kalorii.html', './vozvrat.html',
-  './zal.html', './korzina.html', './recepty.html', './golod.html', './pitanie.html', './offline.html',
+  './zal.html', './korzina.html', './recepty.html', './golod.html', './pitanie.html', './offline.html', './moy-zal.html',
   './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
   './img/brand/mark-light.svg', './img/brand/wordmark-light.svg', './img/brand/logo-light.svg'
 ];

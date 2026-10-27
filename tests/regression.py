@@ -480,6 +480,39 @@ def t_cycle(ctx):
         page.close()
 
 
+def t_myzal(ctx):
+    """«Мой зал»: звёздочки в меню, страница, порядок, удаление, хранение только в браузере."""
+    m = ctx.browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
+    page = fresh(m, "nauka.html")
+    page.click("#menuBtn")
+    for grp, h in (("know", "servisy.html#taymer"), ("know", "progress.html"), ("food", "recepty.html")):
+        page.evaluate(f"document.querySelector('.mg[data-group={grp}]').open=true")
+        page.wait_for_timeout(100)
+        page.click(f'.mnav .pin[data-h="{h}"]')
+    check("Мой зал: звёздочка не закрывает меню", True, page.is_visible("#mnav"))
+    stored = json.loads(page.evaluate("localStorage.getItem('myzal_v1')"))
+    check("Мой зал: три раздела сохранены по порядку", ["servisy.html#taymer", "progress.html", "recepty.html"], [x["h"] for x in stored])
+    check("Мой зал: счётчик в нижней панели", "3", page.eval_on_selector(".dock .zal-n", "e=>e.textContent"))
+    page.click("#menuBtn")
+    page.click(".dock .zal-dock")
+    page.wait_for_load_state()
+    names = lambda: page.eval_on_selector_all(".zal-item b", "e=>e.map(x=>x.textContent)")
+    check("Мой зал: страница показывает выбранные разделы", ["Интервальный таймер", "Мой прогресс", "Рецепты с белком"], names())
+    page.click(".zal-item:nth-child(3) button[data-act=up]")
+    check("Мой зал: перемещение вверх", ["Интервальный таймер", "Рецепты с белком", "Мой прогресс"], names())
+    page.click('.zal-opt[data-h="kalorii.html"]')
+    page.click(".zal-item:nth-child(1) button[data-act=del]")
+    check("Мой зал: добавление со страницы и удаление", ["Рецепты с белком", "Мой прогресс", "Калории и БЖУ"], names())
+    page.reload()
+    check("Мой зал: после перезагрузки список на месте", ["Рецепты с белком", "Мой прогресс", "Калории и БЖУ"], names())
+    check("Мой зал: ссылка ведёт на раздел", True, page.get_attribute(".zal-item:first-child .zal-go", "href") == "recepty.html")
+    page.evaluate("localStorage.setItem('myzal_v1','{сломано')")
+    page.reload()
+    check("Мой зал: повреждённые данные не ломают страницу", (True, []), (page.is_visible(".zal-empty"), page._errors))
+    page.close()
+    m.close()
+
+
 def main():
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
@@ -493,6 +526,7 @@ def main():
         t_recipes(ctx)
         t_print(ctx, browser)
         t_cycle(ctx)
+        t_myzal(ctx)
         browser.close()
     failed = [r for r in RESULTS if not r[0]]
     print(f"\nИтого: {len(RESULTS) - len(failed)} из {len(RESULTS)} проверок пройдены. PDF и файлы: {OUT}")
