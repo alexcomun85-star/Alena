@@ -15,23 +15,25 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: ${{ github.event_name == 'pull_request' && format('pages-pr-{0}', github.event.number) || 'pages' }}
+  cancel-in-progress: true
 
 jobs:
   checks:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container: mcr.microsoft.com/playwright/python:v1.64.1-noble
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-node@v4
         with:
-          python-version: "3.12"
+          node-version: "22"
       - name: Установить средства проверки
+        timeout-minutes: 8
         run: |
-          pip install playwright==1.56.0
-          python -m playwright install --with-deps chromium
-          sudo apt-get update
-          sudo apt-get install -y poppler-utils
+          pip install --retries 2 --timeout 30 playwright==1.64.1
+          apt-get update -o Acquire::Retries=2 -o Acquire::http::Timeout=30
+          apt-get install -y --no-install-recommends poppler-utils
       - name: Проверить сайт, калькуляторы и смену размеров экрана
         run: |
           python -m http.server 8766 > /tmp/alenafit-server.log 2>&1 &
