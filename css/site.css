@@ -1119,3 +1119,7 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenat
 .how-in p{margin:0}
 .how-x{position:absolute;top:18px;right:18px;width:44px;height:44px;border-radius:50%;border:0;background:var(--amber);color:var(--amber-ink);font:700 26px/1 var(--body);cursor:pointer}
 @media print{.how-btn,.how-dlg{display:none!important}}
+
+/* кнопка «Приложение» в шапке — всегда только пиктограмма (подпись — во всплывающей подсказке и для экранного диктора) */
+.bar .inst-btn span{display:none!important}
+.bar .inst-btn{width:40px;min-width:40px;padding:0;flex:none}
