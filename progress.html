@@ -26,7 +26,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20261027h">
+<link rel="stylesheet" href="css/site.css?v=20261027i">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -61,7 +61,7 @@
       <span class="tag" style="display:block">#прогресс</span>
       <h1>Мой <em>прогресс</em></h1>
       <p class="lede">Записывайте результаты — сайт посчитает показатели по общепринятым формулам, построит графики и соберёт отчёт, который можно сохранить в PDF и показать тренеру.</p>
-      <nav class="toc" aria-label="Разделы журнала"><a href="#silovye">Силовые</a><a href="#testy">Тесты</a><a href="#aktivnost">Активность</a><a href="#zamery">Замеры</a><a href="#otchet">Отчёт в PDF</a></nav>
+      <nav class="toc" aria-label="Разделы журнала"><a href="#silovye">Силовые</a><a href="#testy">Тесты</a><a href="#aktivnost">Активность</a><a href="#tsikl">Цикл</a><a href="#zamery">Замеры</a><a href="#otchet">Отчёт в PDF</a></nav>
       <p class="notice"><b>Данные хранятся только в этом браузере на этом устройстве</b> и никуда не отправляются. Чтобы не потерять их при смене телефона, сохраните копию в файл — кнопка внизу страницы.</p>
     </div>
   </section>
@@ -80,6 +80,10 @@
               <div class="field"><label for="pR">Повторы</label><input id="pR" type="number" inputmode="numeric" min="1" max="30" placeholder="10"></div>
               <div class="field"><label for="pS">Подходы</label><input id="pS" type="number" inputmode="numeric" min="1" max="20" placeholder="3"></div>
               <div class="field"><label for="pDate">Дата</label><input id="pDate" type="date"></div>
+            </div>
+            <div class="calc-grid g2">
+              <div class="field"><label for="pFe">Как прошла тренировка</label><select id="pFe"><option value="">не отмечать</option><option value="1">легко</option><option value="2">нормально</option><option value="3">тяжело</option></select></div>
+              <div class="field cyc-only" hidden><label for="pCd">День цикла</label><input id="pCd" type="number" inputmode="numeric" min="1" max="60" placeholder="подставится сам"></div>
             </div>
             <div class="btn-row"><button type="button" class="tbtn" id="pAdd">Добавить подход</button></div>
             <p class="verdict" id="pMsg" aria-live="polite">Записывайте лучший рабочий подход в упражнении. Если подходы разные, добавьте каждый — для даты возьмётся лучший.</p>
@@ -125,6 +129,16 @@
         </div>
       </article>
 
+      <article class="test" id="tsikl">
+        <span class="tag">Блок по желанию · учёт цикла</span>
+        <h2>Цикл <em>и результаты</em></h2>
+        <p>В среднем сила и прогресс от фазы цикла не зависят, но у конкретной женщины картина может быть своей. Отмечайте день цикла и самочувствие — через два цикла станет видно, есть ли у вас дни, когда тренировку лучше заранее облегчить. <a href="nauka.html#tsikl">Что говорят исследования</a>.</p>
+        <div class="test-body">
+          <div data-cycle-panel id="cycPanel"></div>
+          <div class="tool" id="vCycle"></div>
+        </div>
+      </article>
+
       <details class="test body-block" id="zamery">
         <summary><span class="tag">Блок 4 · по желанию</span><h2>Замеры <em>тела</em></h2></summary>
         <div class="test-body">
@@ -135,6 +149,7 @@
               <div class="field"><label for="bHips">Бёдра, см</label><input id="bHips" type="number" inputmode="decimal" step="0.5" min="30" max="250"></div>
               <div class="field"><label for="bWeight">Вес, кг</label><input id="bWeight" type="number" inputmode="decimal" step="0.1" min="25" max="300"></div>
               <div class="field"><label for="bDate">Дата</label><input id="bDate" type="date"></div>
+              <div class="field cyc-only" hidden><label for="bCd">День цикла</label><input id="bCd" type="number" inputmode="numeric" min="1" max="60" placeholder="подставится сам"></div>
             </div>
             <div class="btn-row"><button type="button" class="tbtn" id="bAdd">Добавить замеры</button></div>
             <p class="verdict" id="bMsg" aria-live="polite">Замеряйте в одно время, например утром, раз в 2–4 недели.</p>
@@ -150,6 +165,7 @@
           <div class="tool">
             <div class="field"><label for="rName">Имя для отчёта (необязательно)</label><input id="rName" autocomplete="off" placeholder="например, Мария"></div>
             <label class="check"><input type="checkbox" id="rBody"> Включить замеры тела в отчёт</label>
+            <label class="check" id="rCycleWrap" hidden><input type="checkbox" id="rCycle"> Включить данные цикла в отчёт (только если хотите показать их тренеру)</label>
             <div class="btn-row"><button type="button" class="tbtn" id="pdfBtn">Сохранить отчёт в PDF</button></div>
             <p class="verdict" id="pdfMsg" aria-live="polite">Откроется окно печати. Выберите «Сохранить как PDF»: на iPhone — значок «Поделиться» → «Сохранить в Файлы», на Android — принтер «Сохранить как PDF».</p>
           </div>
@@ -189,7 +205,8 @@
   </section>
 </main>
 <footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a> · <button type="button" class="foot-pwa" data-pwa>Установить приложение</button></span></div></footer>
-<script src="js/progress.js?v=20261027b" defer></script>
+<script src="js/cycle.js?v=20261027a" defer></script>
+<script src="js/progress.js?v=20261027c" defer></script>
 <script src="js/nav.js?v=20261026f" defer></script>
 <script src="js/pwa.js?v=3" defer></script>
 <script src="js/gestures.js?v=1" defer></script>

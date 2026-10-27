@@ -26,7 +26,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20261027h">
+<link rel="stylesheet" href="css/site.css?v=20261027i">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -85,6 +85,13 @@
                 <input type="radio" name="wp" id="wpd" value="dumb"><label for="wpd">Дома, есть гантели</label>
                 <input type="radio" name="wp" id="wpg" value="gym"><label for="wpg">В зале</label>
               </div></div>
+            <div class="field"><span class="flabel">Самочувствие сегодня</span>
+              <div class="opts" role="radiogroup">
+                <input type="radio" name="wf" id="wfn" value="norm" checked><label for="wfn">Обычно</label>
+                <input type="radio" name="wf" id="wft" value="tired"><label for="wft">Мало сил</label>
+                <input type="radio" name="wf" id="wfp" value="pain"><label for="wfp">Болит живот или поясница</label>
+              </div></div>
+            <div class="cyc-hint" id="wCyc" aria-live="polite"></div>
             <div class="btn-row"><button type="button" class="tbtn" id="wGen">Собрать тренировку</button><button type="button" class="tbtn ghost" id="wNew">Другой вариант</button></div>
           </div>
           <div class="workout" id="wOut" aria-live="polite"></div>
@@ -162,11 +169,11 @@
       <article class="test" id="dnevnik">
         <span class="tag">Сервис 5 · подход по себе</span>
         <h2>Дневник самочувствия <em>по циклу</em></h2>
-        <p>Исследования не находят общей закономерности между фазой цикла и силой, поэтому учёные советуют ориентироваться на свою картину. Отмечайте день цикла, энергию и как прошла тренировка — через 2–3 месяца станет видно, есть ли у вас дни, когда лучше снизить нагрузку.</p>
+        <p>Исследования не находят общей закономерности между фазой цикла и силой, поэтому учёные советуют ориентироваться на свою картину. Отмечайте день цикла, энергию и как прошла тренировка — через 2–3 месяца станет видно, есть ли у вас дни, когда лучше снизить нагрузку. Подходы и веса удобнее вести в <a href="progress.html#tsikl">журнале прогресса</a> — там тоже есть день цикла.</p>
+        <div data-cycle-panel id="cycPanelS"></div>
         <div class="test-body">
           <div class="tool" id="cyc">
-            <div class="field"><label for="cStart">Первый день последнего цикла</label><input id="cStart" type="date"></div>
-            <p class="small" id="cDayInfo">Укажите дату — день цикла посчитается сам.</p>
+            <p class="small" id="cDayInfo">Включите «Учитывать цикл» и укажите первый день последних месячных выше — день посчитается сам. Или введите его вручную.</p>
             <div class="field"><label for="cDay">День цикла сегодня</label><input id="cDay" type="number" inputmode="numeric" min="1" max="60" placeholder="например, 3"></div>
             <div class="field"><span class="flabel">Энергия сегодня</span>
               <div class="opts" role="radiogroup" aria-label="Энергия">
@@ -193,7 +200,7 @@
             <div class="btn-row"><button type="button" class="tbtn ghost" id="cWipe">Удалить все записи</button></div>
           </div>
         </div>
-        <p class="notice"><b>Записи хранятся только в этом браузере на этом устройстве</b> и никуда не отправляются — ни мне, ни кому-либо ещё. Если почистить данные браузера, они удалятся. Дневник — для настройки тренировок, а не для контрацепции, планирования беременности или медицинских решений. Сильная боль, очень обильные или нерегулярные циклы — повод обратиться к гинекологу.</p>
+        <p class="notice"><b>Записи хранятся только в этом браузере на этом устройстве</b> и никуда не отправляются — ни мне, ни кому-либо ещё. Если почистить данные браузера, они удалятся. Дневник — для настройки тренировок, а не для контрацепции, планирования беременности или медицинских решений. Сильная боль, очень обильные или нерегулярные циклы, отсутствие месячных 3 месяца и дольше — повод обратиться к гинекологу.</p>
       </article>
 
     </div>
@@ -209,6 +216,7 @@
 </main>
 <footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a> · <button type="button" class="foot-pwa" data-pwa>Установить приложение</button></span></div></footer>
 <script src="js/nav.js?v=20261026f" defer></script>
+<script src="js/cycle.js?v=20261027a"></script>
 <script>
 (function(){
   /* 1. Тренировка дня */
@@ -230,17 +238,23 @@
   function pick(a){return a[Math.floor(Math.random()*a.length)]}
   function val(n){var e=document.querySelector('input[name="'+n+'"]:checked');return e?e.value:null}
   function gen(){
-    var t=+val('wt'),p=val('wp');
+    var t=+val('wt'),p=val('wp'),fe=val('wf')||'norm',light=fe!=='norm';
     var pats=t===15?['legs','hinge','push','core']:t===25?['legs','hinge','pull','push','core']:['legs','hinge','pull','push','core','calf'];
     var plan=t===15?{fmt:'Круговая: 2 круга',reps:'10–12 повторов',hold:'30 секунд',rest:'Между упражнениями — 15–20 секунд, между кругами — 1 минута'}:
              t===25?{fmt:'Круговая: 3 круга',reps:'10–12 повторов',hold:'30–40 секунд',rest:'Между упражнениями — 20 секунд, между кругами — 1–1,5 минуты'}:
                     {fmt:'По подходам: 3 подхода каждого упражнения',reps:'8–12 повторов',hold:'40 секунд',rest:'Между подходами — 60–90 секунд'};
+    /* Облегчённый вариант по самочувствию (в том числе в тяжёлые дни цикла): на круг/подход меньше, запас 3–4 повтора.
+       Фаза цикла сама по себе план не меняет — только самочувствие. */
+    if(light){plan={fmt:t===15?'Круговая: 1–2 круга':t===25?'Круговая: 2 круга':'По подходам: 2 подхода каждого упражнения',reps:plan.reps,hold:t===40?'30 секунд':'20–30 секунд',rest:plan.rest}}
     var warm=t===15?'3 минуты':'5 минут';
     var sup=[];
-    var list=pats.map(function(k){var e=pick(LIB[k][p]),dose=HOLD[e]?plan.hold+(HOLD[e]===2?' на каждую сторону':''):plan.reps+(SIDE.indexOf(e)>=0?' на каждую сторону':'');
+    var list=pats.map(function(k){if(fe==='pain'&&k==='core')return '<li><span class="pat">Спина и дыхание</span>«Кошка-корова» на четвереньках <span class="dose">— 8–10 медленных повторов</span></li>';
+      var e=pick(LIB[k][p]),dose=HOLD[e]?plan.hold+(HOLD[e]===2?' на каждую сторону':''):plan.reps+(SIDE.indexOf(e)>=0?' на каждую сторону':'');
       if(SUP[e])sup.push('<li><b>'+e+'.</b> '+SUP[e]+'</li>');
       return '<li><span class="pat">'+NAMES[k]+'</span>'+e+' <span class="dose">— '+dose+'</span></li>'}).join('');
-    out.innerHTML='<h3>Около '+t+' минут · '+({home:'дома',dumb:'дома с гантелями',gym:'в зале'})[p]+'</h3>'+
+    var lightNote=!light?'':'<div class="wlight"><b>Облегчённый вариант.</b> Меньше кругов или подходов, вес — с запасом 3–4 повтора, отдых — сколько нужно. Станет лучше по ходу тренировки — можно вернуть обычный объём.'+
+      (fe==='pain'?' Планки и упражнения на пресс заменены: при боли внизу живота они часто неприятны. Вместо тренировки подойдёт и прогулка 20–30 минут или лёгкая растяжка — это тоже засчитывается. Если боль сильная, необычная для вас или мешает обычным делам — обратитесь к гинекологу, а не терпите.':'')+'</div>';
+    out.innerHTML='<h3>Около '+t+' минут · '+({home:'дома',dumb:'дома с гантелями',gym:'в зале'})[p]+(light?' · облегчённо':'')+'</h3>'+lightNote+
       '<p class="wstep"><b>Разминка, '+warm+':</b> ходьба на месте, вращения в плечах и тазе, 10 приседаний без веса, 10 ягодичных мостов.</p>'+
       '<p class="wstep"><b>'+plan.fmt+'.</b> '+plan.rest+'.</p><ol class="wlist">'+list+'</ol>'+
       (sup.length?'<div class="wsup"><p class="wstep"><b>Если опора — мебель или косяк:</b></p><ul>'+sup.join('')+'</ul></div>':'')+
@@ -249,7 +263,11 @@
   }
   document.getElementById('wGen').addEventListener('click',gen);
   document.getElementById('wNew').addEventListener('click',gen);
-  document.querySelectorAll('input[name="wt"],input[name="wp"]').forEach(function(i){i.addEventListener('change',gen)});
+  document.querySelectorAll('input[name="wt"],input[name="wp"],input[name="wf"]').forEach(function(i){i.addEventListener('change',gen)});
+  /* подсказка по дню цикла — только если включён учёт цикла */
+  var wc=document.getElementById('wCyc');
+  function cycHint(){var h=window.Cycle?Cycle.trainHint():'';wc.innerHTML=h?'<p>'+h+'</p>':(window.Cycle&&!Cycle.get().on?'<p class="small" style="margin:0">Хотите учитывать цикл? Включите это в <a href="#dnevnik">настройках дневника</a> — здесь появится подсказка по дню цикла.</p>':'')}
+  if(window.Cycle)Cycle.onChange(cycHint);cycHint();
   gen();
 
   /* 2. Интервальный таймер */
@@ -302,19 +320,17 @@
 })();
 (function(){
   /* 5. Дневник самочувствия по циклу — только localStorage этого браузера */
-  var KEY='cycle_diary_v1',KS='cycle_start_v1',data=[];
+  var KEY='cycle_diary_v1',data=[];
   function load(){try{data=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){data=[]}}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){return false}}
   function today(){var d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
-  var st=document.getElementById('cStart'),day=document.getElementById('cDay'),info=document.getElementById('cDayInfo'),msg=document.getElementById('cMsg');
-  if(!st)return;
-  try{st.value=localStorage.getItem(KS)||''}catch(e){}
-  st.max=today();
-  function calc(){if(!st.value){info.textContent='Укажите дату — день цикла посчитается сам.';return}
-    var diff=Math.round((new Date(today())-new Date(st.value))/864e5)+1;
-    if(diff<1||diff>60){info.textContent='Проверьте дату: день цикла получается '+diff+'.';return}
-    day.value=diff;info.textContent='Сегодня '+diff+'-й день цикла.';try{localStorage.setItem(KS,st.value)}catch(e){}}
-  st.addEventListener('change',calc);calc();
+  var day=document.getElementById('cDay'),info=document.getElementById('cDayInfo'),msg=document.getElementById('cMsg');
+  if(!day)return;
+  /* день цикла — из общих настроек (js/cycle.js), можно поправить вручную */
+  function calc(){var d=window.Cycle?Cycle.dayOn(today()):null;
+    if(d){day.value=d;info.textContent='Сегодня '+d+'-й день цикла — по настройкам выше. Можно поправить вручную.'}
+    else info.textContent='Включите «Учитывать цикл» и укажите первый день последних месячных выше — день посчитается сам. Или введите его вручную.'}
+  if(window.Cycle)Cycle.onChange(calc);calc();
   function v(n){var e=document.querySelector('input[name="'+n+'"]:checked');return e?+e.value:null}
   var BUCK=[[1,5],[6,10],[11,15],[16,20],[21,25],[26,60]];
   function render(){
@@ -330,7 +346,7 @@
   }
   document.getElementById('cSave').addEventListener('click',function(){
     var d=Math.round(+day.value),e=v('cEn'),t=v('cTr');
-    if(!(d>=1&&d<=60)){msg.textContent='Укажите день цикла от 1 до 60 или дату начала цикла.';day.focus();return}
+    if(!(d>=1&&d<=60)){msg.textContent='Укажите день цикла от 1 до 60 или дату начала месячных в настройках.';day.focus();return}
     if(e===null||t===null){msg.textContent='Отметьте энергию и тренировку.';return}
     var dt=today();data=data.filter(function(x){return x.date!==dt});data.push({date:dt,d:d,e:e,t:t});
     msg.textContent=save()?'Сохранено. Записей: '+data.length+'.':'Не удалось сохранить: браузер запрещает хранение данных (например, в режиме инкогнито).';
@@ -338,7 +354,7 @@
   });
   var wipe=document.getElementById('cWipe'),armed=false;
   wipe.addEventListener('click',function(){if(!armed){armed=true;wipe.textContent='Точно удалить? Нажмите ещё раз';setTimeout(function(){armed=false;wipe.textContent='Удалить все записи'},4000);return}
-    data=[];try{localStorage.removeItem(KEY);localStorage.removeItem(KS)}catch(e){}st.value='';day.value='';armed=false;wipe.textContent='Удалить все записи';calc();render()});
+    data=[];try{localStorage.removeItem(KEY)}catch(e){}day.value='';armed=false;wipe.textContent='Удалить все записи';calc();render()});
   load();render();
 })();
 </script>

@@ -5,7 +5,8 @@
     python3 tests/regression.py         # нужен Python Playwright с Chromium
 
 Проверяет: импорт резервной копии, тоннаж, проверку ввода (журнал, калькулятор еды,
-калькулятор активности), интервальный таймер, генераторы тренировок, рецепты, печатный отчёт.
+калькулятор активности), интервальный таймер, генераторы тренировок, рецепты, печатный отчёт,
+учёт цикла (журнал, тренировка дня, дневник, калории, план возвращения).
 Выход с кодом 1, если хоть одна проверка не прошла.
 """
 import json
@@ -347,6 +348,138 @@ def t_print(ctx, browser):
         page.close()
 
 
+def t_cycle(ctx):
+    """Учёт цикла (js/cycle.js): расчёт дня и фаз, журнал, тренировка дня, дневник, калории, план возвращения."""
+    import datetime as dt
+    T = dt.date.today()
+    iso = lambda d: d.isoformat()
+    def st(days_ago, on=True, mode="regular", length=28, per=5):
+        return {"cycle_settings_v1": json.dumps({"on": on, "mode": mode, "len": length, "per": per}),
+                "cycle_start_v1": iso(T - dt.timedelta(days=days_ago))}
+    # 1. расчёт дня, фаз и прогноза
+    page = fresh(ctx, "progress.html", st(2))
+    r = page.evaluate("()=>{const t=Cycle.today();return [Cycle.dayOn(t),Cycle.phase(Cycle.dayOn(t))]}")
+    check("цикл: старт 2 дня назад → 3-й день, дни месячных", [3, "men"], r)
+    page.close()
+    page = fresh(ctx, "progress.html", st(20))
+    r = page.evaluate("()=>{const t=Cycle.today();return [Cycle.dayOn(t),Cycle.phase(21),Cycle.phase(10),Cycle.phase(29),Cycle.windows(t,28).map(w=>w.s)]}")
+    check("цикл: 21-й день, фазы 21/10/29 и прогноз следующих месячных", [21, "lut", "fol", "late", [iso(T + dt.timedelta(days=8))]], r)
+    check("цикл: ошибок JavaScript нет (журнал)", [], page._errors)
+    page.close()
+    page = fresh(ctx, "progress.html", st(20, mode="irregular"))
+    check("цикл: нерегулярный — фазы не прогнозируются, прогноза нет", ["men", "other", []], page.evaluate("()=>[Cycle.phase(3),Cycle.phase(21),Cycle.windows(Cycle.today(),28)]"))
+    page.close()
+    page = fresh(ctx, "progress.html", {"cycle_settings_v1": json.dumps({"on": True, "mode": "x", "len": 99, "per": 0})})
+    check("цикл: неверные настройки заменяются значениями по умолчанию", {"on": True, "mode": "regular", "len": 28, "per": 5}, page.evaluate("Cycle.get()"))
+    page.close()
+    # 2. журнал: поля появляются только при включённом учёте, день подставляется
+    page = fresh(ctx, "progress.html")
+    check("журнал: при выключенном учёте поле «день цикла» скрыто", False, page.is_visible("#pCd"))
+    page.check("#cycPanel input[type=checkbox]")
+    page.fill("#cycPanel input[type=date]", iso(T - dt.timedelta(days=6)))
+    page.dispatch_event("#cycPanel input[type=date]", "change")
+    page.wait_for_timeout(100)
+    check("журнал: после включения поле видно и день подставлен", (True, "7"), (page.is_visible("#pCd"), page.input_value("#pCd")))
+    page.fill("#pEx", "Присед"); page.fill("#pW", "40"); page.fill("#pR", "8"); page.fill("#pS", "3"); page.select_option("#pFe", "3")
+    page.click("#pAdd")
+    rec = json.loads(page.evaluate("localStorage.getItem('progress_v1')"))["lifts"][0]
+    check("журнал: запись хранит день цикла и самочувствие", (7, 3), (rec.get("cd"), rec.get("fe")))
+    page.fill("#pCd", "75"); page.click("#pAdd")
+    check("журнал: день цикла 75 не сохраняется", 1, len(json.loads(page.evaluate("localStorage.getItem('progress_v1')"))["lifts"]))
+    check("журнал: ошибок JavaScript нет", [], page._errors)
+    page.close()
+    # 3. импорт с новыми полями
+    page = fresh(ctx, "progress.html")
+    ok = {"lifts": [{"date": "2026-09-01", "ex": "Присед", "w": 40, "r": 8, "s": 3, "cd": 4, "fe": 2}], "body": [{"date": "2026-09-01", "weight": 60, "cd": 4}]}
+    check("импорт: файл с днём цикла и самочувствием принимается", True, "восстановлены" in import_file(page, ok))
+    for name, bad in {"день цикла 0": {"lifts": [{"date": "2026-09-01", "ex": "Присед", "w": 40, "r": 8, "s": 3, "cd": 0}]},
+                      "самочувствие 4": {"lifts": [{"date": "2026-09-01", "ex": "Присед", "w": 40, "r": 8, "s": 3, "fe": 4}]},
+                      "день цикла в замерах 61": {"lifts": [], "body": [{"date": "2026-09-01", "weight": 60, "cd": 61}]},
+                      "день цикла дробный": {"lifts": [{"date": "2026-09-01", "ex": "Присед", "w": 40, "r": 8, "s": 3, "cd": 2.5}]}}.items():
+        check(f"импорт отклонён: {name}", True, "не принят" in import_file(page, bad))
+    page.close()
+    # 4. личная картина: просадка в дни месячных и ровные данные
+    base = dt.date(2026, 6, 1)
+    def lifts(dip):
+        out = []
+        for k in range(0, 84, 3):
+            cd = k % 28 + 1
+            out.append({"date": iso(base + dt.timedelta(days=k)), "ex": "Присед", "w": (46 if (dip and cd <= 5) else 50), "r": 5, "s": 3, "cd": cd, "fe": 3 if (dip and cd <= 5) else 2})
+        return out
+    for dip in (True, False):
+        stor = st(3); stor["progress_v1"] = json.dumps({"lifts": lifts(dip), "tests": [], "act": [], "body": []})
+        page = fresh(ctx, "progress.html", stor)
+        txt = page.inner_text("#vCycle")
+        if dip:
+            check("картина: просадка 8 % в дни месячных найдена", True, "Дни месячных:" in txt and "ниже вашего обычного уровня" in txt)
+        else:
+            check("картина: при ровных данных — «заметной разницы нет»", True, "Заметной разницы" in txt)
+        page.close()
+    stor = st(3); stor["progress_v1"] = json.dumps({"lifts": lifts(True)[:5], "tests": [], "act": [], "body": []})
+    page = fresh(ctx, "progress.html", stor)
+    check("картина: при малом числе записей выводы не делаются", True, "Пока выводы не делаем" in page.inner_text("#vCycle"))
+    page.close()
+    # 5. вес: сравнение с тем же днём прошлого цикла, отчёт по галочке
+    stor = st(3); stor["progress_v1"] = json.dumps({"lifts": lifts(False), "tests": [], "act": [], "body": [{"date": "2026-08-01", "weight": 61, "cd": 25}, {"date": "2026-08-29", "weight": 62.2, "cd": 26}]})
+    page = fresh(ctx, "progress.html", stor)
+    page.click("#zamery summary")
+    bt = page.inner_text("#vBody")
+    check("вес: сравнение с тем же днём прошлого цикла (+1,2 кг) и пояснение про воду", True, "разница +1,2 кг" in bt and "воды" in bt)
+    page.evaluate("window.print=function(){}")
+    page.check("#rBody"); page.click("#pdfBtn")
+    check("отчёт: без галочки данных цикла нет", False, "Цикл и результаты" in page.inner_html("#report") or "день цикла" in page.inner_html("#report"))
+    page.check("#rCycle"); page.click("#pdfBtn")
+    check("отчёт: с галочкой раздел цикла есть", True, "Цикл и результаты" in page.inner_html("#report"))
+    page.close()
+    # 6. тренировка дня: облегчённый вариант и подсказка
+    page = fresh(ctx, "servisy.html")
+    check("тренировка: при выключенном учёте — предложение включить", True, "Хотите учитывать цикл" in page.inner_text("#wCyc"))
+    page.click("label[for=wt40]"); page.click("label[for=wfp]")
+    w = page.inner_text("#wOut")
+    check("тренировка: «болит живот» — облегчённо, без планок, «Кошка-корова», совет к врачу", True,
+          "Облегчённый вариант" in w and "Кошка-корова" in w and "Планка" not in w and "Мёртвый жук" not in w and "гинекологу" in w and "2 подхода" in w)
+    page.click("label[for=wft]")
+    w = page.inner_text("#wOut")
+    check("тренировка: «мало сил» — облегчённо, кор остаётся", True, "Облегчённый вариант" in w and "Кошка-корова" not in w)
+    page.click("label[for=wfn]")
+    check("тренировка: «обычно» — обычный объём", True, "Облегчённый" not in page.inner_text("#wOut") and "3 подхода" in page.inner_text("#wOut"))
+    check("тренировка: ошибок JavaScript нет", [], page._errors)
+    page.close()
+    page = fresh(ctx, "servisy.html", st(1))
+    check("тренировка: 2-й день цикла — подсказка про дни месячных", True, "2-й день цикла, дни месячных" in page.inner_text("#wCyc"))
+    check("дневник: день цикла берётся из общих настроек", "2", page.input_value("#cDay"))
+    check("дневник: ошибок JavaScript нет", [], page._errors)
+    page.close()
+    # 7. калории: подсказка без изменения цифр
+    page = fresh(ctx, "kalorii.html", st(20))
+    h = page.inner_text("#dCyc")
+    check("калории: 21-й день — подсказка про вторую половину цикла", True, "21-й день цикла" in h and "Вторая половина" in h)
+    page.fill("#fDate", iso(T - dt.timedelta(days=19))); page.dispatch_event("#fDate", "change")
+    check("калории: смена даты — подсказка про дни месячных", True, "Дни месячных" in page.inner_text("#dCyc"))
+    check("калории: ошибок JavaScript нет", [], page._errors)
+    page.close()
+    page = fresh(ctx, "kalorii.html")
+    check("калории: при выключенном учёте подсказки нет", "", page.inner_text("#dCyc").strip())
+    page.close()
+    # 8. план возвращения: прогноз только при включённом учёте
+    page = fresh(ctx, "vozvrat.html", st(20))
+    page.click("#vGen")
+    o = page.inner_text("#vOut")
+    d8 = T + dt.timedelta(days=8)
+    check("план возвращения: прогноз месячных на 4 недели", True, "по прогнозу" in o and d8.strftime("%d.%m") in o)
+    check("план возвращения: совет про тяжёлые дни цикла", True, "Тяжёлые дни цикла" in o)
+    check("план возвращения: ошибок JavaScript нет", [], page._errors)
+    page.close()
+    page = fresh(ctx, "vozvrat.html")
+    page.click("#vGen")
+    check("план возвращения: без учёта цикла раздела прогноза нет", False, "по прогнозу" in page.inner_text("#vOut"))
+    page.close()
+    for path in ("nauka.html", "golod.html"):
+        page = fresh(ctx, path)
+        check(f"{path}: раздел про аппетит и цикл на месте", 1, page.locator("#tsikl-eda, #pered-mesyachnymi").count())
+        page.close()
+
+
 def main():
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
@@ -359,6 +492,7 @@ def main():
         t_fooddb(ctx)
         t_recipes(ctx)
         t_print(ctx, browser)
+        t_cycle(ctx)
         browser.close()
     failed = [r for r in RESULTS if not r[0]]
     print(f"\nИтого: {len(RESULTS) - len(failed)} из {len(RESULTS)} проверок пройдены. PDF и файлы: {OUT}")

@@ -18,7 +18,7 @@
   function keepBackup(rawJson,reason){try{localStorage.setItem(BKEY,JSON.stringify({at:new Date().toISOString(),reason:reason,data:rawJson}));return true}catch(e){return false}}
 
   /* ---- проверка данных: общая для ввода, загрузки и импорта ---- */
-  var LIM={w:[0,500],r:[1,30],s:[1,20],srt:[0,10],chair:[0,60],steps:[0,60000],min:[0,2000],days:[0,7],waist:[30,250],hips:[30,250],weight:[25,300]};
+  var LIM={w:[0,500],r:[1,30],s:[1,20],srt:[0,10],chair:[0,60],steps:[0,60000],min:[0,2000],days:[0,7],waist:[30,250],hips:[30,250],weight:[25,300],cd:[1,60],fe:[1,3]};
   var MAXREC=5000;
   function isDate(v){if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v))return false;var d=new Date(v+'T00:00:00Z');return !isNaN(d)&&d.toISOString().slice(0,10)===v&&v>='2000-01-01'&&v<='2100-12-31'}
   function inR(v,k,int){var a=LIM[k];return typeof v==='number'&&isFinite(v)&&v>=a[0]&&v<=a[1]&&(!int||Math.round(v)===v)}
@@ -51,6 +51,8 @@
       if(!inR(r.w,'w')||r.w<=0)return 'вес — число больше 0 и не больше 500 кг';
       if(!inR(r.r,'r',1))return 'повторы — целое число от 1 до 30';
       if(!inR(r.s,'s',1))return 'подходы — целое число от 1 до 20';
+      if(!opt(r.cd,'cd',1))return 'день цикла — целое число от 1 до 60';
+      if(!opt(r.fe,'fe',1))return 'самочувствие — 1, 2 или 3';
     }else if(k==='tests'){
       if(!isDate(r.date))return 'неверная дата';
       if(!opt(r.srt,'srt'))return '«сесть-встать» — от 0 до 10';
@@ -69,15 +71,17 @@
       if(!opt(r.hips,'hips'))return 'бёдра — от 30 до 250 см';
       if(!opt(r.weight,'weight'))return 'вес — от 25 до 300 кг';
       if(r.waist==null&&r.hips==null&&r.weight==null)return 'пустая запись';
+      if(!opt(r.cd,'cd',1))return 'день цикла — целое число от 1 до 60';
     }
     return '';
   }
   function nn(v){return v==null?null:v}
   function clean(k,r){
-    if(k==='lifts')return {date:r.date,ex:r.ex.trim(),w:r.w,r:r.r,s:r.s};
+    /* день цикла (cd) и самочувствие (fe) — необязательные поля: в копию попадают, только если заполнены */
+    if(k==='lifts'){var o={date:r.date,ex:r.ex.trim(),w:r.w,r:r.r,s:r.s};if(r.cd!=null)o.cd=r.cd;if(r.fe!=null)o.fe=r.fe;return o}
     if(k==='tests')return {date:r.date,srt:nn(r.srt),chair:nn(r.chair),bal:nn(r.bal)};
     if(k==='act')return {week:r.week,steps:nn(r.steps),min:nn(r.min),days:nn(r.days)};
-    return {date:r.date,waist:nn(r.waist),hips:nn(r.hips),weight:nn(r.weight)};
+    var b={date:r.date,waist:nn(r.waist),hips:nn(r.hips),weight:nn(r.weight)};if(r.cd!=null)b.cd=r.cd;return b;
   }
   function save(){try{localStorage.setItem(KEY,JSON.stringify(D));return true}catch(e){return false}}
   function $(id){return document.getElementById(id)}
@@ -92,19 +96,76 @@
   function epley(w,r){return r===1?w:w*(1+r/30)}
   function brzycki(w,r){return r===1?w:(r<37?w*36/(37-r):null)}
   function e1rm(w,r){var a=epley(w,r),b=brzycki(w,r);return b==null?a:(a+b)/2}
+
+  /* ---- учёт цикла (js/cycle.js): поля «день цикла», личная картина, сравнение веса ---- */
+  var C=window.Cycle||null;
+  function cycOn(){return !!(C&&C.get().on)}
+  function dd(a,b){return Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/864e5)}
+  function median(a){var b=a.slice().sort(function(x,y){return x-y}),m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2}
+  var PH_ORDER=['men','fol','lut','late','other'];
+  var PH_TITLE={men:'Дни месячных',fol:'Первая половина цикла',lut:'Вторая половина, перед месячными',late:'Дольше обычной длины',other:'Вне дней месячных'};
+  /* Каждый подход сравнивается с медианой расчётного максимума в этом же упражнении за ±21 день:
+     так обычный рост силы со временем не выдаётся за «влияние цикла». */
+  function cycleStats(){
+    var s=C.get(),rated=D.lifts.filter(function(l){return l.cd!=null});
+    var by={};D.lifts.forEach(function(l){(by[l.ex]=by[l.ex]||[]).push(l)});
+    var B={};rated.forEach(function(l){
+      var win=by[l.ex].filter(function(x){return Math.abs(dd(x.date,l.date))<=21}).map(function(x){return e1rm(x.w,x.r)});
+      var ph=C.phase(l.cd,s);if(!ph)return;var b=B[ph]||(B[ph]={n:0,sum:0,fe:0,hard:0,cmp:0});
+      b.n++;if(l.fe!=null){b.fe++;if(l.fe===3)b.hard++}
+      if(win.length>=3){b.cmp++;b.sum+=e1rm(l.w,l.r)/median(win)-1}});
+    var dates=rated.map(function(l){return l.date}).sort();
+    return {s:s,B:B,n:rated.length,span:dates.length?dd(dates[0],dates[dates.length-1]):0}}
+  function cycleHtml(){
+    if(!C)return '';
+    if(!cycOn())return '<p class="small">Включите «Учитывать цикл» выше — в формах появится поле «день цикла», а здесь со временем соберётся ваша личная картина: меняются ли силовые и самочувствие в разные дни цикла.</p>';
+    var st=cycleStats(),need=st.s.mode==='regular'?2*st.s.len:56;
+    if(!st.n)return '<p class="small">Записей с днём цикла пока нет. День подставляется в форму «Силовые» сам, если указана дата начала последних месячных; его можно поправить вручную.</p>';
+    var ready=st.n>=12&&st.span>=need;
+    var head='<p class="small">Записей силовых с днём цикла: <b>'+st.n+'</b> за '+(st.span+1)+' дн. '+(ready?'':'Картина станет надёжнее после 12 и больше записей за два цикла и дольше ('+need+' дн.). Пока выводы не делаем.')+'</p>';
+    if(!ready)return head;
+    var rows=PH_ORDER.filter(function(k){return st.B[k]}).map(function(k){var b=st.B[k],dev=b.cmp?b.sum/b.cmp*100:null;
+      return {k:k,b:b,dev:dev}});
+    var t='<div class="tbl-wrap"><table class="ptbl ctbl" style="min-width:0"><thead><tr><th>Дни цикла</th><th>Записей</th><th>Силовые*</th><th>«Тяжело»</th></tr></thead><tbody>'+
+      rows.map(function(r){return '<tr><td>'+PH_TITLE[r.k]+'</td><td>'+r.b.n+'</td><td class="'+(r.dev!=null&&r.dev<=-3?'dn':'')+'">'+(r.dev==null||r.b.cmp<3?'мало данных':(r.dev>0?'+':'')+f(r.dev,1)+' %')+'</td><td>'+(r.b.fe?r.b.hard+' из '+r.b.fe:'—')+'</td></tr>'}).join('')+'</tbody></table></div>';
+    var ok=rows.filter(function(r){return r.dev!=null&&r.b.cmp>=3}),low=ok.filter(function(r){return r.dev<=-3}).sort(function(a,b){return a.dev-b.dev})[0];
+    var hard=rows.filter(function(r){return r.b.fe>=3&&r.b.hard/r.b.fe>=0.4})[0];
+    var v=low?'<b>'+PH_TITLE[low.k]+':</b> результаты в среднем на '+f(-low.dev,1)+' % ниже вашего обычного уровня. Можно заранее планировать на эти дни облегчённые тренировки — на 1 подход меньше и на 1–2 повтора больше в запасе.'
+      :(ok.length?'<b>Заметной разницы между днями цикла у вас нет:</b> отклонения в пределах ±3 % — это обычный разброс от тренировки к тренировке. Тренируйтесь по плану, а нагрузку меняйте по самочувствию.':'Пока мало записей для сравнения по упражнениям.');
+    if(hard)v+=' '+PH_TITLE[hard.k]+': тренировки часто отмечены как тяжёлые ('+hard.b.hard+' из '+hard.b.fe+') — в эти дни можно сразу брать облегчённый вариант.';
+    return head+t+'<p class="verdict">'+v+'</p><p class="small">Как считали: расчётный максимум каждого подхода сравнивается с медианой этого же упражнения за ±3 недели, чтобы обычный рост силы не выдавать за влияние цикла. Фазы — по текущим настройкам и длине цикла, это прогноз, а не измерение гормонов. Выводы по небольшому числу записей предварительные.</p>';
+  }
+  function weightCycleHtml(){
+    if(!cycOn())return '';
+    var w=D.body.filter(function(x){return x.weight!=null&&x.cd!=null}).sort(function(a,b){return a.date<b.date?-1:1});
+    var tip='<p class="small">Перед месячными и в первые их дни вес у многих временно выше из-за задержки воды. Чтобы сравнение было честным, взвешивайтесь в один и тот же день цикла.</p>';
+    if(!w.length)return tip;
+    var last=w[w.length-1],prev=null;
+    for(var i=w.length-2;i>=0;i--){if(Math.abs(w[i].cd-last.cd)<=2&&dd(w[i].date,last.date)>=15){prev=w[i];break}}
+    var ph=C.phase(last.cd);
+    var out='<p class="verdict"><b>Вес '+fd(last.date)+', '+last.cd+'-й день цикла:</b> '+f(last.weight,1)+' кг. '+
+      (prev?'В тот же день прошлого цикла ('+fd(prev.date)+', '+prev.cd+'-й день): '+f(prev.weight,1)+' кг, разница '+((last.weight-prev.weight)>0?'+':'')+f(last.weight-prev.weight,1)+' кг.':'Для сравнения с тем же днём прошлого цикла пока нет записи.')+
+      ((ph==='men'||ph==='lut')?' Сейчас '+C.phaseName(ph)+' — колебания на 0,5–2 кг за счёт воды в эти дни не редкость, это не жир.':'')+'</p>';
+    return out+tip}
+  function fillCd(dateId,cdId){if(!C||!$(cdId))return;var d=C.dayOn($(dateId).value||today());$(cdId).value=d==null?'':d}
+  function syncCycleUi(){var on=cycOn();document.querySelectorAll('.cyc-only').forEach(function(e){e.hidden=!on});
+    if(on){fillCd('pDate','pCd');fillCd('bDate','bCd')}
+    var rc=$('rCycleWrap');if(rc)rc.hidden=!on}
   ['pDate','tDate','bDate'].forEach(function(id){if($(id))$(id).value=today()});
 
   /* ---- ввод ---- */
   function msg(id,t){$(id).textContent=t}
   $('pAdd').addEventListener('click',function(){
-    var ex=$('pEx').value.trim(),w=num('pW'),r=num('pR'),s=num('pS'),dt=$('pDate').value||today();
+    var ex=$('pEx').value.trim(),w=num('pW'),r=num('pR'),s=num('pS'),dt=$('pDate').value||today(),fe=$('pFe').value===''?null:+$('pFe').value,cd=cycOn()?num('pCd'):null;
     if(!ex){msg('pMsg','Укажите упражнение.');return}
     if(ex.length>100){msg('pMsg','Название упражнения — до 100 символов.');return}
     if(!isDate(dt)){msg('pMsg','Проверьте дату.');return}
     if(!(w>0&&w<=500)){msg('pMsg','Вес — от 0,5 до 500 кг. Для упражнений с собственным весом впишите 1.');return}
     if(!(r>=1&&r<=30&&Math.round(r)===r)){msg('pMsg','Повторы — целое число от 1 до 30.');return}
     if(!(s>=1&&s<=20&&Math.round(s)===s)){msg('pMsg','Подходы — целое число от 1 до 20.');return}
-    D.lifts.push({date:dt,ex:ex,w:w,r:r,s:s});
+    if(cd!==null&&!inR(cd,'cd',1)){msg('pMsg','День цикла — целое число от 1 до 60. Если не знаете — оставьте поле пустым.');return}
+    var rec={date:dt,ex:ex,w:w,r:r,s:s};if(cd!==null)rec.cd=cd;if(fe!==null)rec.fe=fe;
+    D.lifts.push(rec);
     msg('pMsg',(save()?'Записано. ':'Не удалось сохранить в браузере. ')+'Расчётный максимум: '+f(e1rm(w,r),1)+' кг, тоннаж: '+f(w*r*s,0)+' кг.'+(r>10?' Точность формул ниже при повторах больше 10.':''));
     renderAll();
   });
@@ -129,11 +190,13 @@
     msg('aMsg',save()?'Неделя записана.':'Не удалось сохранить в браузере.');renderAll();
   });
   $('bAdd').addEventListener('click',function(){
-    var w=num('bWaist'),h=num('bHips'),kg=num('bWeight'),dt=$('bDate').value||today();
+    var w=num('bWaist'),h=num('bHips'),kg=num('bWeight'),dt=$('bDate').value||today(),cd=cycOn()?num('bCd'):null;
     if(w===null&&h===null&&kg===null){msg('bMsg','Заполните хотя бы одно поле.');return}
     if(!opt(w,'waist')||!opt(h,'hips')){msg('bMsg','Обхваты — от 30 до 250 см. Замеры не сохранены.');return}
     if(!opt(kg,'weight')){msg('bMsg','Вес — от 25 до 300 кг. Замеры не сохранены.');return}
-    D.body.push({date:dt,waist:w,hips:h,weight:kg});msg('bMsg',save()?'Замеры записаны.':'Не удалось сохранить в браузере.');renderAll();
+    if(cd!==null&&!inR(cd,'cd',1)){msg('bMsg','День цикла — целое число от 1 до 60. Если не знаете — оставьте поле пустым.');return}
+    var rb={date:dt,waist:w,hips:h,weight:kg};if(cd!==null)rb.cd=cd;
+    D.body.push(rb);msg('bMsg',save()?'Замеры записаны.':'Не удалось сохранить в браузере.');renderAll();
   });
   (function(){var d=new Date(),day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('aWeek').value=d.toISOString().slice(0,10)})();
 
@@ -209,25 +272,25 @@
     var t='<div class="nums"><div><b>'+(avg==null?'—':f(avg,0))+'</b><span>шагов в день в среднем за последние '+withSteps.length+' нед.</span></div><div><b>'+okDays+' из '+last.length+'</b><span>недель с силовыми от 2 дней (ориентир ВОЗ)</span></div><div><b>'+okMin+' из '+last.length+'</b><span>недель с силовыми от 30 минут</span></div></div>';
     return t+'<figure class="chfig"><figcaption>Шаги в день по неделям</figcaption>'+bars(withSteps.map(function(x){return {y:x.steps,label:fd(x.week).slice(0,5)}}),'Шаги по неделям')+'</figure>';
   }
-  function bodyHtml(){
+  function bodyHtml(withCycle){
     if(!D.body.length)return '<p class="small">Пока нет замеров.</p>';
     var rows=[['Талия, см','waist'],['Бёдра, см','hips'],['Вес, кг','weight']].map(function(r){return [r[0],fl(series(D.body,r[1])),r[1]]}).filter(function(r){return r[1]});
     var t='<div class="tbl-wrap"><table class="ptbl"><thead><tr><th>Замер</th><th>Первый</th><th>Последний</th><th>Разница</th></tr></thead><tbody>'+
       rows.map(function(r){var p=r[1],d=p.last.y-p.first.y;return '<tr><td>'+r[0]+'</td><td>'+f(p.first.y,1)+' ('+fd(p.first.x)+')</td><td>'+f(p.last.y,1)+' ('+fd(p.last.x)+')</td><td>'+(p.first.x!==p.last.x?(d>0?'+':'')+f(d,1):'—')+'</td></tr>'}).join('')+'</tbody></table></div>';
     var s=rows.filter(function(r){return r[2]!=='weight'}).map(function(r){return {name:r[0].split(',')[0],pts:series(D.body,r[2])}}).filter(function(s){return s.pts.length});
-    return t+(s.length?'<figure class="chfig"><figcaption>Обхваты, см</figcaption>'+line(s,'см','Динамика обхватов')+'</figure>':'')+'<p class="small">Цифры — для наблюдения, а не для оценки. Сила, самочувствие и привычки важнее сантиметров и килограммов.</p>';
+    return t+(s.length?'<figure class="chfig"><figcaption>Обхваты, см</figcaption>'+line(s,'см','Динамика обхватов')+'</figure>':'')+(withCycle?weightCycleHtml():'')+'<p class="small">Цифры — для наблюдения, а не для оценки. Сила, самочувствие и привычки важнее сантиметров и килограммов.</p>';
   }
   function logHtml(){
-    var all=[];D.lifts.forEach(function(x,i){all.push({d:x.date,t:esc(x.ex)+': '+f(x.w,1)+' кг × '+x.r+' × '+x.s,k:'lifts',i:i})});
+    var all=[];D.lifts.forEach(function(x,i){all.push({d:x.date,t:esc(x.ex)+': '+f(x.w,1)+' кг × '+x.r+' × '+x.s+(x.cd!=null?' · '+x.cd+'-й день цикла':'')+(x.fe!=null?' · '+['','легко','нормально','тяжело'][x.fe]:''),k:'lifts',i:i})});
     D.tests.forEach(function(x,i){all.push({d:x.date,t:'Тесты'+(x.srt!=null?' · сесть-встать '+f(x.srt,1):'')+(x.chair!=null?' · стул '+x.chair:''),k:'tests',i:i})});
     D.act.forEach(function(x,i){all.push({d:x.week,t:'Неделя активности'+(x.steps!=null?' · '+f(x.steps,0)+' шагов/день':''),k:'act',i:i})});
-    D.body.forEach(function(x,i){all.push({d:x.date,t:'Замеры',k:'body',i:i})});
+    D.body.forEach(function(x,i){all.push({d:x.date,t:'Замеры'+(x.cd!=null?' · '+x.cd+'-й день цикла':''),k:'body',i:i})});
     all.sort(function(a,b){return a.d<b.d?1:-1});
     if(!all.length)return '';
     return '<ul class="plog">'+all.slice(0,12).map(function(x){return '<li><span>'+fd(x.d)+' · '+x.t+'</span><button type="button" class="del" data-k="'+x.k+'" data-i="'+x.i+'" aria-label="Удалить запись">×</button></li>'}).join('')+'</ul>';
   }
   function renderAll(){
-    $('vLifts').innerHTML=liftsHtml(false);$('vTests').innerHTML=testsHtml();$('vAct').innerHTML=actHtml();$('vBody').innerHTML=bodyHtml();$('vLog').innerHTML=logHtml();
+    $('vLifts').innerHTML=liftsHtml(false);$('vTests').innerHTML=testsHtml();$('vAct').innerHTML=actHtml();$('vBody').innerHTML=bodyHtml(cycOn());if($('vCycle'))$('vCycle').innerHTML=cycleHtml();$('vLog').innerHTML=logHtml();
     $('exList').innerHTML=Object.keys(D.lifts.reduce(function(m,l){m[l.ex]=1;return m},{})).concat(['Присед','Гоблет-присед','Румынская тяга','Становая тяга','Жим лёжа','Жим гантелей лёжа','Тяга верхнего блока','Тяга гантели в наклоне','Ягодичный мост','Жим ногами','Выпады назад','Жим гантелей стоя']).filter(function(v,i,a){return a.indexOf(v)===i}).map(function(e){return '<option value="'+esc(e)+'">'}).join('');
   }
   $('vLog').addEventListener('click',function(e){var b=e.target.closest('.del');if(!b)return;D[b.dataset.k].splice(+b.dataset.i,1);save();renderAll()});
@@ -237,9 +300,9 @@
     var name=$('rName').value.trim();D.name=name;save();
     var dates=[].concat(D.lifts.map(function(x){return x.date}),D.tests.map(function(x){return x.date}),D.act.map(function(x){return x.week}),D.body.map(function(x){return x.date})).sort();
     if(!dates.length){msg('pdfMsg','Сначала добавьте хотя бы одну запись.');return}
-    var inc=$('rBody').checked;
+    var inc=$('rBody').checked,incC=cycOn()&&$('rCycle')&&$('rCycle').checked;
     $('report').innerHTML='<header class="r-head"><div><p class="r-brand">Алёна · Сила без перегибов · alenafit.com</p><h1>Отчёт о прогрессе'+(name?': '+esc(name):'')+'</h1><p>Период: '+fd(dates[0])+' — '+fd(dates[dates.length-1])+' · сформирован '+fd(today())+'</p></div></header>'+
-      '<section><h2>Силовые</h2>'+liftsHtml(true)+'</section><section><h2>Функциональные тесты</h2>'+testsHtml()+'</section><section><h2>Активность</h2>'+actHtml()+'</section>'+(inc?'<section><h2>Замеры</h2>'+bodyHtml()+'</section>':'')+
+      '<section><h2>Силовые</h2>'+liftsHtml(true)+'</section><section><h2>Функциональные тесты</h2>'+testsHtml()+'</section><section><h2>Активность</h2>'+actHtml()+'</section>'+(inc?'<section><h2>Замеры</h2>'+bodyHtml(incC)+'</section>':'')+(incC?'<section><h2>Цикл и результаты</h2>'+cycleHtml()+'</section>':'')+
       '<section class="r-notes"><h2>Как считали</h2><p>Расчётный максимум на 1 повтор (1ПМ) — среднее по формулам Эпли (1985): вес × (1 + повторы / 30) и Бжицки (1993): вес × 36 / (37 − повторы). Точнее всего при 1–10 повторах. Для каждой даты берётся лучший подход.</p><p>Тоннаж — сумма «вес × повторы × подходы» по всем записям упражнения за день. Прирост — (последнее − первое) / первое × 100%, округление до сотых.</p><p>Ориентиры: ВОЗ — силовые от 2 дней в неделю; 7 000 шагов в день — обзор Ding et al., The Lancet Public Health, 2025. Тест «сесть-встать» — Araújo et al., 2025.</p><p>Отчёт не является медицинским документом.</p></section>';
     msg('pdfMsg','В окне печати выберите «Сохранить как PDF».');
     setTimeout(function(){window.print()},50);
@@ -287,5 +350,8 @@
   wipe.addEventListener('click',function(){if(!armed){armed=true;wipe.textContent='Точно удалить всё? Нажмите ещё раз';setTimeout(function(){armed=false;wipe.textContent='Удалить все данные'},4000);return}
     var had=D.lifts.length+D.tests.length+D.act.length+D.body.length;if(had)keepBackup(JSON.stringify(D),'wipe');
     D={lifts:[],tests:[],act:[],body:[],name:''};try{localStorage.removeItem(KEY)}catch(e){}armed=false;wipe.textContent='Удалить все данные';renderAll();backupUi();msg('bkMsg','Все данные удалены.'+(had?' Если это ошибка — нажмите «Вернуть предыдущие данные».':''))});
-  load();if(D.name)$('rName').value=D.name;renderAll();backupUi();if(loadNote)msg('bkMsg',loadNote);
+  if(C){C.onChange(function(){syncCycleUi();renderAll()});
+    $('pDate').addEventListener('change',function(){if(cycOn())fillCd('pDate','pCd')});
+    $('bDate').addEventListener('change',function(){if(cycOn())fillCd('bDate','bCd')})}
+  load();if(D.name)$('rName').value=D.name;syncCycleUi();renderAll();backupUi();if(loadNote)msg('bkMsg',loadNote);
 })();
