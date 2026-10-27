@@ -65,4 +65,9 @@
   /* в аккордеоне открыта одна группа за раз */
   var ds=[].slice.call(menu.querySelectorAll('details.mg'));
   ds.forEach(function(d){d.addEventListener('toggle',function(){if(d.open)ds.forEach(function(o){if(o!==d)o.open=false})})});
+  /* Fold/поворот: скрытое широким макетом меню не должно блокировать страницу. */
+  var wide=window.matchMedia('(min-width:1024px)');
+  function layoutChanged(){if(wide.matches&&!menu.hidden)set(false);if(!wide.matches&&openDd)close(openDd)}
+  if(wide.addEventListener)wide.addEventListener('change',layoutChanged);
+  else if(wide.addListener)wide.addListener(layoutChanged);
 })();

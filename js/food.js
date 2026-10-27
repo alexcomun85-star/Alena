@@ -1,9 +1,12 @@
 /* Калькулятор еды: калории и БЖУ без дневной нормы. Данные — только в браузере. */
 (function(){
   'use strict';
-  var KEY='food_v1',S={custom:[],days:{}};
-  function load(){try{var x=JSON.parse(localStorage.getItem(KEY)||'null');if(x&&typeof x==='object')S=Object.assign(S,x)}catch(e){}}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){return false}}
+  var KEY='food_v1',BKEY='food_v1_backup',S={custom:[],days:{}},blocked=false;
+  function copy(){return JSON.parse(JSON.stringify(S))}
+  function load(){try{var raw=localStorage.getItem(KEY);if(raw)S=validate(JSON.parse(raw))}catch(e){blocked=true}}
+  /* Меняем состояние только после успешной записи: экран не обещает несохранённое. */
+  function save(next){if(blocked)return false;try{next=validate(next);localStorage.setItem(KEY,JSON.stringify(next));S=next;return true}catch(e){return false}}
+  var SAVE_ERR='Не удалось сохранить в браузере. Данные не изменены, введённые поля оставлены. Проверьте доступ к хранилищу и свободное место.';
   function $(id){return document.getElementById(id)}
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function r1(x){return Math.round((x+Number.EPSILON)*10)/10}
@@ -23,13 +26,33 @@
     if(bad(p)||bad(fa)||bad(c))return {err:'Белки, жиры и углеводы — числа от 0 до 100 г на 100 г продукта, без минуса.'};
     var sum=(p||0)+(fa||0)+(c||0);
     if(sum>100+SUM_TOL)return {err:'Белки + жиры + углеводы = '+f(sum)+' г, а в 100 г продукта не может быть больше 100 г. Проверьте, что цифры указаны на 100 г, а не на упаковку или порцию.'};
-    if(k!=null&&!(typeof k==='number'&&isFinite(k)&&k>=0&&k<=KMAX))return {err:'Калории — от 0 до 900 на 100 г, без минуса.'};
+    if(k!=null&&!(typeof k==='number'&&isFinite(k)&&k>=0&&k<=KMAX))return {err:'Калории — от 0 до 910 на 100 г, без минуса.'};
     var warn='';
     if(k!=null&&p!=null&&fa!=null&&c!=null){var a=atwater(p,fa,c),d=Math.abs(k-a);
       if(d>Math.max(25,0.2*Math.max(k,a)))warn='Калории заметно отличаются от расчёта по БЖУ (≈ '+f(a,0)+' ккал). Так бывает из-за клетчатки, сахарозаменителей или особых коэффициентов, но стоит сверить с этикеткой.'}
     return {err:'',warn:warn};
   }
   var MEALS=['Завтрак','Обед','Ужин','Перекус'];
+  function isDate(v){if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v))return false;var d=new Date(v+'T00:00:00Z');return !isNaN(d)&&d.toISOString().slice(0,10)===v&&v>='2000-01-01'&&v<='2100-12-31'}
+  function finite(v,min,max){return typeof v==='number'&&isFinite(v)&&v>=min&&v<=max}
+  function named(x){return x&&typeof x==='object'&&typeof x.name==='string'&&x.name.trim()&&x.name.length<=200}
+  /* Одинаковая проверка при загрузке и импорте. Старый формат food_v1 сохраняется. */
+  function validate(x){
+    if(!x||!Array.isArray(x.custom)||!x.days||typeof x.days!=='object'||Array.isArray(x.days))throw Error('неверная структура дневника');
+    if(x.custom.length>10000||Object.keys(x.days).length>10000)throw Error('слишком много записей');
+    var out={custom:[],days:{}},ids=Object.create(null),count=0;
+    x.custom.forEach(function(v){
+      if(!named(v)||typeof v.id!=='string'||!/^c[\w-]{1,80}$/.test(v.id)||ids[v.id]||!finite(v.k,0,KMAX)||!finite(v.p,0,100)||!finite(v.f,0,100)||!finite(v.c,0,100)||checkFood(v.k,v.p,v.f,v.c).err)throw Error('неверный продукт');
+      ids[v.id]=true;var z={id:v.id,name:v.name,k:v.k,p:v.p,f:v.f,c:v.c,pg:100,pl:'100 г'};if(v.src0==='O')z.src0='O';out.custom.push(z);
+    });
+    Object.keys(x.days).forEach(function(day){
+      if(!isDate(day)||!Array.isArray(x.days[day])||(count+=x.days[day].length)>20000)throw Error('неверная дата или список записей');
+      out.days[day]=x.days[day].map(function(v){
+        if(!named(v)||!finite(v.g,1,3000)||MEALS.indexOf(v.meal)<0||!finite(v.k,0,KMAX*v.g/100)||!finite(v.p,0,v.g)||!finite(v.f,0,v.g)||!finite(v.c,0,v.g)||(v.p+v.f+v.c)>v.g*1.015+1e-8)throw Error('неверная запись о еде');
+        return {name:v.name,g:v.g,meal:v.meal,k:v.k,p:v.p,f:v.f,c:v.c};
+      });
+    });return out;
+  }
   var META=window.FOOD_META||{};
   var DB=(window.FOOD_DB||[]).map(function(r,i){var m=META[r[0]]||[];return {id:'b'+i,name:r[0],k:r[1],p:r[2],f:r[3],c:r[4],cat:r[5],src:r[6],pg:r[7],pl:r[8],st:m[0]||'',fdc:m[1]||''}});
   function all(){return S.custom.map(function(c){return Object.assign({src:c.src0||'C',cat:'Мои продукты'},c)}).concat(DB)}
@@ -60,14 +83,18 @@
     calcSel();$('fG').focus();
   }
   $('fPortions').addEventListener('click',function(e){var b=e.target.closest('.chipbtn');if(!b)return;$('fG').value=b.dataset.g;calcSel()});
-  function calcSel(){if(!sel)return;var g=n($('fG').value)||0,m=g/100;$('fSelCalc').textContent=g?f(sel.k*m,0)+' ккал · Б '+f(sel.p*m)+' г · Ж '+f(sel.f*m)+' г · У '+f(sel.c*m)+' г':''}
+  function calcSel(){if(!sel)return;var g=n($('fG').value),valid=finite(g,1,3000),m=g/100;
+    $('fG').setAttribute('aria-invalid',g!=null&&!valid?'true':'false');
+    $('fSelCalc').textContent=valid?f(sel.k*m,0)+' ккал · Б '+f(sel.p*m)+' г · Ж '+f(sel.f*m)+' г · У '+f(sel.c*m)+' г':g==null?'':'Укажите вес от 1 до 3000 г.'}
   $('fG').addEventListener('input',calcSel);
   $('fAdd').addEventListener('click',function(){
     if(!sel){$('fMsg').textContent='Выберите продукт из списка.';return}
-    var g=n($('fG').value);if(!(g>0&&g<=3000)){$('fMsg').textContent='Укажите вес от 1 до 3000 г.';return}
+    var g=n($('fG').value);if(!finite(g,1,3000)){$('fMsg').textContent='Укажите вес от 1 до 3000 г.';return}
     var m=g/100,meal=$('fMeal').value;
-    (S.days[date]=S.days[date]||[]).push({name:sel.name,g:g,meal:meal,k:sel.k*m,p:sel.p*m,f:sel.f*m,c:sel.c*m});
-    $('fMsg').textContent=save()?'Добавлено: '+sel.name+', '+f(g,0)+' г.':'Не удалось сохранить: браузер запрещает хранение данных.';
+    if(!isDate(date)||date>today()){$('fMsg').textContent='Выберите существующую дату не позже сегодняшней.';return}
+    var next=copy();(next.days[date]=next.days[date]||[]).push({name:sel.name,g:g,meal:meal,k:sel.k*m,p:sel.p*m,f:sel.f*m,c:sel.c*m});
+    if(!save(next)){$('fMsg').textContent=SAVE_ERR;return}
+    $('fMsg').textContent='Добавлено: '+sel.name+', '+f(g,0)+' г.';
     q.value='';showRes();$('fSel').hidden=true;sel=null;render();
   });
 
@@ -84,7 +111,8 @@
     var ck=checkFood(k,p0,f0,c0);if(ck.err){$('cMsg').textContent=ck.err+' Продукт не сохранён.';return}
     var p=p0||0,fa=f0||0,c=c0||0;
     if(k==null){if(!(p||fa||c)){$('cMsg').textContent='Укажите калории или хотя бы белки, жиры и углеводы.';return}k=atwater(p,fa,c)}
-    var item={id:'c'+Date.now(),name:name,k:k,p:p,f:fa,c:c,pg:100,pl:'100 г'};S.custom.unshift(item);save();
+    var item={id:newId(),name:name,k:k,p:p,f:fa,c:c,pg:100,pl:'100 г'},next=copy();next.custom.unshift(item);
+    if(!save(next)){$('cMsg').textContent=SAVE_ERR;return}
     ['cName','cK','cP','cF','cC'].forEach(function(id){$(id).value=''});hint();
     $('cMsg').textContent='Продукт «'+name+'» сохранён в «Мои продукты».'+(ck.warn?' '+ck.warn:'');pick(item.id);showRes();
   });
@@ -98,6 +126,7 @@
     if(k==null||!name||checkFood(k,pr,fa,ca).err)return null;
     return {name:name,k:k,p:pr||0,f:fa||0,c:ca||0,code:p.code||''}}
   var offRes=[];
+  function newId(){var id='c'+Date.now();while(S.custom.some(function(v){return v.id===id}))id+='x';return id}
   $('oBtn').addEventListener('click',function(){
     var t=$('oQ').value.trim();if(!t){$('oMsg').textContent='Введите название или штрихкод.';return}
     var isCode=/^\d{8,14}$/.test(t),F='code,product_name,product_name_ru,brands,nutriments';
@@ -113,7 +142,9 @@
     }).catch(function(){clearTimeout(tm);$('oMsg').textContent='База Open Food Facts сейчас не отвечает. Попробуйте позже или внесите продукт вручную по этикетке.'});
   });
   $('oRes').addEventListener('click',function(e){var b=e.target.closest('.fr');if(!b)return;var x=offRes[+b.dataset.i];
-    var item={id:'c'+Date.now(),name:x.name,k:x.k,p:x.p,f:x.f,c:x.c,pg:100,pl:'100 г',src0:'O'};S.custom.unshift(item);save();
+    if(!x)return;
+    var item={id:newId(),name:x.name,k:x.k,p:x.p,f:x.f,c:x.c,pg:100,pl:'100 г',src0:'O'},next=copy();next.custom.unshift(item);
+    if(!save(next)){$('oMsg').textContent=SAVE_ERR;return}
     $('oMsg').textContent='«'+x.name+'» сохранён в «Мои продукты».';pick(item.id);location.hash='#dobavit';});
 
   /* ---- день ---- */
@@ -128,9 +159,29 @@
       var mk=it.reduce(function(a,o){return a+o.x.k},0);
       return '<div class="meal"><h3>'+m+' <span>'+f(mk,0)+' ккал</span></h3><ul>'+it.map(function(o){return '<li><span>'+esc(o.x.name)+', '+f(o.x.g,0)+' г</span><span>'+f(o.x.k,0)+' ккал · Б '+f(o.x.p)+'</span><button type="button" class="del" data-i="'+o.i+'" aria-label="Удалить">×</button></li>'}).join('')+'</ul></div>'}).join(''):'<p class="small">За этот день записей нет.</p>';
   }
-  $('dList').addEventListener('click',function(e){var b=e.target.closest('.del');if(!b)return;(S.days[date]||[]).splice(+b.dataset.i,1);save();render()});
+  $('dList').addEventListener('click',function(e){var b=e.target.closest('.del');if(!b)return;var next=copy();(next.days[date]||[]).splice(+b.dataset.i,1);if(!save(next)){$('fMsg').textContent=SAVE_ERR;return}render()});
+  /* ---- перенос и восстановление: файл проверяется до замены, прежняя версия остаётся ---- */
+  function transferMsg(t){$('foodTransferMsg').textContent=t}
+  function backupUi(){try{$('foodRestore').disabled=!localStorage.getItem(BKEY);$('foodBackup').disabled=!localStorage.getItem(BKEY)}catch(e){$('foodRestore').disabled=true;$('foodBackup').disabled=true}}
+  function download(raw,name){var u=URL.createObjectURL(new Blob([raw],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name+'-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},1000)}
+  function replace(next){try{var prev=localStorage.getItem(KEY);if(prev!==null)localStorage.setItem(BKEY,prev);localStorage.setItem(KEY,JSON.stringify(next));S=next;blocked=false;return true}catch(e){return false}}
+  function refreshed(){sel=null;$('fSel').hidden=true;showRes();render();backupUi()}
+  $('foodExport').addEventListener('click',function(){try{var raw=blocked?localStorage.getItem(KEY):JSON.stringify({format:'alenafit-food',version:1,data:S});if(!raw)throw Error();download(raw,'alenafit-food')}catch(e){transferMsg('Не удалось скачать копию. Попробуйте другой браузер.')}});
+  $('foodImport').addEventListener('change',function(){var input=this,file=input.files[0];if(!file)return;
+    if(file.size>5*1024*1024){transferMsg('Файл не принят: размер больше 5 МБ. Данные не изменены.');input.value='';return}
+    var reader=new FileReader();reader.onerror=function(){transferMsg('Не удалось прочитать файл. Данные не изменены.');input.value=''};
+    reader.onload=function(){try{var x=JSON.parse(reader.result);if(x&&x.format==='alenafit-food'){if(x.version!==1)throw Error('неподдерживаемая версия');x=x.data}var next=validate(x);
+      if(!confirm('Заменить дневник питания данными из файла? Текущая версия останется в резервной копии.'))return;
+      if(!replace(next)){transferMsg(SAVE_ERR);return}refreshed();transferMsg('Дневник импортирован. Предыдущую версию можно вернуть.');
+    }catch(e){transferMsg('Файл не принят: '+(e.message||'неверные данные')+'. Данные не изменены.')}finally{input.value=''}};reader.readAsText(file);
+  });
+  $('foodRestore').addEventListener('click',function(){try{var raw=localStorage.getItem(BKEY);if(!raw)throw Error('копии нет');var next=validate(JSON.parse(raw));
+    if(!confirm('Вернуть предыдущую версию дневника? Нынешняя версия станет резервной копией.'))return;
+    if(!replace(next)){transferMsg(SAVE_ERR);return}refreshed();transferMsg('Предыдущая версия восстановлена.');
+  }catch(e){transferMsg('Копию не удалось восстановить. Её можно скачать для проверки.')}});
+  $('foodBackup').addEventListener('click',function(){try{var raw=localStorage.getItem(BKEY);if(raw)download(raw,'alenafit-food-backup')}catch(e){transferMsg('Не удалось скачать резервную копию.')}});
   var w=$('fWipe'),armed=false;
   w.addEventListener('click',function(){if(!armed){armed=true;w.textContent='Точно удалить всё? Нажмите ещё раз';setTimeout(function(){armed=false;w.textContent='Удалить все записи и мои продукты'},4000);return}
-    S={custom:[],days:{}};try{localStorage.removeItem(KEY)}catch(e){}armed=false;w.textContent='Удалить все записи и мои продукты';showRes();render()});
-  load();showRes();render();
+    if(!replace({custom:[],days:{}})){transferMsg(SAVE_ERR);return}armed=false;w.textContent='Удалить все записи и мои продукты';refreshed();transferMsg('Дневник очищен. Прежние данные можно вернуть из резервной копии.')});
+  load();showRes();render();backupUi();if(blocked)transferMsg('Хранилище недоступно или данные повреждены. Исходные данные не перезаписаны. Скачайте копию и импортируйте проверенный файл.');
 })();

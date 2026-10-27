@@ -26,7 +26,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20261027q">
+<link rel="stylesheet" href="css/site.css?v=20261027r">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -145,6 +145,18 @@
         <h2>Источники <em>и точность</em></h2>
         <p>Базовые продукты — по справочнику USDA FoodData Central (Министерство сельского хозяйства США), набор SR Legacy: у выбранного продукта видны его состояние (сырой, сухой, варёный, запечённый) и номер записи со ссылкой на источник. Молочные продукты и колбасы — по типичным значениям с российских этикеток (помечены ≈): у разных марок цифры отличаются, сверяйтесь со своей упаковкой. Домашние блюда — борщ, пельмени, плов, оливье, котлеты, сырники — ориентировочно (≈): всё зависит от рецепта. Калории своих продуктов без указанной энергетической ценности считаются по коэффициентам Этуотера: 4 ккал на грамм белков и углеводов, 9 — на грамм жиров.</p>
         <p class="small">Записи хранятся только в этом браузере на этом устройстве и никуда не отправляются.</p>
+        <h3 style="margin-top:20px">Копия дневника и перенос на другое устройство</h3>
+        <p class="small">Скачайте файл и храните его у себя. При импорте записи и свои продукты заменяются после проверки и подтверждения; прежняя версия сохраняется в браузере. Файл содержит ваши записи о питании — передавайте его только тем, кому доверяете.</p>
+        <div class="btn-row">
+          <button type="button" class="tbtn" id="foodExport">Скачать дневник</button>
+          <label class="tbtn ghost" for="foodImport">Импортировать дневник</label>
+          <input id="foodImport" class="sr-only" type="file" accept=".json,application/json">
+        </div>
+        <div class="btn-row">
+          <button type="button" class="tbtn ghost" id="foodRestore" disabled>Вернуть предыдущую версию</button>
+          <button type="button" class="tbtn ghost" id="foodBackup" disabled>Скачать резервную копию</button>
+        </div>
+        <p class="verdict" id="foodTransferMsg" aria-live="polite"></p>
         <div class="btn-row"><button type="button" class="tbtn ghost" id="fWipe">Удалить все записи и мои продукты</button></div>
       </article>
 
@@ -161,13 +173,13 @@
 </main>
 <footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a> · <button type="button" class="foot-pwa" data-pwa>Установить приложение</button></span></div></footer>
 <script src="js/food-db.js?v=20261027b" defer></script>
-<script src="js/food.js?v=20261027c" defer></script>
+<script src="js/food.js?v=20261027r" defer></script>
 <script src="js/cycle.js?v=20261027a" defer></script>
 <script>document.addEventListener('DOMContentLoaded',function(){var C=window.Cycle,box=document.getElementById('dCyc'),dt=document.getElementById('fDate');if(!C||!box||!dt)return;
   /* подсказка по дню цикла для выбранной даты; цифры еды не меняются */
   function upd(){box.innerHTML=C.foodHint(dt.value||C.today())}
   dt.addEventListener('change',upd);dt.addEventListener('input',upd);C.onChange(upd);upd();});</script>
-<script src="js/nav.js?v=20261027q" defer></script>
+<script src="js/nav.js?v=20261027r" defer></script>
 <script src="js/sections.js?v=1" defer></script>
 <script src="js/myzal.js?v=1" defer></script>
 <script src="js/pwa.js?v=3" defer></script>

@@ -1150,3 +1150,16 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenat
 }
 @media (max-width:1023px) and (prefers-reduced-motion:no-preference){.menu-open .mnav-in{animation:mnUp .22s ease-out}}
 @keyframes mnUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+
+/* Промежуточный экран (в том числе раскрытый Fold): больше места без меню ПК. */
+@media (min-width:720px) and (max-width:1023px){
+  .w{max-width:880px}
+  .mnav-in{max-width:760px}
+  .page-hero .lede{max-width:52ch}
+}
+/* Область нажатия рассчитана на палец, включая кнопки карточек и избранного. */
+.how-btn,.zal-toggle,.zal-toggle-s,.zal-ctl button,.mnav-in .m-zal-links a{min-height:48px!important}
+.zal-ctl button{width:48px;height:48px}
+.btn-row label.tbtn{display:inline-flex;align-items:center;justify-content:center}
+.btn-row:has(#foodImport:focus-visible) label[for="foodImport"]{outline:3px solid var(--amber);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
