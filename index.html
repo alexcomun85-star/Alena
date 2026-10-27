@@ -28,7 +28,7 @@
 <meta name="description" content="Алёна — тренер и нутрициолог. Силовые тренировки и питание без крайностей: онлайн-сопровождение и мини-группы в центре Санкт-Петербурга.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20261027p">
+<link rel="stylesheet" href="css/site.css?v=20261027q">
 </head>
 <body>
 
@@ -407,13 +407,7 @@
 
 <footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a> · <button type="button" class="foot-pwa" data-pwa>Установить приложение</button></span></div></footer>
 
-<div class="dock hide" id="dock">
-  <div class="w">
-    <a class="home-btn zal-dock" href="moy-zal.html" aria-label="Мой зал"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg><span>Мой зал</span><i class="zal-n" hidden></i></a>
-    <a class="btn btn-main" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a>
-    <small>Ответ 9–21 МСК</small>
-  </div>
-</div>
+
 
 <script>
 document.getElementById('copy').addEventListener('click',function(){
@@ -422,14 +416,7 @@ document.getElementById('copy').addEventListener('click',function(){
   function fb(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено'}
   try{navigator.clipboard.writeText('@Gym_mom1988').then(ok,fb)}catch(e){fb()}
 });
-(function(){
-  var dock=document.getElementById('dock'),hero=document.querySelector('.hero'),fin=document.getElementById('start');
-  if(!('IntersectionObserver' in window)){dock.classList.remove('hide');return;}
-  var vis={hero:true,fin:false};
-  function upd(){dock.classList.toggle('hide',vis.hero||vis.fin)}
-  new IntersectionObserver(function(e){vis.hero=e[0].isIntersecting;upd()},{threshold:.25}).observe(hero);
-  new IntersectionObserver(function(e){vis.fin=e[0].isIntersecting;upd()},{threshold:.15}).observe(fin);
-})();
+
 
 (function(){
   var form=document.getElementById('quizForm');if(!form)return;
@@ -465,10 +452,10 @@ tabs.forEach(function(t,i){t.addEventListener('click',function(){sel(t)});t.addE
 if(location.hash==='#channel'){sel(tabs[1]);setTimeout(function(){document.getElementById('news').scrollIntoView()},50)}})();
 </script>
 <script src="js/feeds.js?v=20261026e" defer></script>
-<script src="js/nav.js?v=20261027c" defer></script>
+<script src="js/nav.js?v=20261027q" defer></script>
 <script src="js/sections.js?v=1" defer></script>
 <script src="js/myzal.js?v=1" defer></script>
 <script src="js/pwa.js?v=3" defer></script>
-<script src="js/gestures.js?v=2" defer></script>
+<script src="js/gestures.js?v=20261027q" defer></script>
 </body>
 </html>

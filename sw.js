@@ -2,7 +2,7 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-v7';
+const VERSION = 'alenafit-v8';
 const CORE = [
   './', './index.html', './servisy.html', './progress.html', './kalorii.html', './vozvrat.html',
   './zal.html', './korzina.html', './recepty.html', './golod.html', './pitanie.html', './offline.html', './moy-zal.html',

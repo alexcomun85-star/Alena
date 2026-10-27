@@ -32,22 +32,37 @@
   document.addEventListener('click',function(e){if(openDd&&!openDd.contains(e.target))close(openDd)});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&openDd){var b=openDd.querySelector('.dd-btn');close(openDd);b.focus()}});
 
-  /* Телефон: полноэкранное меню */
-  var btn=document.getElementById('menuBtn'),menu=document.getElementById('mnav');if(!btn||!menu)return;
-  function set(o){menu.hidden=!o;btn.setAttribute('aria-expanded',o);document.body.classList.toggle('menu-open',o);btn.lastChild.textContent=o?'Закрыть':'Меню';if(o){var s=menu.querySelector('details[open] summary')||menu.querySelector('summary');s&&s.focus()}}
-  btn.addEventListener('click',function(){set(menu.hidden)});
+  /* Телефон и планшет: всё управление — в нижней панели под большим пальцем.
+     Главная (на главной — «Наверх», в режиме приложения — «Назад») · Мой зал · СТАРТ · Меню.
+     Меню открывается шторкой снизу, пункты прижаты к низу экрана. */
+  var menu=document.getElementById('mnav'),btn=document.getElementById('menuBtn');
+  var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  var home=path==='index.html'||path==='';
+  var I={home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/>',up:'<path d="M12 19V5M6 11l6-6 6 6"/>',back:'<path d="M15 5l-7 7 7 7"/>',star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'};
+  function ico(d){return '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>'}
+  var first=home?'<button type="button" class="home-btn dock-top">'+ico(I.up)+'<span>Наверх</span></button>'
+    :standalone?'<button type="button" class="home-btn dock-back">'+ico(I.back)+'<span>Назад</span></button>'
+    :'<a class="home-btn" href="./">'+ico(I.home)+'<span>Главная</span></a>';
+  var dock=document.createElement('nav');dock.className='dock';dock.setAttribute('aria-label','Быстрые действия');
+  dock.innerHTML='<div class="w">'+first+
+    '<a class="home-btn zal-dock" href="moy-zal.html"'+(path==='moy-zal.html'?' aria-current="page"':'')+'>'+ico(I.star)+'<span>Мой зал</span><i class="zal-n" hidden></i></a>'+
+    '<a class="btn btn-main dock-start" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener" aria-label="Написать «СТАРТ» в Telegram">СТАРТ</a>'+
+    (menu?'<button type="button" class="home-btn dock-menu" id="dockMenu" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span><span class="dm-t">Меню</span></button>':'')+
+    '</div>';
+  document.body.appendChild(dock);
+  var t=dock.querySelector('.dock-top');if(t)t.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  var bk=dock.querySelector('.dock-back');if(bk)bk.addEventListener('click',function(){if(history.length>1)history.back();else location.href='./'});
+  if(!menu)return;
+  var dm=document.getElementById('dockMenu');
+  function set(o){menu.hidden=!o;document.body.classList.toggle('menu-open',o);
+    if(btn){btn.setAttribute('aria-expanded',o);btn.lastChild.textContent=o?'Закрыть':'Меню'}
+    dm.setAttribute('aria-expanded',o);dm.querySelector('.dm-t').textContent=o?'Закрыть':'Меню';
+    if(o){var s=menu.querySelector('details[open] summary')||menu.querySelector('summary');s&&s.focus({preventScroll:true});menu.scrollTop=menu.scrollHeight}}
+  if(btn)btn.addEventListener('click',function(){set(menu.hidden)});
+  dm.addEventListener('click',function(){set(menu.hidden)});
   menu.addEventListener('click',function(e){if(e.target.closest('a'))set(false)});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!menu.hidden){set(false);btn.focus()}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!menu.hidden){set(false);(dm.offsetParent?dm:btn).focus()}});
   /* в аккордеоне открыта одна группа за раз */
   var ds=[].slice.call(menu.querySelectorAll('details.mg'));
   ds.forEach(function(d){d.addEventListener('toggle',function(){if(d.open)ds.forEach(function(o){if(o!==d)o.open=false})})});
 })();
-
-/* Нижняя панель на телефоне для внутренних страниц: «Главная», «Мой зал» и «Написать СТАРТ» (на главной — своя панель #dock) */
-(function(){
-  if(document.getElementById('dock')||document.querySelector('.dock'))return;
-  var d=document.createElement('div');d.className='dock dock-inner';
-  d.innerHTML='<div class="w"><a class="home-btn" href="./" aria-label="На главную"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span>Главная</span></a><a class="home-btn zal-dock" href="moy-zal.html" aria-label="Мой зал"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg><span>Мой зал</span><i class="zal-n" hidden></i></a><a class="btn btn-main" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a></div>';
-  document.body.appendChild(d);
-})();
-

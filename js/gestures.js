@@ -21,7 +21,7 @@
   document.addEventListener('touchend',function(){if(edge&&dx>80)goBack();edge=false;ind.style.transform='';ind.classList.remove('ready')},{passive:true});
 
   /* 3. Меню: свайп вниз (когда меню прокручено к началу) или вправо — закрыть */
-  var menu=document.getElementById('mnav'),mb=document.getElementById('menuBtn');
+  var menu=document.getElementById('mnav'),mb=document.getElementById('dockMenu')||document.getElementById('menuBtn');
   if(menu&&mb){var mx=0,my=0,top0=false;
     menu.addEventListener('touchstart',function(e){var t=e.touches[0];mx=t.clientX;my=t.clientY;top0=menu.scrollTop<=0},{passive:true});
     menu.addEventListener('touchend',function(e){var t=e.changedTouches[0],ddx=t.clientX-mx,ddy=t.clientY-my;

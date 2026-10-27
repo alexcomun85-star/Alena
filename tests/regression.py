@@ -494,9 +494,9 @@ def t_myzal(ctx):
     check("Мой зал: сохранены ключи разделов по порядку", ["progress", "servisy#taymer", "recepty"], stored["ids"])
     check("Мой зал: кнопка показывает состояние", ("true", "В Моём зале"), (page.get_attribute(".page-hero .zal-toggle", "aria-pressed"), page.inner_text(".page-hero .zal-toggle")))
     check("Мой зал: счётчик в нижней панели", "3", page.eval_on_selector(".dock .zal-n", "e=>e.textContent"))
-    page.click("#menuBtn")
+    page.click("#dockMenu")
     check("Мой зал: разделы видны в мобильном меню", ["Мой прогресс", "Интервальный таймер", "Рецепты с белком"], page.eval_on_selector_all(".m-zal-links a", "e=>e.map(x=>x.textContent)"))
-    page.click("#menuBtn")
+    page.click("#dockMenu")
     page.click(".dock .zal-dock")
     page.wait_for_load_state()
     names = lambda: page.eval_on_selector_all(".zal-item b", "e=>e.map(x=>x.textContent)")
@@ -551,6 +551,40 @@ def t_tehnika(ctx):
     page.close()
 
 
+def t_dock(ctx):
+    """Телефон: управление внизу — шапка без кнопок, нижняя панель, меню-шторка; ПК — без изменений."""
+    m = ctx.browser.new_context(viewport={"width": 360, "height": 740}, is_mobile=True, has_touch=True)
+    for path, first in (("index.html", "Наверх"), ("servisy.html", "Главная")):
+        page = fresh(m, path)
+        hidden = page.evaluate("[...document.querySelectorAll('.bar .menu-btn,.bar .btn-main,.bar .zal-btn,.bar .inst-btn')].every(e=>!e.offsetParent)")
+        check(f"панель ({path}): в шапке телефона нет кнопок", True, hidden)
+        check(f"панель ({path}): шапка не липнет", "relative", page.evaluate("getComputedStyle(document.querySelector('.bar')).position"))
+        labels = page.eval_on_selector_all(".dock .w > *", "e=>e.map(x=>x.innerText.trim())")
+        check(f"панель ({path}): кнопки снизу", [first, "Мой зал", "СТАРТ", "Меню"], labels)
+        page.mouse.wheel(0, 2000)
+        page.wait_for_timeout(200)
+        r = page.evaluate("document.querySelector('.dock').getBoundingClientRect()")
+        check(f"панель ({path}): видна внизу экрана при прокрутке", True, abs(r["bottom"] - 740) < 2)
+        page.click("#dockMenu")
+        check(f"панель ({path}): меню открывается, панель остаётся", (False, "Закрыть", True), (page.evaluate("document.getElementById('mnav').hidden"), page.inner_text("#dockMenu .dm-t"), page.is_visible(".dock")))
+        mb = page.evaluate("document.querySelector('.mnav-in').getBoundingClientRect().bottom")
+        check(f"панель ({path}): пункты меню прижаты к панели", True, abs(mb - page.evaluate("document.querySelector('.dock').getBoundingClientRect().top")) < 8)
+        page.keyboard.press("Escape")
+        check(f"панель ({path}): Esc закрывает меню", True, page.evaluate("document.getElementById('mnav').hidden"))
+        check(f"панель ({path}): нет горизонтальной прокрутки", False, page.evaluate("document.documentElement.scrollWidth>innerWidth"))
+        check(f"панель ({path}): ошибок JavaScript нет", [], page._errors)
+        page.close()
+    page = fresh(m, "index.html")
+    page.mouse.wheel(0, 3000); page.wait_for_timeout(300)
+    page.click(".dock-top"); page.wait_for_timeout(900)
+    check("панель: «Наверх» на главной", True, page.evaluate("scrollY") < 5)
+    page.close()
+    m.close()
+    page = fresh(ctx, "servisy.html")
+    check("ПК: нижней панели нет, кнопки в шапке", (False, True), (page.is_visible(".dock"), page.is_visible(".bar .btn-main")))
+    page.close()
+
+
 def main():
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
@@ -565,6 +599,7 @@ def main():
         t_print(ctx, browser)
         t_cycle(ctx)
         t_tehnika(ctx)
+        t_dock(ctx)
         t_myzal(ctx)
         browser.close()
     failed = [r for r in RESULTS if not r[0]]
