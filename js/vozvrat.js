@@ -27,7 +27,7 @@
   var med=document.getElementById('vMed'),ok=document.getElementById('vOk'),btn=document.getElementById('vGen'),out=document.getElementById('vOut'),sec=document.getElementById('report');
   function sync(){var lim=v('vl')==='1';med.hidden=!lim;btn.disabled=lim&&!ok.checked}
   document.querySelectorAll('input[name="vl"]').forEach(function(i){i.addEventListener('change',sync)});ok.addEventListener('change',sync);sync();
-  function dayTable(list){return '<table class="ptbl"><thead><tr><th>Упражнение</th><th>Повторы</th></tr></thead><tbody>'+list.map(function(e){return '<tr><td>'+esc(e[0])+'</td><td>'+esc(e[1])+'</td></tr>'}).join('')+'</tbody></table>'}
+  function dayTable(list){return '<table class="ptbl"><thead><tr><th>Упражнение</th><th>Повторы</th></tr></thead><tbody>'+list.map(function(e){return '<tr><td>'+esc(e[0])+(window.Tehnika?Tehnika.btn(e[0]):'')+'</td><td>'+esc(e[1])+'</td></tr>'}).join('')+'</tbody></table>'}
   /* Учёт цикла (js/cycle.js): прогноз ближайших месячных в эти 4 недели — только подсказка, план не меняется */
   function cycSec(){var C=window.Cycle;if(!C||!C.get().on)return '';var s=C.get(),t=C.today();
     if(!C.start())return '<section><h2>Дни цикла</h2><p>Учёт цикла включён, но не указан первый день последних месячных — прогноза нет. Ориентируйтесь на самочувствие: в тяжёлые дни — облегчённый вариант из раздела «Когда снизить нагрузку».</p></section>';

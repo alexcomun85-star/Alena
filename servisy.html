@@ -221,6 +221,7 @@
 <script src="js/sections.js?v=1" defer></script>
 <script src="js/myzal.js?v=1" defer></script>
 <script src="js/cycle.js?v=20261027a"></script>
+<script src="js/tehnika.js?v=1"></script>
 <script>
 (function(){
   /* 1. Тренировка дня */
@@ -252,10 +253,10 @@
     if(light){plan={fmt:t===15?'Круговая: 1–2 круга':t===25?'Круговая: 2 круга':'По подходам: 2 подхода каждого упражнения',reps:plan.reps,hold:t===40?'30 секунд':'20–30 секунд',rest:plan.rest}}
     var warm=t===15?'3 минуты':'5 минут';
     var sup=[];
-    var list=pats.map(function(k){if(fe==='pain'&&k==='core')return '<li><span class="pat">Спина и дыхание</span>«Кошка-корова» на четвереньках <span class="dose">— 8–10 медленных повторов</span></li>';
+    var list=pats.map(function(k){if(fe==='pain'&&k==='core')return '<li><span class="pat">Спина и дыхание</span>«Кошка-корова» на четвереньках <span class="dose">— 8–10 медленных повторов</span>'+(window.Tehnika?Tehnika.btn('«Кошка-корова» на четвереньках'):'')+'</li>';
       var e=pick(LIB[k][p]),dose=HOLD[e]?plan.hold+(HOLD[e]===2?' на каждую сторону':''):plan.reps+(SIDE.indexOf(e)>=0?' на каждую сторону':'');
       if(SUP[e])sup.push('<li><b>'+e+'.</b> '+SUP[e]+'</li>');
-      return '<li><span class="pat">'+NAMES[k]+'</span>'+e+' <span class="dose">— '+dose+'</span></li>'}).join('');
+      return '<li><span class="pat">'+NAMES[k]+'</span>'+e+' <span class="dose">— '+dose+'</span>'+(window.Tehnika?Tehnika.btn(e):'')+'</li>'}).join('');
     var lightNote=!light?'':'<div class="wlight"><b>Облегчённый вариант.</b> Меньше кругов или подходов, вес — с запасом 3–4 повтора, отдых — сколько нужно. Станет лучше по ходу тренировки — можно вернуть обычный объём.'+
       (fe==='pain'?' Планки и упражнения на пресс заменены: при боли внизу живота они часто неприятны. Вместо тренировки подойдёт и прогулка 20–30 минут или лёгкая растяжка — это тоже засчитывается. Если боль сильная, необычная для вас или мешает обычным делам — обратитесь к гинекологу, а не терпите.':'')+'</div>';
     out.innerHTML='<h3>Около '+t+' минут · '+({home:'дома',dumb:'дома с гантелями',gym:'в зале'})[p]+(light?' · облегчённо':'')+'</h3>'+lightNote+

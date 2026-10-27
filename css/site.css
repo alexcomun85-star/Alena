@@ -1106,3 +1106,16 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenat
 .zal-toggle.on{border-color:var(--amber);background:var(--surface-2)}
 .zal-toggle-s{min-height:36px;font-size:13.5px;padding:0 14px 0 10px}
 .zal-toggle-s svg{width:18px;height:18px}
+
+/* карточки техники: кнопка «Как делать» и окно */
+.how-btn{display:inline-flex;align-items:center;gap:6px;margin-left:6px;vertical-align:middle;min-height:36px;padding:0 12px;border:0;border-radius:999px;background:transparent;box-shadow:inset 0 0 0 1.5px var(--amber);color:var(--amber);font:600 13px var(--body);cursor:pointer;white-space:nowrap}
+.how-btn::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--amber)}
+.how-btn:hover{background:var(--amber);color:var(--amber-ink)}
+.how-btn:hover::before{background:var(--amber-ink)}
+.how-dlg{border:0;padding:0;background:transparent;max-width:min(480px,calc(100vw - 32px));width:100%;max-height:calc(100dvh - 32px)}
+.how-dlg::backdrop{background:rgba(5,12,10,.82)}
+.how-in{position:relative;background:var(--surface);border-radius:var(--r-md);padding:12px;display:grid;gap:10px;max-height:calc(100dvh - 32px);overflow:auto}
+.how-in img{width:100%;height:auto;border-radius:12px;display:block}
+.how-in p{margin:0}
+.how-x{position:absolute;top:18px;right:18px;width:44px;height:44px;border-radius:50%;border:0;background:var(--amber);color:var(--amber-ink);font:700 26px/1 var(--body);cursor:pointer}
+@media print{.how-btn,.how-dlg{display:none!important}}

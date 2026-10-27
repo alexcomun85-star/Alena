@@ -528,6 +528,29 @@ def t_myzal(ctx):
     m.close()
 
 
+def t_tehnika(ctx):
+    """Карточки техники: кнопки «Как делать», окно с картинкой, все картинки на месте."""
+    page = fresh(ctx, "servisy.html")
+    page.click("label[for=wpd]")
+    check("техника: в тренировке дня есть кнопки «Как делать»", True, page.locator("#wOut .how-btn").count() >= 1)
+    page.locator("#wOut .how-btn").first.click()
+    page.wait_for_timeout(400)
+    check("техника: окно открывается и картинка загружена", (True, 720), (page.evaluate("document.querySelector('.how-dlg').open"), page.evaluate("document.querySelector('.how-dlg img').naturalWidth")))
+    page.keyboard.press("Escape")
+    check("техника: окно закрывается по Esc", False, page.evaluate("document.querySelector('.how-dlg').open"))
+    slugs = page.evaluate("Object.keys(Tehnika.list)")
+    missing = [x for x in slugs if not page.request.get(BASE + "img/tehnika/" + x + ".webp").ok]
+    check("техника: все картинки карточек на месте", [], missing)
+    check("техника: ошибок JavaScript нет", [], page._errors)
+    page.close()
+    page = fresh(ctx, "vozvrat.html")
+    page.click("#vGen")
+    check("техника: в плане возвращения есть кнопки", True, page.locator("#vOut .how-btn").count() >= 1)
+    page.emulate_media(media="print")
+    check("техника: кнопки не печатаются", False, page.locator("#vOut .how-btn").first.is_visible())
+    page.close()
+
+
 def main():
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
@@ -541,6 +564,7 @@ def main():
         t_recipes(ctx)
         t_print(ctx, browser)
         t_cycle(ctx)
+        t_tehnika(ctx)
         t_myzal(ctx)
         browser.close()
     failed = [r for r in RESULTS if not r[0]]
