@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /tests/
+Disallow: /scripts/
+Disallow: /offline.html
+
 Sitemap: https://alenafit.com/sitemap.xml

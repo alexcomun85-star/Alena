@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # история нужна для дат в sitemap.xml
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -38,6 +40,8 @@ jobs:
         run: |
           pip install feedparser==6.0.11 beautifulsoup4==4.12.3 requests==2.32.3
           python scripts/update_data.py
+      - name: Карта сайта для поисковиков
+        run: python scripts/build_sitemap.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
