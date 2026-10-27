@@ -27,7 +27,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="css/site.css?v=20261027r">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}
+.hand-illustrated{gap:12px}.hand-illustrated .hand{padding:12px 10px 20px;align-content:start;gap:6px}.hand-art{position:relative;width:min(100%,190px);aspect-ratio:1;overflow:hidden;border-radius:12px}.hand-art img{position:absolute;width:200%;height:200%;max-width:none;left:0;top:0}.hand-fist img{left:-100%}.hand-cupped img{top:-100%}.hand-thumb img{left:-100%;top:-100%}.hand-illustrated .hand b{font-size:clamp(12px,2.5vw,16px);line-height:1.5}.hand-illustrated .hand span{line-height:1.5}
+</style>
 </head>
 <body>
 <!-- nav:start -->
@@ -190,11 +192,11 @@
       <span class="tag">#питание · без весов</span>
       <h2>Порции <em>рукой</em></h2>
       <p class="lede">Рука всегда с собой и растёт вместе с вами. Ориентир на один основной приём пищи:</p>
-      <div class="hand-grid">
-        <div class="hand"><svg viewBox="0 0 80 80" aria-hidden="true"><rect x="16" y="22" width="48" height="44" rx="14" fill="#f0a92b"/></svg><b>Ладонь</b><span>белка</span></div>
-        <div class="hand"><svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="42" r="24" fill="#a9c0b7"/></svg><b>Кулак</b><span>круп, хлеба, картофеля</span></div>
-        <div class="hand"><svg viewBox="0 0 80 80" aria-hidden="true"><path d="M8 40a32 26 0 0 0 64 0z" fill="#2c6e5f"/><path d="M8 40a32 26 0 0 1 64 0" fill="none" stroke="#2c6e5f" stroke-width="4"/></svg><b>Две горсти</b><span>овощей</span></div>
-        <div class="hand"><svg viewBox="0 0 80 80" aria-hidden="true"><rect x="32" y="16" width="16" height="48" rx="8" fill="#eef4f1"/></svg><b>Большой палец</b><span>масла, орехов, сыра</span></div>
+      <div class="hand-grid hand-illustrated">
+        <div class="hand"><div class="hand-art hand-palm" aria-hidden="true"><img src="img/pitanie/hands.webp" alt="" width="1536" height="1536" loading="lazy"></div><b>Ладонь</b><span>белка</span></div>
+        <div class="hand"><div class="hand-art hand-fist" aria-hidden="true"><img src="img/pitanie/hands.webp" alt="" width="1536" height="1536" loading="lazy"></div><b>Кулак</b><span>круп, хлеба, картофеля</span></div>
+        <div class="hand"><div class="hand-art hand-cupped" aria-hidden="true"><img src="img/pitanie/hands.webp" alt="" width="1536" height="1536" loading="lazy"></div><b>Две горсти</b><span>овощей</span></div>
+        <div class="hand"><div class="hand-art hand-thumb" aria-hidden="true"><img src="img/pitanie/hands.webp" alt="" width="1536" height="1536" loading="lazy"></div><b>Большой палец</b><span>масла, орехов, сыра</span></div>
       </div>
       <p class="quiz-note">Это стартовая точка, а не норма. Если голодно — добавьте порцию, если тяжело — уменьшите. Цифры можно посмотреть в <a href="kalorii.html">калькуляторе калорий и БЖУ</a>, а схему тарелки — в <a href="servisy.html#tarelka">«Полезном»</a>.</p>
     </div>

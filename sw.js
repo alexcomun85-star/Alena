@@ -2,7 +2,7 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-v9';
+const VERSION = 'alenafit-v10';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
   "./",
@@ -79,6 +79,7 @@ const MEDIA = [
   "./img/odezhda/stirka.webp",
   "./img/og.jpg",
   "./img/pitanie/belok.webp",
+  "./img/pitanie/hands.webp",
   "./img/pitanie/kletchatka.webp",
   "./img/pitanie/korzina.webp",
   "./img/pitanie/mikro.webp",
