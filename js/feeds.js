@@ -19,7 +19,8 @@
           (ru?'<p class="orig">'+esc(it.title)+'</p>':'')+'</article>';
       }).join('');
       var up=wrap&&wrap.querySelector('[data-updated]');if(up&&data.updated)up.textContent='Обновлено автоматически: '+d(data.updated);
-      if(wrap)wrap.hidden=false;
+      /* Видимость вкладок управляется переключателем, а не загрузкой ленты. */
+      if(wrap&&wrap.hasAttribute('data-hide-empty')&&wrap.getAttribute('role')!=='tabpanel')wrap.hidden=false;
     }).catch(function(){if(wrap&&wrap.hasAttribute('data-hide-empty'))wrap.hidden=true});
   });
 })();

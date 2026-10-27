@@ -3,6 +3,8 @@ name: Сборка и публикация сайта
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   schedule:
     - cron: "0 4 * * *"   # каждый день в 07:00 по Москве
   workflow_dispatch:
@@ -17,7 +19,48 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Установить средства проверки
+        run: |
+          pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+      - name: Проверить сайт, калькуляторы и смену размеров экрана
+        run: |
+          python -m http.server 8766 > /tmp/alenafit-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          python - <<'PY'
+          import time, urllib.request
+          for attempt in range(50):
+              try:
+                  urllib.request.urlopen('http://localhost:8766/', timeout=1).close()
+                  break
+              except OSError:
+                  time.sleep(.1)
+          else:
+              raise RuntimeError('Локальный сервер не запустился')
+          PY
+          node tests/food_storage.test.cjs
+          node tests/nav_resize.test.cjs
+          python tests/regression.py
+          python tests/audit_regression.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-and-fold-checks
+          path: qa-output/
+          if-no-files-found: ignore
   build:
+    needs: checks
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
