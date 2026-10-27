@@ -67,7 +67,7 @@ def ext(href):
 
 
 def icon(k):
-    return ('<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" '
+    return ('<svg class="ico" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" '
             'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[k] + "</svg>")
 
 
@@ -97,18 +97,42 @@ def build():
         '    <a class="brand" href="./" aria-label="ALENAFIT — на главную"><img class="brand-mark" src="img/brand/mark-light.svg" alt="" width="41" height="34"><span class="brand-text"><img class="brand-word" src="img/brand/wordmark-light.svg" alt="ALENAFIT" width="108" height="15"><small>сила без перегибов</small></span></a>\n'
         '    <nav class="tnav" aria-label="Разделы">' + "".join(top) + '</nav>\n'
         '    <a class="zal-btn" href="moy-zal.html" aria-label="Мой зал — избранные разделы" title="Мой зал"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linejoin=\"round\"><path d=\"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z\"/></svg><span>Мой зал</span><i class="zal-n" hidden></i></a>\n'
-        '    <button class="inst-btn" type="button" data-pwa aria-label="Установить приложение на телефон" title="Установить приложение"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Приложение</span></button>\n'
+        '    <button class="inst-btn" type="button" data-pwa aria-label="Установить приложение на телефон" title="Установить приложение"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Приложение</span></button>\n'
         '    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span>Меню</button>\n'
         f'    <a class="btn btn-main" href="{START}" target="_blank" rel="noopener">СТАРТ</a>\n'
         '  </div>\n</header>\n'
         '<div class="mnav" id="mnav" hidden>\n  <nav class="mnav-in g" aria-label="Меню">\n'
-        '    <a class="m-home" href="./">Главная</a>\n    <button type="button" class="m-install" data-pwa><img src="icons/icon-192.png" alt="" width="40" height="40"><span><b>Приложение на телефон</b><small>Иконка на рабочем столе, основные инструменты — без интернета</small></span></button>\n    <div class="m-zal"><a class="m-zal-head" href="moy-zal.html"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linejoin=\"round\"><path d=\"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z\"/></svg><span><b>Мой зал</b><small>Нажмите ☆ у раздела, чтобы он всегда был под рукой</small></span><i class="zal-n" hidden></i></a><div class="m-zal-links"></div></div>\n    ' + "\n    ".join(mob) + '\n'
+        '    <a class="m-home" href="./">Главная</a>\n    <button type="button" class="m-install" data-pwa><img src="icons/icon-192.png" alt="" width="40" height="40"><span><b>Приложение на телефон</b><small>Иконка на рабочем столе, основные инструменты — без интернета</small></span></button>\n    <div class="m-zal"><a class="m-zal-head" href="moy-zal.html"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linejoin=\"round\"><path d=\"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z\"/></svg><span><b>Мой зал</b><small>Избранные разделы — всегда под рукой</small></span><i class="zal-n" hidden></i></a><div class="m-zal-links"></div></div>\n    ' + "\n    ".join(mob) + '\n'
         f'    <div class="m-cta"><a class="btn btn-main btn-wide" href="{START}" target="_blank" rel="noopener">Написать «СТАРТ»</a></div>\n'
         '  </nav>\n</div>\n<!-- nav:end -->')
     return header
 
 
+def slug(h):
+    """Стабильный ключ раздела для «Моего зала»: адрес без ./ и .html."""
+    h = h[2:] if h.startswith("./") else h
+    page, _, anchor = h.partition("#")
+    page = page.replace(".html", "") or "index"
+    return page + ("#" + anchor if anchor else "")
+
+
+def write_sections():
+    """js/sections.js — единый список разделов меню (источник для «Моего зала»)."""
+    import json
+    out = []
+    for k, title, items, promo in MENU:
+        for h, t, d in items:
+            if d is None or h.startswith("http"):
+                continue
+            out.append({"id": slug(h), "h": h, "t": t, "d": d, "g": title})
+    js = ("/* Собирается автоматически: scripts/build_nav.py. Не править вручную. */\n"
+          "window.ALENA_SECTIONS=" + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")
+    open("js/sections.js", "w", encoding="utf-8").write(js)
+    print("sections", len(out))
+
+
 def main():
+    write_sections()
     nav = build()
     old = re.compile(r'<header class="bar g">.*?</header>\s*<div class="mnav" id="mnav" hidden>.*?</nav>\s*</div>', re.S)
     marked = re.compile(r'<!-- nav:start -->.*?<!-- nav:end -->', re.S)

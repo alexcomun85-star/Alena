@@ -8,13 +8,13 @@
   /* 1. Кнопка «назад» в режиме приложения (кроме главной) */
   if(standalone&&path!=='index.html'&&path!==''){
     var bar=document.querySelector('.bar .w');
-    if(bar){var b=document.createElement('button');b.type='button';b.className='app-back';b.setAttribute('aria-label','Назад');b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';b.addEventListener('click',goBack);bar.insertBefore(b,bar.firstChild)}
+    if(bar){var b=document.createElement('button');b.type='button';b.className='app-back';b.setAttribute('aria-label','Назад');b.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';b.addEventListener('click',goBack);bar.insertBefore(b,bar.firstChild)}
   }
 
   if(!touch)return;
 
   /* 2. Свайп вправо от левого края — назад */
-  var ind=document.createElement('div');ind.className='edge-back';ind.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';document.body.appendChild(ind);
+  var ind=document.createElement('div');ind.className='edge-back';ind.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';document.body.appendChild(ind);
   var sx=0,sy=0,edge=false,dx=0;
   document.addEventListener('touchstart',function(e){var t=e.touches[0];sx=t.clientX;sy=t.clientY;dx=0;edge=sx<28&&path!=='index.html'&&!document.body.classList.contains('menu-open')},{passive:true});
   document.addEventListener('touchmove',function(e){if(!edge)return;var t=e.touches[0];dx=t.clientX-sx;var dy=Math.abs(t.clientY-sy);if(dy>60){edge=false;ind.style.transform='';return}if(dx>0){ind.style.transform='translate('+Math.min(dx,90)/90*64+'px,-50%)';ind.classList.toggle('ready',dx>80)}},{passive:true});

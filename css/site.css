@@ -827,9 +827,9 @@ circle.lv{display:block}
   .dd-promo span{font-size:14px;color:var(--muted)}
   .dd-promo i{font-style:normal;color:var(--amber);font-weight:700;margin-top:6px}
   .dd-promo:hover{background:var(--teal)}
-  .dd-grid .dd-links>.pin-wrap:nth-child(1){grid-column:1}.dd-grid .dd-links>.pin-wrap:nth-child(2){grid-column:2}
-  .dd-grid .dd-links>.pin-wrap:nth-child(3){grid-column:1}.dd-grid .dd-links>.pin-wrap:nth-child(4){grid-column:2}
-  .dd-grid .dd-links>.pin-wrap:nth-child(5){grid-column:1/span 2}
+  .dd-grid .dd-link:nth-child(1){grid-column:1}.dd-grid .dd-link:nth-child(2){grid-column:2}
+  .dd-grid .dd-link:nth-child(3){grid-column:1}.dd-grid .dd-link:nth-child(4){grid-column:2}
+  .dd-grid .dd-link:nth-child(5){grid-column:1/span 2}
 }
 @media (min-width:1024px) and (max-width:1180px){.brand-text small{display:none}.dd-btn{padding:0 10px}}
 
@@ -857,7 +857,7 @@ circle.lv{display:block}
 @media (min-width:1024px){
   .dd-grid{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
   .dd-links{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
-  .dd-grid .dd-links>.pin-wrap:nth-child(n){grid-column:auto}
+  .dd-grid .dd-link:nth-child(n){grid-column:auto}
   .dd-promo{grid-column:2;grid-row:1}
 }
 .kz-static .chk{display:grid;gap:6px;margin:0}
@@ -1043,13 +1043,7 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenat
 @media (max-width:479px){.bar .w:has(.app-back) .brand-text{display:none}}
 
 /* «Мой зал»: звёздочки в меню, кнопка в шапке, блок в мобильном меню, страница */
-.pin-wrap{position:relative;min-width:0}
-.pin-wrap>a{padding-right:48px!important}
-.pin{position:absolute;top:50%;right:6px;transform:translateY(-50%);width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:none;color:var(--muted);cursor:pointer;opacity:.75}
-.pin svg{width:20px;height:20px}
-.pin:hover,.pin:focus-visible{opacity:1;color:var(--amber);background:var(--surface)}
-.pin.on{opacity:1;color:var(--amber)}
-.pin.on svg,.zal-opt.on svg{fill:currentColor}
+.zal-opt.on svg,.zal-toggle.on svg{fill:currentColor}
 .zal-btn{display:none;position:relative;align-items:center;justify-content:center;gap:6px;min-height:40px;min-width:40px;padding:0 10px;border-radius:999px;background:var(--surface-2);color:var(--amber);font:600 14px var(--body);text-decoration:none;flex:none}
 .zal-btn svg{width:20px;height:20px;flex:none}
 .zal-btn span{display:none}
@@ -1097,8 +1091,18 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenat
 .zal-opt.on{border-color:var(--amber);background:var(--surface)}
 .zal-opt.on svg{color:var(--amber)}
 .zal-opt:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-@media print{.zal-toast,.pin{display:none!important}}
+@media print{.zal-toast,.zal-row{display:none!important}}
 .mnav-in .m-zal-head{border:0!important;min-height:auto!important;font:inherit!important;padding:8px 0!important}
 .m-zal-head small{font-weight:400}
 @media (min-width:1024px){.brand{flex:none}}
 @media (min-width:1024px) and (max-width:1439px){.inst-btn span{display:none}.inst-btn{min-width:40px;padding:0}}
+
+.zal-row{margin:14px 0 4px}
+.zal-row-s{margin:8px 0 12px}
+.zal-toggle{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px 0 12px;border:1px solid var(--line);border-radius:999px;background:none;color:var(--ink);font:600 14.5px var(--body);cursor:pointer}
+.zal-toggle svg{width:20px;height:20px;flex:none;color:var(--amber)}
+.zal-toggle:hover{border-color:var(--amber)}
+.zal-toggle:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.zal-toggle.on{border-color:var(--amber);background:var(--surface-2)}
+.zal-toggle-s{min-height:36px;font-size:13.5px;padding:0 14px 0 10px}
+.zal-toggle-s svg{width:18px;height:18px}
