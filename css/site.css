@@ -1008,7 +1008,7 @@ circle.lv{display:block}
 
 /* Крупный шрифт в настройках телефона: длинные слова переносятся, а не вылезают за карточки */
 body{overflow-wrap:break-word}
-h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto}
+h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenate-limit-chars:10 5 4;-webkit-hyphenate-limit-before:5;-webkit-hyphenate-limit-after:4}
 @media (max-width:719px){.cat-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,9em),1fr))}}
 .creds span{text-align:right}
 .about-text,.about-text>*{min-width:0}
@@ -1033,3 +1033,11 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto}
 .wlight{border:2px solid var(--amber);border-radius:14px;padding:12px 14px;font-size:15px}
 .wlight b{color:var(--amber)}
 .ctbl td.dn{font-weight:700}
+
+/* Нижняя панель внутренних страниц и кнопка «Главная» */
+.home-btn{flex:none;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:64px;height:48px;padding:0 10px;border-radius:14px;background:var(--surface-2);color:var(--ink);text-decoration:none;font-size:11.5px;font-weight:600}
+.home-btn svg{width:22px;height:22px}
+.home-btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+@media print{.dock{display:none!important}}
+/* Режим приложения: кнопка «назад» + логотип не помещаются на узком экране — оставляем знак без надписи */
+@media (max-width:479px){.bar .w:has(.app-back) .brand-text{display:none}}

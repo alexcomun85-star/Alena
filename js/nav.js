@@ -42,3 +42,11 @@
   var ds=[].slice.call(menu.querySelectorAll('details.mg'));
   ds.forEach(function(d){d.addEventListener('toggle',function(){if(d.open)ds.forEach(function(o){if(o!==d)o.open=false})})});
 })();
+
+/* Нижняя панель на телефоне для внутренних страниц: «Главная» и «Написать СТАРТ» (на главной — своя панель #dock) */
+(function(){
+  if(document.getElementById('dock')||document.querySelector('.dock'))return;
+  var d=document.createElement('div');d.className='dock dock-inner';
+  d.innerHTML='<div class="w"><a class="home-btn" href="./" aria-label="На главную"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span>Главная</span></a><a class="btn btn-main" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать «СТАРТ»</a></div>';
+  document.body.appendChild(d);
+})();
