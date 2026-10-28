@@ -137,7 +137,8 @@ def t_ui(browser):
 
 def t_static():
     s=Path('index.html').read_text()
-    protected={'plans':'22b99e3634f8f2bbd16a5613deb4468fa20b4061c0c52e451c9bf9e89e55107a', 'quiz':'025dfaaa89ee165c9a924a31fca689cd812603dbd9c029117e7e1e3eb6f7f7e7', 'faq':'3e55f92d141330f5aeeb1919c41e6fc676b190916fe99aee00ea95c2dab32409', 'start':'c08f828234f519cdd0422b0649000f308fdbf04f4811976d34abb3b3ccd135c6'}
+    # Финальное приглашение обновлено по утверждённому дизайну 28.10.2026.
+    protected={'plans':'22b99e3634f8f2bbd16a5613deb4468fa20b4061c0c52e451c9bf9e89e55107a', 'quiz':'025dfaaa89ee165c9a924a31fca689cd812603dbd9c029117e7e1e3eb6f7f7e7', 'faq':'3e55f92d141330f5aeeb1919c41e6fc676b190916fe99aee00ea95c2dab32409', 'start':'5229f62ee713f47b5e3e6739fc6d450aaeb417711715384ffb60ce62313ce8eb'}
     for name,digest in protected.items():
         block=re.search('<section[^>]*id="'+name+'".*?</section>',s,re.S)[0]
         check('оффер сохранён: '+name,digest,hashlib.sha256(block.encode()).hexdigest())
