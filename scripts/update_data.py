@@ -191,4 +191,6 @@ if __name__ == "__main__":
     write("data/channel.json", {"updated": NOW, "channel": ch, "items": channel(ch)})
     write("data/answers.json", {"updated": NOW, "channel": ch, "items": answers(ch)})
     write("data/recipes.json", {"updated": NOW, "channel": ch, "items": answers(ch, tags=("#рецепт",))})
+    from update_products import refresh
+    refresh()
     print("done")

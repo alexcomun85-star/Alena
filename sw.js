@@ -2,33 +2,47 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-v12';
+const VERSION = 'alenafit-v26';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
+  "./img/alena-invitation.webp",
+  "./css/final-invite.css?v=20261028d",
+  "./js/final-invite.js?v=20261028a",
+  "./css/home-motion.css?v=20261028b",
+  "./css/gym-images.css?v=20261028j",
   "./",
   "./404.html",
   "./blizost.html",
-  "./css/site.css?v=20261028a",
+  "./css/fonts.css?v=20261028b",
+  "./css/site.css?v=20261028k",
+  "./data/products-ru.json",
+  "./fonts/golos-pdf.ttf",
+  "./fonts/golos-text-cyrillic.woff2",
+  "./fonts/golos-text-latin.woff2",
+  "./fonts/unbounded-cyrillic.woff2",
+  "./fonts/unbounded-latin.woff2",
   "./gadzhety.html",
   "./golod.html",
   "./index.html",
   "./inventar.html",
-  "./js/cycle.js?v=20261027a",
+  "./js/cycle-diary.js?v=20261028d",
+  "./js/cycle.js?v=20261028b",
+  "./js/export.js?v=20261028d",
   "./js/feeds.js?v=20261027r",
   "./js/food-db.js?v=20261027b",
-  "./js/food.js?v=20261028a",
+  "./js/food.js?v=20261028d",
   "./js/gadzhety.js?v=20261026h",
   "./js/gestures.js?v=20261027q",
   "./js/golod.js?v=20261026e",
-  "./js/gym.js?v=20261026c",
+  "./js/gym.js?v=20261028j",
   "./js/korzina.js?v=20261026e",
-  "./js/myzal.js?v=1",
-  "./js/nav.js?v=20261027r",
-  "./js/progress.js?v=20261027c",
-  "./js/pwa.js?v=3",
+  "./js/myzal.js?v=20261028b",
+  "./js/nav.js?v=20261028f",
+  "./js/progress.js?v=20261028d",
+  "./js/pwa.js?v=20261028b",
   "./js/recepty.js?v=20261027a",
   "./js/sections.js?v=1",
-  "./js/tehnika.js?v=2",
+  "./js/tehnika.js?v=20261028b",
   "./js/trener.js?v=20261026i",
   "./js/vozvrat.js?v=20261027c",
   "./kalorii.html",
@@ -50,6 +64,28 @@ const CORE = [
   "./zal.html"
 ];
 const MEDIA = [
+  "./img/gym/treadmill.webp?v=4",
+  "./img/gym/bike.webp?v=4",
+  "./img/gym/elliptical.webp?v=4",
+  "./img/gym/rack.webp?v=4",
+  "./img/gym/smith.webp?v=4",
+  "./img/gym/bench.webp?v=4",
+  "./img/gym/dumbbells.webp?v=4",
+  "./img/gym/hyperextension.webp?v=4",
+  "./img/gym/lat-pulldown.webp?v=4",
+  "./img/gym/cable-row.webp?v=4",
+  "./img/gym/crossover.webp?v=4",
+  "./img/gym/leg-press.webp?v=4",
+  "./img/gym/leg-extension.webp?v=4",
+  "./img/gym/leg-curl.webp?v=4",
+  "./img/gym/hip-abduction.webp?v=4",
+  "./img/gym/mats.webp?v=4",
+
+  "./fonts/unbounded-vietnamese.woff2",
+  "./fonts/golos-text-cyrillic-ext.woff2",
+  "./fonts/unbounded-cyrillic-ext.woff2",
+  "./fonts/golos-text-latin-ext.woff2",
+  "./fonts/unbounded-latin-ext.woff2",
   "./apple-touch-icon.png",
   "./favicon.png",
   "./icons/icon-192.png",
@@ -60,16 +96,9 @@ const MEDIA = [
   "./img/04_zhenshchiny.jpg",
   "./img/blizost/cover.webp",
   "./img/blizost/most.webp",
-  "./img/brand/avatar-dark.png",
-  "./img/brand/avatar-light.png",
-  "./img/brand/logo-dark-bg.png",
-  "./img/brand/logo-light-bg.png",
   "./img/brand/logo-light.svg",
-  "./img/brand/logo-original.svg",
   "./img/brand/mark-light.svg",
-  "./img/brand/mark-original.svg",
   "./img/brand/wordmark-light.svg",
-  "./img/hero_squat.jpg",
   "./img/hero_squat.jpg?v=2",
   "./img/inventar/gadzhety.webp",
   "./img/inventar/nabor.webp",
@@ -77,7 +106,6 @@ const MEDIA = [
   "./img/odezhda/komplekt.webp",
   "./img/odezhda/obuv.webp",
   "./img/odezhda/stirka.webp",
-  "./img/og.jpg",
   "./img/pitanie/belok.webp",
   "./img/pitanie/hands.webp",
   "./img/pitanie/kletchatka.webp",
@@ -89,7 +117,6 @@ const MEDIA = [
   "./img/pitanie/uglevody.webp",
   "./img/pitanie/voda.webp",
   "./img/pitanie/zhiry.webp",
-  "./img/portrait.jpg",
   "./img/portrait.jpg?v=3",
   "./img/recepty/kurica.webp",
   "./img/recepty/omlet.webp",
@@ -112,7 +139,6 @@ const MEDIA = [
   "./img/tehnika/zhim-skamya.webp",
   "./img/tehnika/zhim-stoya.webp",
   "./img/tehnika/zhuk.webp",
-  "./img/trener-thumb.jpg",
   "./img/trener-thumb.jpg?v=2"
 ];
 
@@ -121,7 +147,7 @@ self.addEventListener('install', e => {
     const cache = await caches.open(VERSION);
     // Если обязательный файл не загрузился, прежняя рабочая версия остаётся активной.
     await cache.addAll(CORE);
-    await Promise.allSettled(MEDIA.map(u => cache.add(u)));
+    // Медиа сохраняются отдельно после загрузки интерфейса: шрифты и инструменты уже в CORE.
     await self.skipWaiting();
   })());
 });
@@ -159,4 +185,22 @@ self.addEventListener('fetch', e => {
       return cached || net;
     })
   );
+});
+
+// Пакет медиа запускается приложением в свободное время, максимум 3 запроса одновременно.
+let warming = null;
+self.addEventListener('message', e => {
+  if (!e.data || e.data.type !== 'CACHE_MEDIA') return;
+  if (!warming) warming = (async () => {
+    const cache = await caches.open(VERSION);
+    let next = 0;
+    async function worker() {
+      while (next < MEDIA.length) {
+        const url = MEDIA[next++];
+        try { if (!await cache.match(url)) await cache.add(url); } catch (ignore) {}
+      }
+    }
+    await Promise.all([worker(), worker(), worker()]);
+  })().finally(() => { warming = null; });
+  e.waitUntil(warming);
 });

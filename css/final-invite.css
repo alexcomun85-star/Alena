@@ -1,0 +1,45 @@
+/* Closing hero uses the homepage's type, palette, buttons and corner radii. */
+.final.final-invite{padding-top:72px;padding-bottom:40px}
+.final-invite>.w{display:block;max-width:1120px}
+.invite-card{position:relative;isolation:isolate;overflow:hidden;border-radius:var(--r-lg);background:var(--band);border:1px solid var(--line)}
+.invite-watermark{display:none}
+.invite-portrait{position:relative;margin:0;min-width:0;aspect-ratio:1.2;overflow:hidden;background:var(--band)}
+.invite-portrait>img{display:block;width:100%;height:100%;object-fit:cover;object-position:78% 40%}
+.invite-portrait::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 62%,var(--band) 100%)}
+.invite-portrait figcaption{position:absolute;left:24px;bottom:24px;z-index:1;display:grid;gap:4px;color:var(--ink);border-left:2px solid var(--amber);padding-left:12px}
+.invite-portrait figcaption b{font:600 16px/1.3 var(--body)}
+.invite-portrait figcaption span{font:400 12px/1.4 var(--body);color:var(--ink)}
+.invite-copy{position:relative;z-index:1;min-width:0;padding:12px 24px 24px}
+.invite-eyebrow{display:flex;align-items:center;gap:12px;font:600 10px/1.4 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.invite-eyebrow img{display:block;flex:none;width:32px;height:28px}
+.final-invite h2{font:800 clamp(29px,7.6vw,48px)/1.12 var(--display);letter-spacing:-.035em;text-wrap:initial;margin:25px 0 24px}
+.final-invite h2 em{font:inherit;color:var(--amber)}
+.final-invite h2::after{content:"";display:block;width:64px;height:2px;margin-top:24px;background:var(--amber)}
+.final-invite .invite-message{font:400 16px/1.65 var(--body);color:var(--muted);max-width:34ch;margin:0 0 26px}
+.invite-values{display:flex;flex-wrap:wrap;gap:8px 16px;margin:0 0 26px;padding:0;list-style:none;color:var(--ink);font:500 11px/1.5 var(--body)}
+.invite-values li{display:flex;align-items:center;gap:7px}
+.invite-values li::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--amber)}
+.invite-action{display:flex;justify-content:space-between;width:100%;gap:12px;min-height:56px;text-align:left}
+.invite-action>span{font-size:23px;line-height:1}
+.final-invite .invite-note{margin:12px 0 0;font:400 11px/1.5 var(--body);color:var(--muted);text-align:center}
+.invite-contact{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding-top:12px;margin-top:24px;border-top:1px solid var(--line);font:400 12px/1.5 var(--body);color:var(--muted)}
+.invite-contact>span{user-select:all}
+.invite-copy-btn{min-height:44px;padding:8px 0;border:0;background:transparent;color:var(--ink);font:500 12px var(--body);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.home-motion footer .foot-logo{width:105px;margin-bottom:6px}
+.home-motion footer .w{font-size:12px;gap:8px}
+@media(min-width:900px){
+ .invite-card{min-height:720px;border-radius:32px}
+ .invite-portrait{position:absolute;inset:0;aspect-ratio:auto;width:100%;height:100%}
+ .invite-portrait>img{object-position:65% center}
+ .invite-portrait::after{background:linear-gradient(90deg,var(--band) 0%,rgba(13,30,26,.97) 26%,rgba(13,30,26,.83) 42%,rgba(13,30,26,.05) 68%),linear-gradient(0deg,rgba(13,30,26,.7),transparent 30%)}
+ .invite-portrait figcaption{left:auto;right:36px;bottom:36px}
+ .invite-copy{width:56%;padding:48px 44px 28px}
+ .final-invite h2{font-size:48px;margin-top:36px}
+ .final-invite .invite-message{max-width:31ch}
+ .invite-action{max-width:390px}
+ .final-invite .invite-note,.invite-contact{max-width:390px}
+}
+@media(max-width:359px){.invite-copy{padding:12px 18px 18px}.final-invite h2{font-size:27px}.invite-action{font-size:14px;padding:14px 17px}.invite-values{gap:8px 12px;font-size:10px}.invite-eyebrow{font-size:9px}}
+@media(prefers-reduced-motion:no-preference){.invite-copy.invite-enter{animation:inviteIn 1.3s cubic-bezier(.16,1,.3,1) .15s 1 backwards}}
+@keyframes inviteIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){[data-invite-reveal]{animation:none!important;transform:none!important;opacity:1!important}}

@@ -48,9 +48,12 @@
     }
     function toggle(id) {
       var s = BY[id]; if (!s) return;
-      if (has(id)) { ids = ids.filter(function (x) { return x !== id; }); save(); toast('«' + esc(s.t) + '» убран из Моего зала'); }
+      var before = ids.slice(), removing = has(id);
+      if (removing) { ids = ids.filter(function (x) { return x !== id; }); }
       else if (ids.length >= MAX) { toast('В Моём зале уже ' + MAX + ' разделов — уберите лишние'); return; }
-      else { ids.push(id); toast(save() ? '«' + esc(s.t) + '» — в <a href="moy-zal.html">Моём зале</a>' : 'Браузер не дал сохранить: возможно, включён режим инкогнито'); }
+      else { ids.push(id); }
+      if (!save()) { ids = before; toast('Не удалось сохранить изменение. Прежнее избранное оставлено.'); }
+      else { toast(removing ? '«' + esc(s.t) + '» убран из Моего зала' : '«' + esc(s.t) + '» — в <a href="moy-zal.html">Моём зале</a>'); }
       render();
     }
 
@@ -120,9 +123,11 @@
     var box = document.getElementById('zalList');
     if (box) box.addEventListener('click', function (e) {
       var b = e.target.closest('button[data-act]'); if (!b) return;
-      var k = +b.dataset.k, a = b.dataset.act, focusK = k;
-      if (a === 'del') { var t = BY[ids[k]].t; ids.splice(k, 1); save(); toast('«' + esc(t) + '» убран из Моего зала'); focusK = Math.min(k, ids.length - 1); }
-      else { var j = a === 'up' ? k - 1 : k + 1; if (j < 0 || j >= ids.length) return; var x = ids[k]; ids[k] = ids[j]; ids[j] = x; save(); focusK = j; }
+      var k = +b.dataset.k, a = b.dataset.act, focusK = k, before = ids.slice();
+      if (a === 'del') { var t = BY[ids[k]].t; ids.splice(k, 1); focusK = Math.min(k, ids.length - 1); }
+      else { var j = a === 'up' ? k - 1 : k + 1; if (j < 0 || j >= ids.length) return; var x = ids[k]; ids[k] = ids[j]; ids[j] = x; focusK = j; }
+      if (!save()) { ids = before; focusK = k; toast('Не удалось сохранить изменение. Прежнее избранное оставлено.'); }
+      else if (a === 'del') toast('«' + esc(t) + '» убран из Моего зала');
       render();
       var nb = box.querySelector('button[data-act="' + a + '"][data-k="' + focusK + '"]') || box.querySelector('button[data-k="' + focusK + '"]');
       if (nb && !nb.disabled) nb.focus();

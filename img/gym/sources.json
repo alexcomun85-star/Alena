@@ -1,0 +1,9 @@
+{
+  "source": "Canva unbranded originals + exact dist/img/brand/mark-light.svg",
+  "media_ids": [
+    "MAHZUuRkcAo",
+    "MAHZUuZk6eo",
+    "MAHZUrDYdtY"
+  ],
+  "branding": "Original vector SVG decals on 6 broad surfaces; no logo on narrow parts. Rebuild: python3 scripts/build-gym-images.py"
+}

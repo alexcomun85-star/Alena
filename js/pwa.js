@@ -1,6 +1,11 @@
 /* Установка сайта как приложения: регистрация сервис-воркера и кнопка «Установить». */
 (function(){
-  if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}
+  if('serviceWorker' in navigator){window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').then(function(){return navigator.serviceWorker.ready}).then(function(reg){
+      function warm(){if(reg.active)reg.active.postMessage({type:'CACHE_MEDIA'})}
+      if(window.requestIdleCallback)window.requestIdleCallback(warm,{timeout:5000});else setTimeout(warm,2500);
+    }).catch(function(){})
+  })}
   var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
   var btns=[].slice.call(document.querySelectorAll('[data-pwa]'));
   if(standalone){btns.forEach(function(b){b.hidden=true});return}

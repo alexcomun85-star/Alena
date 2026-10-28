@@ -10,7 +10,7 @@
   var KS='cycle_settings_v1',KSTART='cycle_start_v1';
   var DEF={on:false,mode:'regular',len:28,per:5};
   var MODES=['regular','irregular','hormonal'];
-  var subs=[];
+  var subs=[],storageError='';
 
   function today(){var d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
   function isDate(v){if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v))return false;var d=new Date(v+'T00:00:00Z');return !isNaN(d)&&d.toISOString().slice(0,10)===v}
@@ -29,12 +29,15 @@
       if(int(x.per,2,10))s.per=x.per;
     }
     return s}
-  function set(p){var s=get();Object.keys(p).forEach(function(k){s[k]=p[k]});
-    try{localStorage.setItem(KS,JSON.stringify(s))}catch(e){}emit();return s}
+  function set(p){var s=get();Object.keys(p).forEach(function(k){if(Object.prototype.hasOwnProperty.call(DEF,k))s[k]=p[k]});
+    if(typeof s.on!=='boolean'||MODES.indexOf(s.mode)<0||!int(s.len,21,45)||!int(s.per,2,10)){storageError='Настройки не сохранены: проверьте значения.';emit();return false}
+    try{localStorage.setItem(KS,JSON.stringify(s));storageError=''}catch(e){storageError='Не удалось сохранить настройки. Прежние значения оставлены. Проверьте разрешения и свободное место браузера.';emit();return false}emit();return s}
   /* дата начала последних месячных — та же, что у дневника самочувствия */
   function start(){var v=null;try{v=localStorage.getItem(KSTART)}catch(e){}
     if(!isDate(v))return null;var t=today();if(v>t||days(v,t)>365)return null;return v}
-  function setStart(v){try{if(v)localStorage.setItem(KSTART,v);else localStorage.removeItem(KSTART)}catch(e){}emit()}
+  function setStart(v){if(v&&(!isDate(v)||v>today())){storageError='Дата не сохранена: она должна быть корректной и не позже сегодняшней.';emit();return false}
+    try{if(v)localStorage.setItem(KSTART,v);else localStorage.removeItem(KSTART);storageError=''}catch(e){storageError='Не удалось сохранить дату. Прежняя дата оставлена. Проверьте разрешения и свободное место браузера.';emit();return false}emit();return true}
+  function refresh(){storageError='';emit()}
   function emit(){subs.forEach(function(f){try{f(get())}catch(e){}})}
   function onChange(f){subs.push(f)}
 
@@ -111,16 +114,18 @@
       if(document.activeElement!==stI)stI.value=isDate(raw)?raw:'';
       if(document.activeElement!==len)len.value=s.len;
       if(document.activeElement!==per)per.value=s.per;
-      lw.hidden=s.mode!=='regular';stat.textContent=statusText()}
+      lw.hidden=s.mode!=='regular';stat.textContent=storageError||statusText();stat.hidden=!s.on;
+      el.querySelector('.cyc-error').textContent=storageError}
     on.addEventListener('change',function(){set({on:on.checked})});
     el.querySelectorAll('input[name="'+id+'m"]').forEach(function(r){r.addEventListener('change',function(){set({mode:r.value})})});
     stI.addEventListener('change',function(){var v=stI.value;
-      if(!v){setStart('');return}
+      if(!v){if(!setStart(''))stI.value=start()||'';return}
       if(!isDate(v)||v>today()){stat.textContent='Дата не может быть в будущем.';return}
-      setStart(v)});
+      if(!setStart(v))stI.value=start()||''});
     function num(inp,a,b,key,label){inp.addEventListener('change',function(){var v=+String(inp.value).replace(',','.');
       if(!int(v,a,b)){stat.textContent=label+' — целое число от '+a+' до '+b+'. Сохранено прежнее значение.';inp.value=get()[key];return}
-      var p={};p[key]=v;set(p)})}
+      var p={};p[key]=v;if(!set(p))inp.value=get()[key]})}
+    var err=document.createElement('p');err.className='verdict cyc-error';err.setAttribute('aria-live','polite');el.appendChild(err);
     num(len,21,45,'len','Длина цикла');num(per,2,10,'per','Дни месячных');
     onChange(fill);fill()}
 
@@ -142,7 +147,7 @@
     if(p==='late')return 'Сегодня '+d+'-й день цикла — дольше обычного. Тренируйтесь по самочувствию; начались месячные — обновите дату в настройках.';
     return 'Сегодня '+d+'-й день цикла. Тренируйтесь по самочувствию.'}
 
-  window.Cycle={get:get,set:set,start:start,setStart:setStart,onChange:onChange,dayOn:dayOn,phase:phase,phaseName:phaseName,
+  window.Cycle={get:get,set:set,start:start,setStart:setStart,onChange:onChange,refresh:refresh,dayOn:dayOn,phase:phase,phaseName:phaseName,
     windows:windows,mount:mount,foodHint:foodHint,trainHint:trainHint,statusText:statusText,today:today,isDate:isDate,addDays:addDays,days:days,FLAGS:FLAGS};
   function mountAll(){document.querySelectorAll('[data-cycle-panel]').forEach(function(el){if(!el.classList.contains('cyc-panel'))mount(el)})}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountAll);else mountAll();

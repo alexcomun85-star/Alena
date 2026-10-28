@@ -560,7 +560,7 @@ def t_dock(ctx):
         check(f"панель ({path}): в шапке телефона нет кнопок", True, hidden)
         check(f"панель ({path}): шапка не липнет", "relative", page.evaluate("getComputedStyle(document.querySelector('.bar')).position"))
         labels = page.eval_on_selector_all(".dock .w > *", "e=>e.map(x=>x.innerText.trim())")
-        check(f"панель ({path}): кнопки снизу", [first, "Мой зал", "СТАРТ", "Меню"], labels)
+        check(f"панель ({path}): кнопки снизу", [first, "Мой зал", "Инструменты", "Меню"], labels)
         page.mouse.wheel(0, 2000)
         page.wait_for_timeout(200)
         r = page.evaluate("document.querySelector('.dock').getBoundingClientRect()")
@@ -602,7 +602,7 @@ def t_swlist(ctx=None):
 
 def main():
     with sync_playwright() as pw:
-        browser = pw.chromium.launch()
+        browser = pw.chromium.launch(executable_path=os.environ.get("ALENAFIT_CHROMIUM"))
         ctx = browser.new_context(accept_downloads=True, locale="ru-RU", viewport={"width": 1200, "height": 900})
         t_import(ctx)
         t_tonnage(ctx)
