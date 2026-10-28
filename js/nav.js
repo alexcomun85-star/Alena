@@ -50,11 +50,13 @@
     (menu?'<button type="button" class="home-btn dock-menu" id="dockMenu" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span><span class="dm-t">Меню</span></button>':'')+
     '</div>';
   document.body.appendChild(dock);
-  var t=dock.querySelector('.dock-top');if(t)t.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});
+  var t=dock.querySelector('.dock-top');if(t)t.addEventListener('click',function(){window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'})});
   var bk=dock.querySelector('.dock-back');if(bk)bk.addEventListener('click',function(){if(history.length>1)history.back();else location.href='./'});
   if(!menu)return;
   var dm=document.getElementById('dockMenu');
+  var behind=[].slice.call(document.querySelectorAll('main,header.bar,footer,.skip-link'));
   function set(o){menu.hidden=!o;document.body.classList.toggle('menu-open',o);
+    behind.forEach(function(el){el.inert=o});
     if(btn){btn.setAttribute('aria-expanded',o);btn.lastChild.textContent=o?'Закрыть':'Меню'}
     dm.setAttribute('aria-expanded',o);dm.querySelector('.dm-t').textContent=o?'Закрыть':'Меню';
     if(o){var s=menu.querySelector('details[open] summary')||menu.querySelector('summary');s&&s.focus({preventScroll:true});menu.scrollTop=menu.scrollHeight}}
@@ -62,6 +64,14 @@
   dm.addEventListener('click',function(){set(menu.hidden)});
   menu.addEventListener('click',function(e){if(e.target.closest('a'))set(false)});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!menu.hidden){set(false);(dm.offsetParent?dm:btn).focus()}});
+  document.addEventListener('keydown',function(e){
+    if(e.key!=='Tab'||menu.hidden)return;
+    var q='a,button,summary,input,select,textarea,[tabindex]';
+    var nodes=[].slice.call(menu.querySelectorAll(q)).concat([].slice.call(dock.querySelectorAll(q))).filter(function(el){return !el.disabled&&el.tabIndex>=0&&el.getClientRects().length});
+    if(!nodes.length)return;var first=nodes[0],last=nodes[nodes.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+  });
   /* в аккордеоне открыта одна группа за раз */
   var ds=[].slice.call(menu.querySelectorAll('details.mg'));
   ds.forEach(function(d){d.addEventListener('toggle',function(){if(d.open)ds.forEach(function(o){if(o!==d)o.open=false})})});

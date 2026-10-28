@@ -93,7 +93,7 @@ def build():
             f'<details class="mg" data-group="{k}"><summary>{icon(k)}<span>{title}</span>'
             f'<i class="chev" aria-hidden="true"></i></summary><div class="mg-links">{mlinks}</div></details>')
     header = (
-        '<!-- nav:start -->\n<header class="bar g">\n  <div class="w">\n'
+        '<!-- nav:start -->\n<a class="skip-link" href="#top">К основному содержимому</a>\n<header class="bar g">\n  <div class="w">\n'
         '    <a class="brand" href="./" aria-label="ALENAFIT — на главную"><img class="brand-mark" src="img/brand/mark-light.svg" alt="" width="41" height="34"><span class="brand-text"><img class="brand-word" src="img/brand/wordmark-light.svg" alt="ALENAFIT" width="108" height="15"><small>сила без перегибов</small></span></a>\n'
         '    <nav class="tnav" aria-label="Разделы">' + "".join(top) + '</nav>\n'
         '    <a class="zal-btn" href="moy-zal.html" aria-label="Мой зал — избранные разделы" title="Мой зал"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linejoin=\"round\"><path d=\"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z\"/></svg><span>Мой зал</span><i class="zal-n" hidden></i></a>\n'

@@ -25,13 +25,13 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20261028a">
+<link rel="stylesheet" href="css/fonts.css?v=20261028b">
+<link rel="stylesheet" href="css/site.css?v=20261028b">
 <style>:root{color-scheme:dark;background:#132823;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
-<body>
+<body class="tool-page">
 <!-- nav:start -->
+<a class="skip-link" href="#top">К основному содержимому</a>
 <header class="bar g">
   <div class="w">
     <a class="brand" href="./" aria-label="ALENAFIT — на главную"><img class="brand-mark" src="img/brand/mark-light.svg" alt="" width="41" height="34"><span class="brand-text"><img class="brand-word" src="img/brand/wordmark-light.svg" alt="ALENAFIT" width="108" height="15"><small>сила без перегибов</small></span></a>
@@ -57,14 +57,15 @@
 </div>
 <!-- nav:end -->
 
-<main id="top">
+<main id="top" tabindex="-1">
   <section class="page-hero g">
     <div class="w">
       <a class="back" href="./">← На главную</a>
       <span class="tag" style="display:block">#полезное</span>
       <h1>Полезное <em>на каждый день</em></h1>
       <p class="lede">Инструменты для занятых: тренировка, когда некогда думать, таймер, простая схема питания и трекер привычек. Бесплатно, без регистрации, ничего не отправляется.</p>
-      <nav class="toc" aria-label="Сервисы"><a href="vozvrat.html">План возвращения на 4 недели</a><a href="zal.html">Карта зала</a><a href="#trenirovka">Тренировка дня</a><a href="#taymer">Интервальный таймер</a><a href="#tarelka">Тарелка без запретов</a><a href="kalorii.html">Калории и БЖУ</a><a href="#treker">Трекер недели</a><a href="#dnevnik">Дневник по циклу</a><a href="nauka.html#tsikl">Цикл и тренировки: наука</a></nav>
+      <nav class="task-shortcuts" aria-label="С чего начать"><a href="#trenirovka">Потренироваться</a><a href="#tarelka">Разобраться с питанием</a><a href="#dnevnik">Отметить самочувствие</a></nav>
+      <details class="tool-directory"><summary>Все инструменты</summary><nav class="toc" aria-label="Сервисы"><a href="vozvrat.html">План возвращения на 4 недели</a><a href="zal.html">Карта зала</a><a href="#trenirovka">Тренировка дня</a><a href="#taymer">Интервальный таймер</a><a href="#tarelka">Тарелка без запретов</a><a href="kalorii.html">Калории и БЖУ</a><a href="#treker">Трекер недели</a><a href="#dnevnik">Дневник по циклу</a><a href="nauka.html#tsikl">Цикл и тренировки: наука</a></nav></details>
     </div>
   </section>
 
@@ -194,7 +195,8 @@
                 <input type="radio" name="cTr" id="cTr3" value="3"><label for="cTr3">Тяжело</label>
               </div></div>
             <div class="btn-row"><button type="button" class="tbtn" id="cSave">Сохранить запись за сегодня</button></div>
-            <p class="verdict" id="cMsg" aria-live="polite">Записей пока нет.</p>
+            <p class="small" id="cCount">Записей пока нет.</p>
+            <p class="verdict" id="cMsg" aria-live="polite"></p>
           </div>
           <div class="tool">
             <h3 style="font-size:17px">Ваша картина</h3>
@@ -203,6 +205,13 @@
             <div class="btn-row"><button type="button" class="tbtn ghost" id="cWipe">Удалить все записи</button></div>
           </div>
         </div>
+        <details class="diary-transfer"><summary>Копия дневника и перенос на другой телефон</summary>
+          <p class="small">Файл содержит ваши записи о самочувствии. Он обрабатывается только в браузере; храните его у себя. Импорт заменяет записи после проверки и подтверждения. Перед заменой и очисткой сохраняется резервная копия.</p>
+          <label class="check"><input type="checkbox" id="cycleWithSettings"> Переносить также общие настройки и дату начала цикла (по желанию)</label>
+          <p class="small">Без этой отметки выгружаются и восстанавливаются только записи дневника. Включённая отметка позволяет перенести настройки для всех инструментов сайта.</p>
+          <div class="btn-row"><button type="button" class="tbtn" id="cycleExport">Скачать дневник</button><label class="tbtn ghost" for="cycleImport">Восстановить из файла</label><input class="sr-only" id="cycleImport" type="file" accept=".json,application/json"><button type="button" class="tbtn ghost" id="cycleRestore" disabled>Вернуть предыдущую версию</button><button type="button" class="tbtn ghost" id="cycleBackup">Скачать резервную копию</button><button type="button" class="tbtn ghost" id="cycleOriginal" disabled>Скачать исходную версию</button></div>
+          <p class="verdict" id="cycleTransferMsg" aria-live="polite"></p>
+        </details>
         <p class="notice"><b>Записи хранятся только в этом браузере на этом устройстве</b> и никуда не отправляются — ни мне, ни кому-либо ещё. Если почистить данные браузера, они удалятся. Дневник — для настройки тренировок, а не для контрацепции, планирования беременности или медицинских решений. Сильная боль, очень обильные или нерегулярные циклы, отсутствие месячных 3 месяца и дольше — повод обратиться к гинекологу.</p>
       </article>
 
@@ -218,11 +227,11 @@
   </section>
 </main>
 <footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a> · <button type="button" class="foot-pwa" data-pwa>Установить приложение</button></span></div></footer>
-<script src="js/nav.js?v=20261027r" defer></script>
+<script src="js/nav.js?v=20261028b" defer></script>
 <script src="js/sections.js?v=1" defer></script>
-<script src="js/myzal.js?v=1" defer></script>
-<script src="js/cycle.js?v=20261027a"></script>
-<script src="js/tehnika.js?v=2"></script>
+<script src="js/myzal.js?v=20261028b" defer></script>
+<script src="js/cycle.js?v=20261028b"></script>
+<script src="js/tehnika.js?v=20261028b"></script>
 <script>
 (function(){
   /* 1. Тренировка дня */
@@ -320,51 +329,13 @@
   var o=document.getElementById('trkOut');
   function sum(){var c=0;tb.querySelectorAll('input').forEach(function(i){if(i.checked)c++});
     o.innerHTML=c===0?'Начните с одной отметки сегодня.':'<b>'+c+' отметок на этой неделе.</b> '+(c>=20?'Очень стабильная неделя — так держать.':c>=10?'Хороший ритм. Попробуйте добавить одну привычку в слабый день.':'Каждая отметка считается. Регулярность важнее идеальности.')}
-  tb.addEventListener('change',function(e){if(e.target.id){data[e.target.id]=e.target.checked;try{localStorage.setItem(K,JSON.stringify(data))}catch(err){}sum()}});
-  document.getElementById('trkClear').addEventListener('click',function(){data={};try{localStorage.removeItem(K)}catch(e){}tb.querySelectorAll('input').forEach(function(i){i.checked=false});sum()});
+  tb.addEventListener('change',function(e){if(e.target.id){var next=Object.assign({},data);next[e.target.id]=e.target.checked;try{localStorage.setItem(K,JSON.stringify(next));data=next;sum()}catch(err){e.target.checked=!!data[e.target.id];o.textContent='Не удалось сохранить отметку. Прежние данные оставлены.'}}});
+  document.getElementById('trkClear').addEventListener('click',function(){try{localStorage.removeItem(K)}catch(e){o.textContent='Не удалось очистить неделю. Прежние данные оставлены.';return}data={};tb.querySelectorAll('input').forEach(function(i){i.checked=false});sum()});
   sum();
 })();
-(function(){
-  /* 5. Дневник самочувствия по циклу — только localStorage этого браузера */
-  var KEY='cycle_diary_v1',data=[];
-  function load(){try{data=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){data=[]}}
-  function save(){try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){return false}}
-  function today(){var d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
-  var day=document.getElementById('cDay'),info=document.getElementById('cDayInfo'),msg=document.getElementById('cMsg');
-  if(!day)return;
-  /* день цикла — из общих настроек (js/cycle.js), можно поправить вручную */
-  function calc(){var d=window.Cycle?Cycle.dayOn(today()):null;
-    if(d){day.value=d;info.textContent='Сегодня '+d+'-й день цикла — по настройкам выше. Можно поправить вручную.'}
-    else info.textContent='Включите «Учитывать цикл» и укажите первый день последних месячных выше — день посчитается сам. Или введите его вручную.'}
-  if(window.Cycle)Cycle.onChange(calc);calc();
-  function v(n){var e=document.querySelector('input[name="'+n+'"]:checked');return e?+e.value:null}
-  var BUCK=[[1,5],[6,10],[11,15],[16,20],[21,25],[26,60]];
-  function render(){
-    var chart=document.getElementById('cChart'),list=document.getElementById('cList');
-    msg.textContent=data.length?'Записей: '+data.length+'.':'Записей пока нет.';
-    if(data.length<6){chart.innerHTML='<p class="small">Картина появится после 6 записей. Самые полезные выводы — через 2–3 цикла.</p>'}
-    else{chart.innerHTML='<div class="cbars">'+BUCK.map(function(b){var it=data.filter(function(x){return x.d>=b[0]&&x.d<=b[1]});
-      var avg=it.length?it.reduce(function(a,x){return a+x.e},0)/it.length:0,hard=it.filter(function(x){return x.t===3}).length;
-      var h=Math.round(avg/5*100);return '<div class="cbar"><div class="cbar-col"><div class="cbar-fill" style="height:'+h+'%"></div></div><b>'+(it.length?avg.toFixed(1).replace('.',','):'—')+'</b><span>дни '+b[0]+(b[1]>30?'+':'–'+b[1])+'</span><span class="ch">'+(hard?'тяжело: '+hard:'&nbsp;')+'</span></div>'}).join('')+'</div><p class="small">Столбик — средняя энергия от 1 до 5 в эти дни цикла. «Тяжело» — сколько тренировок прошли тяжело.</p>'}
-    var last=data.slice().sort(function(a,b){return a.date<b.date?1:-1}).slice(0,7);
-    var TR=['не было','легко','нормально','тяжело'];
-    list.innerHTML=last.length?'<ul class="clist">'+last.map(function(x){var p=x.date.split('-');return '<li><span>'+p[2]+'.'+p[1]+' · '+x.d+'-й день</span><span>энергия '+x.e+' · '+TR[x.t]+'</span></li>'}).join('')+'</ul>':'';
-  }
-  document.getElementById('cSave').addEventListener('click',function(){
-    var d=Math.round(+day.value),e=v('cEn'),t=v('cTr');
-    if(!(d>=1&&d<=60)){msg.textContent='Укажите день цикла от 1 до 60 или дату начала месячных в настройках.';day.focus();return}
-    if(e===null||t===null){msg.textContent='Отметьте энергию и тренировку.';return}
-    var dt=today();data=data.filter(function(x){return x.date!==dt});data.push({date:dt,d:d,e:e,t:t});
-    msg.textContent=save()?'Сохранено. Записей: '+data.length+'.':'Не удалось сохранить: браузер запрещает хранение данных (например, в режиме инкогнито).';
-    render();
-  });
-  var wipe=document.getElementById('cWipe'),armed=false;
-  wipe.addEventListener('click',function(){if(!armed){armed=true;wipe.textContent='Точно удалить? Нажмите ещё раз';setTimeout(function(){armed=false;wipe.textContent='Удалить все записи'},4000);return}
-    data=[];try{localStorage.removeItem(KEY)}catch(e){}day.value='';armed=false;wipe.textContent='Удалить все записи';calc();render()});
-  load();render();
-})();
 </script>
-<script src="js/pwa.js?v=3" defer></script>
+<script src="js/cycle-diary.js?v=20261028b" defer></script>
+<script src="js/pwa.js?v=20261028b" defer></script>
 <script src="js/gestures.js?v=20261027q" defer></script>
 </body>
 </html>

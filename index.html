@@ -27,14 +27,15 @@
 <style>:root{color-scheme:dark;background:#132823;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Алёна · Сила без перегибов — тренер и нутрициолог, СПб</title>
 <meta name="description" content="Алёна — тренер и нутрициолог. Силовые тренировки и питание без крайностей: онлайн-сопровождение и мини-группы в центре Санкт-Петербурга.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="css/site.css?v=20261028a">
+<link rel="stylesheet" href="css/fonts.css?v=20261028b">
+<link rel="stylesheet" href="css/site.css?v=20261028b">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","@id":"https://alenafit.com/#alena","name":"Алёна Вислова","url":"https://alenafit.com/","jobTitle":"Тренер и нутрициолог","sameAs":["https://t.me/alena_gymmom"]}</script>
 </head>
 <body>
 
 
 <!-- nav:start -->
+<a class="skip-link" href="#top">К основному содержимому</a>
 <header class="bar g">
   <div class="w">
     <a class="brand" href="./" aria-label="ALENAFIT — на главную"><img class="brand-mark" src="img/brand/mark-light.svg" alt="" width="41" height="34"><span class="brand-text"><img class="brand-word" src="img/brand/wordmark-light.svg" alt="ALENAFIT" width="108" height="15"><small>сила без перегибов</small></span></a>
@@ -61,7 +62,7 @@
 <!-- nav:end -->
 
 
-<main id="top">
+<main id="top" tabindex="-1">
   <section class="hero g">
     <div class="w">
       <figure class="hero-photo">
@@ -276,19 +277,30 @@
       <h2>Бесплатные <em>инструменты</em></h2>
       <p class="lede">Без регистрации. Записи хранятся только на вашем устройстве.</p>
       <span class="anchor" id="novichkam"></span><span class="anchor" id="pitanie-teaser"></span><span class="anchor" id="tests"></span><span class="anchor" id="ask"></span>
-      <div class="cat-grid">
+      <nav class="task-nav" aria-label="Выберите задачу"><a href="#tools-train"><b>Начать тренироваться</b><span>Тренировка, план и знакомство с залом</span></a><a href="#tools-food"><b>Разобраться с питанием</b><span>Порции, рецепты и состав еды</span></a><a href="#tools-progress"><b>Записать результат</b><span>Тесты, журнал и полезные привычки</span></a></nav>
+      <div class="tool-group" id="tools-train"><h3>Начать тренироваться</h3>
+        <div class="cat-grid">
         <a class="cat" href="servisy.html#trenirovka"><b>Тренировка дня</b><span>Готовая тренировка на 15–40 минут дома или в зале</span></a>
         <a class="cat" href="vozvrat.html"><b>План возвращения</b><span>4 недели после паузы, сохраняется в PDF</span></a>
         <a class="cat" href="zal.html"><b>Карта зала</b><span>Что за тренажёр и как его настроить</span></a>
-        <a class="cat" href="testy.html"><b>Тесты за 5 минут</b><span>Сила, баланс, активность</span></a>
-        <a class="cat" href="progress.html"><b>Мой прогресс</b><span>Журнал, графики и отчёт в PDF</span></a>
-        <a class="cat" href="servisy.html#taymer"><b>Таймер и трекер</b><span>Интервалы, привычки недели, дневник самочувствия</span></a>
+        <a class="cat" href="odezhda.html"><b>Экипировка</b><span>Одежда и обувь, инвентарь для дома, гаджеты</span></a>
+        </div>
+      </div>
+      <div class="tool-group" id="tools-food"><h3>Разобраться с питанием</h3>
+        <div class="cat-grid">
         <a class="cat" href="pitanie.html"><b>Основы питания</b><span>Белок, углеводы, жиры, порции рукой</span></a>
         <a class="cat" href="golod.html"><b>Голод и перекусы</b><span>Голод или что-то другое — и что съесть</span></a>
         <a class="cat" href="recepty.html"><b>Рецепты с белком</b><span>Простые блюда, белок на порцию</span></a>
         <a class="cat" href="kalorii.html"><b>Калории и БЖУ</b><span>Посчитать еду без дневной нормы</span></a>
-        <a class="cat" href="odezhda.html"><b>Экипировка</b><span>Одежда и обувь, инвентарь для дома, гаджеты</span></a>
+        </div>
+      </div>
+      <div class="tool-group" id="tools-progress"><h3>Записать результат</h3>
+        <div class="cat-grid">
+        <a class="cat" href="testy.html"><b>Тесты за 5 минут</b><span>Сила, баланс, активность</span></a>
+        <a class="cat" href="progress.html"><b>Мой прогресс</b><span>Журнал, графики и отчёт в PDF</span></a>
+        <a class="cat" href="servisy.html#taymer"><b>Таймер и трекер</b><span>Интервалы, привычки недели, дневник самочувствия</span></a>
         <a class="cat" href="vopros.html"><b>Вопросы и предложения</b><span>Предложить тему для разбора в канале</span></a>
+        </div>
       </div>
       <div class="row-btns"><a class="btn btn-line" href="servisy.html">Все инструменты</a></div>
     </div>
@@ -453,10 +465,10 @@ tabs.forEach(function(t,i){t.addEventListener('click',function(){sel(t)});t.addE
 if(location.hash==='#channel'){sel(tabs[1]);setTimeout(function(){document.getElementById('news').scrollIntoView()},50)}})();
 </script>
 <script src="js/feeds.js?v=20261027r" defer></script>
-<script src="js/nav.js?v=20261027r" defer></script>
+<script src="js/nav.js?v=20261028b" defer></script>
 <script src="js/sections.js?v=1" defer></script>
-<script src="js/myzal.js?v=1" defer></script>
-<script src="js/pwa.js?v=3" defer></script>
+<script src="js/myzal.js?v=20261028b" defer></script>
+<script src="js/pwa.js?v=20261028b" defer></script>
 <script src="js/gestures.js?v=20261027q" defer></script>
 </body>
 </html>

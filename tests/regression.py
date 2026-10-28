@@ -602,7 +602,7 @@ def t_swlist(ctx=None):
 
 def main():
     with sync_playwright() as pw:
-        browser = pw.chromium.launch()
+        browser = pw.chromium.launch(executable_path=os.environ.get("ALENAFIT_CHROMIUM"))
         ctx = browser.new_context(accept_downloads=True, locale="ru-RU", viewport={"width": 1200, "height": 900})
         t_import(ctx)
         t_tonnage(ctx)

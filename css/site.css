@@ -1165,3 +1165,33 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenat
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 /* пустое поле сообщения не рисуем плашкой, но оставляем в документе — экранный диктор прочитает текст, когда он появится */
 .verdict:empty{padding:0;background:none;min-height:0;margin:0;border:0}
+
+/* Общие правила доступности и компактные входы к существующим инструментам. */
+.skip-link{position:fixed;top:12px;left:12px;z-index:200;padding:12px 18px;border-radius:12px;background:var(--amber);color:var(--amber-ink);font-weight:700;transform:translateY(-180%)}
+.skip-link:focus{transform:none}
+main[tabindex="-1"]:focus{outline:none}
+.task-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:24px}
+.task-nav a{display:grid;gap:8px;padding:20px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);text-decoration:none;min-width:0}
+.task-nav b{font:700 17px/1.3 var(--display);color:var(--amber)}
+.task-nav span{font-size:14px;color:var(--muted)}
+.task-nav a:hover{border-color:var(--amber)}
+.tool-group{margin-top:28px;scroll-margin-top:88px}
+.tool-group>.cat-grid{margin-top:12px}
+.task-shortcuts{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.task-shortcuts a{display:inline-flex;align-items:center;min-height:48px;padding:10px 16px;border:1px solid var(--line);border-radius:999px;background:var(--surface);text-decoration:none;font-size:15px;font-weight:600}
+.task-shortcuts a:hover{border-color:var(--amber)}
+.tool-directory{margin-top:14px}
+.tool-directory summary{cursor:pointer;min-height:44px;display:list-item;align-content:center;color:var(--muted)}
+.tool-directory .toc{margin-top:8px}
+.tool-page .page-hero{padding-block:24px 28px}
+.tool-page .page-hero .lede{max-width:64ch}
+.how-copy{padding:10px 4px;display:grid;gap:12px}
+.how-copy ol{padding-left:24px;margin:0;display:grid;gap:10px}
+.how-copy p{border-left:3px solid var(--amber);padding-left:12px}
+.diary-transfer{display:grid;gap:14px;padding:16px;border:1px solid var(--line);border-radius:var(--r-md);min-width:0}
+.diary-transfer summary{cursor:pointer;font-weight:600;min-height:48px;align-content:center}
+.diary-transfer>p,.diary-transfer>.check,.diary-transfer>.btn-row{margin-top:14px}
+.diary-transfer input[type="file"]:focus-visible{position:static;width:100%;height:auto;clip:auto;clip-path:none;overflow:visible}
+.btn-row:has(#cycleImport:focus-visible) label[for="cycleImport"]{outline:3px solid var(--amber);outline-offset:3px}
+@media(max-width:719px){.task-nav{grid-template-columns:1fr}.task-nav a{padding:16px;gap:4px}.tool-group{scroll-margin-top:20px}}
+@media print{.skip-link,.task-nav,.task-shortcuts,.diary-transfer,.tool-directory{display:none!important}}

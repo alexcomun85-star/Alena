@@ -194,7 +194,7 @@ def t_offline(browser):
 
 def main():
     with sync_playwright() as pw:
-        browser = pw.chromium.launch()
+        browser = pw.chromium.launch(executable_path=os.environ.get("ALENAFIT_CHROMIUM"))
         t_food(browser)
         t_tabs(browser)
         t_fold(browser)

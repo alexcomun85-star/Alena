@@ -56,8 +56,10 @@ jobs:
           retry() { "$@" || { echo "::warning::Повтор после сбоя: $*"; "$@"; }; }
           node tests/food_storage.test.cjs
           node tests/nav_resize.test.cjs
+          node tests/cycle_diary.test.cjs
           retry python tests/regression.py
           retry python tests/audit_regression.py
+          retry python tests/technical_regression.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
