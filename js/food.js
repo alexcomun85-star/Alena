@@ -3,7 +3,16 @@
   'use strict';
   var KEY='food_v1',BKEY='food_v1_backup',S={custom:[],days:{}},blocked=false;
   function copy(){return JSON.parse(JSON.stringify(S))}
-  function load(){try{var raw=localStorage.getItem(KEY);if(raw)S=validate(JSON.parse(raw))}catch(e){blocked=true}}
+  var loadNote='';
+  /* Загрузка: сначала строго; если часть старых записей неверна — исходник сохраняется резервной копией,
+     неверные записи скрываются, остальным дневником можно пользоваться. Повреждённый JSON — только чтение. */
+  function load(){var raw=null,x;try{raw=localStorage.getItem(KEY)}catch(e){blocked=true;return}
+    if(!raw)return;
+    try{x=JSON.parse(raw)}catch(e){blocked=true;return}
+    try{S=validate(x);return}catch(e){}
+    var c;try{c=validate(x,true)}catch(e){blocked=true;return}
+    try{if(!localStorage.getItem(BKEY))localStorage.setItem(BKEY,raw);else localStorage.setItem(BKEY+'_load',raw);localStorage.setItem(KEY,JSON.stringify(c.data))}catch(e){blocked=true;return}
+    S=c.data;loadNote='Часть старых записей ('+c.skipped+') не прошла проверку и скрыта, остальной дневник работает. Исходная версия сохранена: её можно скачать кнопкой «Скачать резервную копию».'}
   /* Меняем состояние только после успешной записи: экран не обещает несохранённое. */
   function save(next){if(blocked)return false;try{next=validate(next);localStorage.setItem(KEY,JSON.stringify(next));S=next;return true}catch(e){return false}}
   var SAVE_ERR='Не удалось сохранить в браузере. Данные не изменены, введённые поля оставлены. Проверьте доступ к хранилищу и свободное место.';
@@ -26,7 +35,7 @@
     if(bad(p)||bad(fa)||bad(c))return {err:'Белки, жиры и углеводы — числа от 0 до 100 г на 100 г продукта, без минуса.'};
     var sum=(p||0)+(fa||0)+(c||0);
     if(sum>100+SUM_TOL)return {err:'Белки + жиры + углеводы = '+f(sum)+' г, а в 100 г продукта не может быть больше 100 г. Проверьте, что цифры указаны на 100 г, а не на упаковку или порцию.'};
-    if(k!=null&&!(typeof k==='number'&&isFinite(k)&&k>=0&&k<=KMAX))return {err:'Калории — от 0 до 910 на 100 г, без минуса.'};
+    if(k!=null&&!(typeof k==='number'&&isFinite(k)&&k>=0&&k<=KMAX))return {err:'Калории — от 0 до 900 на 100 г, без минуса.'};
     var warn='';
     if(k!=null&&p!=null&&fa!=null&&c!=null){var a=atwater(p,fa,c),d=Math.abs(k-a);
       if(d>Math.max(25,0.2*Math.max(k,a)))warn='Калории заметно отличаются от расчёта по БЖУ (≈ '+f(a,0)+' ккал). Так бывает из-за клетчатки, сахарозаменителей или особых коэффициентов, но стоит сверить с этикеткой.'}
@@ -35,23 +44,30 @@
   var MEALS=['Завтрак','Обед','Ужин','Перекус'];
   function isDate(v){if(typeof v!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v))return false;var d=new Date(v+'T00:00:00Z');return !isNaN(d)&&d.toISOString().slice(0,10)===v&&v>='2000-01-01'&&v<='2100-12-31'}
   function finite(v,min,max){return typeof v==='number'&&isFinite(v)&&v>=min&&v<=max}
-  function named(x){return x&&typeof x==='object'&&typeof x.name==='string'&&x.name.trim()&&x.name.length<=200}
-  /* Одинаковая проверка при загрузке и импорте. Старый формат food_v1 сохраняется. */
-  function validate(x){
+  function named(x){return x&&typeof x==='object'&&typeof x.name==='string'&&!!x.name.trim()}
+  /* Длинные названия (бывают в Open Food Facts) не считаем ошибкой — обрезаем до 200 символов. */
+  function nm(v){return v.name.trim().slice(0,200)}
+  /* Одинаковая проверка при загрузке и импорте. Старый формат food_v1 сохраняется.
+     lenient=true (только загрузка из браузера): неверные записи пропускаются, а не блокируют весь дневник;
+     результат — {data, skipped}. Без lenient — ошибка на первой неверной записи (импорт файла). */
+  function validate(x,lenient){
     if(!x||!Array.isArray(x.custom)||!x.days||typeof x.days!=='object'||Array.isArray(x.days))throw Error('неверная структура дневника');
     if(x.custom.length>10000||Object.keys(x.days).length>10000)throw Error('слишком много записей');
-    var out={custom:[],days:{}},ids=Object.create(null),count=0;
+    var out={custom:[],days:{}},ids=Object.create(null),count=0,skipped=0;
+    function bad(t){if(lenient){skipped++;return true}throw Error(t)}
     x.custom.forEach(function(v){
-      if(!named(v)||typeof v.id!=='string'||!/^c[\w-]{1,80}$/.test(v.id)||ids[v.id]||!finite(v.k,0,KMAX)||!finite(v.p,0,100)||!finite(v.f,0,100)||!finite(v.c,0,100)||checkFood(v.k,v.p,v.f,v.c).err)throw Error('неверный продукт');
-      ids[v.id]=true;var z={id:v.id,name:v.name,k:v.k,p:v.p,f:v.f,c:v.c,pg:100,pl:'100 г'};if(v.src0==='O')z.src0='O';out.custom.push(z);
+      if(!named(v)||typeof v.id!=='string'||!/^c[\w-]{1,80}$/.test(v.id)||ids[v.id]||!finite(v.k,0,KMAX)||!finite(v.p,0,100)||!finite(v.f,0,100)||!finite(v.c,0,100)||checkFood(v.k,v.p,v.f,v.c).err){bad('неверный продукт');return}
+      ids[v.id]=true;var z={id:v.id,name:nm(v),k:v.k,p:v.p,f:v.f,c:v.c,pg:100,pl:'100 г'};if(v.src0==='O')z.src0='O';out.custom.push(z);
     });
     Object.keys(x.days).forEach(function(day){
-      if(!isDate(day)||!Array.isArray(x.days[day])||(count+=x.days[day].length)>20000)throw Error('неверная дата или список записей');
-      out.days[day]=x.days[day].map(function(v){
-        if(!named(v)||!finite(v.g,1,3000)||MEALS.indexOf(v.meal)<0||!finite(v.k,0,KMAX*v.g/100)||!finite(v.p,0,v.g)||!finite(v.f,0,v.g)||!finite(v.c,0,v.g)||(v.p+v.f+v.c)>v.g*1.015+1e-8)throw Error('неверная запись о еде');
-        return {name:v.name,g:v.g,meal:v.meal,k:v.k,p:v.p,f:v.f,c:v.c};
+      if(!isDate(day)||!Array.isArray(x.days[day])||(count+=x.days[day].length)>20000){bad('неверная дата или список записей');return}
+      var list=[];x.days[day].forEach(function(v){
+        /* вес: старая версия принимала и доли грамма (например, 0,5 г соли), поэтому здесь > 0, а при вводе — от 1 г */
+        if(!named(v)||!finite(v.g,0,3000)||!(v.g>0)||MEALS.indexOf(v.meal)<0||!finite(v.k,0,KMAX*v.g/100)||!finite(v.p,0,v.g)||!finite(v.f,0,v.g)||!finite(v.c,0,v.g)||(v.p+v.f+v.c)>v.g*1.015+1e-8){bad('неверная запись о еде');return}
+        list.push({name:nm(v),g:v.g,meal:v.meal,k:v.k,p:v.p,f:v.f,c:v.c});
       });
-    });return out;
+      if(list.length)out.days[day]=list;else if(!x.days[day].length)out.days[day]=list;
+    });return lenient?{data:out,skipped:skipped}:out;
   }
   var META=window.FOOD_META||{};
   var DB=(window.FOOD_DB||[]).map(function(r,i){var m=META[r[0]]||[];return {id:'b'+i,name:r[0],k:r[1],p:r[2],f:r[3],c:r[4],cat:r[5],src:r[6],pg:r[7],pl:r[8],st:m[0]||'',fdc:m[1]||''}});
@@ -162,7 +178,7 @@
   $('dList').addEventListener('click',function(e){var b=e.target.closest('.del');if(!b)return;var next=copy();(next.days[date]||[]).splice(+b.dataset.i,1);if(!save(next)){$('fMsg').textContent=SAVE_ERR;return}render()});
   /* ---- перенос и восстановление: файл проверяется до замены, прежняя версия остаётся ---- */
   function transferMsg(t){$('foodTransferMsg').textContent=t}
-  function backupUi(){try{$('foodRestore').disabled=!localStorage.getItem(BKEY);$('foodBackup').disabled=!localStorage.getItem(BKEY)}catch(e){$('foodRestore').disabled=true;$('foodBackup').disabled=true}}
+  function backupUi(){try{$('foodRestore').disabled=!localStorage.getItem(BKEY);$('foodBackup').disabled=!(localStorage.getItem(BKEY)||localStorage.getItem(BKEY+'_load'))}catch(e){$('foodRestore').disabled=true;$('foodBackup').disabled=true}}
   function download(raw,name){var u=URL.createObjectURL(new Blob([raw],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name+'-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},1000)}
   function replace(next){try{var prev=localStorage.getItem(KEY);if(prev!==null)localStorage.setItem(BKEY,prev);localStorage.setItem(KEY,JSON.stringify(next));S=next;blocked=false;return true}catch(e){return false}}
   function refreshed(){sel=null;$('fSel').hidden=true;showRes();render();backupUi()}
@@ -175,13 +191,14 @@
       if(!replace(next)){transferMsg(SAVE_ERR);return}refreshed();transferMsg('Дневник импортирован. Предыдущую версию можно вернуть.');
     }catch(e){transferMsg('Файл не принят: '+(e.message||'неверные данные')+'. Данные не изменены.')}finally{input.value=''}};reader.readAsText(file);
   });
-  $('foodRestore').addEventListener('click',function(){try{var raw=localStorage.getItem(BKEY);if(!raw)throw Error('копии нет');var next=validate(JSON.parse(raw));
-    if(!confirm('Вернуть предыдущую версию дневника? Нынешняя версия станет резервной копией.'))return;
+  $('foodRestore').addEventListener('click',function(){try{var raw=localStorage.getItem(BKEY);if(!raw)throw Error('копии нет');var c=validate(JSON.parse(raw),true),next=c.data;
+    if(!confirm('Вернуть предыдущую версию дневника?'+(c.skipped?' Неверные записи ('+c.skipped+') будут пропущены.':'')+' Нынешняя версия станет резервной копией.'))return;
     if(!replace(next)){transferMsg(SAVE_ERR);return}refreshed();transferMsg('Предыдущая версия восстановлена.');
   }catch(e){transferMsg('Копию не удалось восстановить. Её можно скачать для проверки.')}});
-  $('foodBackup').addEventListener('click',function(){try{var raw=localStorage.getItem(BKEY);if(raw)download(raw,'alenafit-food-backup')}catch(e){transferMsg('Не удалось скачать резервную копию.')}});
+  /* Резервная копия; если при загрузке старые записи были скрыты, а копия уже была занята, исходник лежит в _load — скачиваем и его */
+  $('foodBackup').addEventListener('click',function(){try{var raw=localStorage.getItem(BKEY),orig=localStorage.getItem(BKEY+'_load');if(raw)download(raw,'alenafit-food-backup');if(orig)download(orig,'alenafit-food-original')}catch(e){transferMsg('Не удалось скачать резервную копию.')}});
   var w=$('fWipe'),armed=false;
   w.addEventListener('click',function(){if(!armed){armed=true;w.textContent='Точно удалить всё? Нажмите ещё раз';setTimeout(function(){armed=false;w.textContent='Удалить все записи и мои продукты'},4000);return}
     if(!replace({custom:[],days:{}})){transferMsg(SAVE_ERR);return}armed=false;w.textContent='Удалить все записи и мои продукты';refreshed();transferMsg('Дневник очищен. Прежние данные можно вернуть из резервной копии.')});
-  load();showRes();render();backupUi();if(blocked)transferMsg('Хранилище недоступно или данные повреждены. Исходные данные не перезаписаны. Скачайте копию и импортируйте проверенный файл.');
+  load();showRes();render();backupUi();if(loadNote)transferMsg(loadNote);if(blocked)transferMsg('Хранилище недоступно или данные повреждены. Исходные данные не перезаписаны. Скачайте копию и импортируйте проверенный файл.');
 })();

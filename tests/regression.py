@@ -585,6 +585,21 @@ def t_dock(ctx):
     page.close()
 
 
+def t_swlist(ctx=None):
+    """Работа без сети: каждый стиль и скрипт со страниц (с версией) есть в списке sw.js, и наоборот."""
+    import glob, re
+    root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    sw = open(os.path.join(root, "sw.js"), encoding="utf-8").read()
+    listed = set(re.findall(r'"\./([^"]+)"', sw))
+    refs = set()
+    for f in glob.glob(os.path.join(root, "*.html")):
+        refs |= set(re.findall(r'(?:src|href)="((?:css|js)/[^"]+)"', open(f, encoding="utf-8").read()))
+    check("sw.js: все стили и скрипты страниц есть в списке для работы без сети", [], sorted(refs - listed))
+    check("sw.js: в списке нет устаревших версий стилей и скриптов", [], sorted(x for x in listed - refs if x.startswith(("css/", "js/"))))
+    pages = {os.path.basename(f) for f in glob.glob(os.path.join(root, "*.html"))}
+    check("sw.js: все страницы есть в списке", [], sorted(pages - listed))
+
+
 def main():
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
@@ -600,6 +615,7 @@ def main():
         t_cycle(ctx)
         t_tehnika(ctx)
         t_dock(ctx)
+        t_swlist()
         t_myzal(ctx)
         browser.close()
     failed = [r for r in RESULTS if not r[0]]

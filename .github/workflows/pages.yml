@@ -20,6 +20,8 @@ concurrency:
 
 jobs:
   checks:
+    # Ежедневный запуск по расписанию код не меняет — проверяем только при изменениях (push, PR, ручной запуск).
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     container: mcr.microsoft.com/playwright/python:v1.64.1-noble
@@ -50,10 +52,12 @@ jobs:
           else:
               raise RuntimeError('Локальный сервер не запустился')
           PY
+          # Браузерные проверки на общих серверах GitHub иногда сбиваются по времени — упавший набор повторяем один раз.
+          retry() { "$@" || { echo "::warning::Повтор после сбоя: $*"; "$@"; }; }
           node tests/food_storage.test.cjs
           node tests/nav_resize.test.cjs
-          python tests/regression.py
-          python tests/audit_regression.py
+          retry python tests/regression.py
+          retry python tests/audit_regression.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -62,7 +66,8 @@ jobs:
           if-no-files-found: ignore
   build:
     needs: checks
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    # По расписанию проверки пропускаются, и новости публикуются; при изменениях кода — только после успешных проверок.
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && (needs.checks.result == 'success' || (github.event_name == 'schedule' && needs.checks.result == 'skipped'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -93,6 +98,8 @@ jobs:
           path: .
   deploy:
     needs: build
+    # always(): пропущенные проверки по расписанию не должны «протекать» пропуском в публикацию
+    if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

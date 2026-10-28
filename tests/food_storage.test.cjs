@@ -85,4 +85,19 @@ a.fire('fWipe', 'click');a.fire('fWipe', 'click');eq(a.state(), {custom: [], day
 a.fire('foodRestore', 'click');eq(a.raw(), before);
 a = app({food_v1: '{broken'});a.product();eq(a.raw(), '{broken');
 eq(a.el('foodTransferMsg').textContent.includes('повреждены'), true);
+/* Старые записи: доли грамма и длинные названия принимаются, неверная запись не блокирует дневник. */
+const legacy = {custom: [{id: 'c1', name: 'Масло', k: 899, p: 0, f: 99.9, c: 0, pg: 100, pl: '100 г'}],
+  days: {'2026-10-20': [{name: 'Соль', g: .5, meal: 'Обед', k: 0, p: 0, f: 0, c: 0},
+    {name: 'Й'.repeat(250), g: 100, meal: 'Обед', k: 100, p: 5, f: 1, c: 10},
+    {name: 'Сломанная', g: 100, meal: 'Ужин', k: -5, p: 0, f: 0, c: 0}]}};
+a = app({food_v1: JSON.stringify(legacy)});
+eq(a.state().days['2026-10-20'].length, 2);
+eq(a.state().days['2026-10-20'][0].g, .5);
+eq(a.state().days['2026-10-20'][1].name.length, 200);
+eq(a.data.get('food_v1_backup'), JSON.stringify(legacy));
+eq(a.el('foodTransferMsg').textContent.includes('(1)'), true);
+a.product();eq(a.state().custom.length, 2);
+const ok = {custom: [], days: {'2026-10-21': [{name: 'Соль', g: .5, meal: 'Обед', k: 0, p: 0, f: 0, c: 0}]}};
+a = app({food_v1: JSON.stringify(ok)});
+eq(a.el('foodTransferMsg').textContent, '');eq(a.data.has('food_v1_backup'), false);
 console.log(`${checks} проверок food.js пройдены`);
