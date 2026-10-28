@@ -554,7 +554,7 @@ def t_tehnika(ctx):
 def t_dock(ctx):
     """Телефон: управление внизу — шапка без кнопок, нижняя панель, меню-шторка; ПК — без изменений."""
     m = ctx.browser.new_context(viewport={"width": 360, "height": 740}, is_mobile=True, has_touch=True)
-    for path, first in (("index.html", "Главная"), ("servisy.html", "Главная")):
+    for path, first in (("index.html", "Наверх"), ("servisy.html", "Главная")):
         page = fresh(m, path)
         hidden = page.evaluate("[...document.querySelectorAll('.bar .menu-btn,.bar .btn-main,.bar .zal-btn,.bar .inst-btn')].every(e=>!e.offsetParent)")
         check(f"панель ({path}): в шапке телефона нет кнопок", True, hidden)
