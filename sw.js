@@ -2,14 +2,19 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-v14';
+const VERSION = 'alenafit-v26';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
+  "./img/alena-invitation.webp",
+  "./css/final-invite.css?v=20261028d",
+  "./js/final-invite.js?v=20261028a",
+  "./css/home-motion.css?v=20261028b",
+  "./css/gym-images.css?v=20261028j",
   "./",
   "./404.html",
   "./blizost.html",
   "./css/fonts.css?v=20261028b",
-  "./css/site.css?v=20261028d",
+  "./css/site.css?v=20261028k",
   "./data/products-ru.json",
   "./fonts/golos-pdf.ttf",
   "./fonts/golos-text-cyrillic.woff2",
@@ -29,10 +34,10 @@ const CORE = [
   "./js/gadzhety.js?v=20261026h",
   "./js/gestures.js?v=20261027q",
   "./js/golod.js?v=20261026e",
-  "./js/gym.js?v=20261026c",
+  "./js/gym.js?v=20261028j",
   "./js/korzina.js?v=20261026e",
   "./js/myzal.js?v=20261028b",
-  "./js/nav.js?v=20261028b",
+  "./js/nav.js?v=20261028f",
   "./js/progress.js?v=20261028d",
   "./js/pwa.js?v=20261028b",
   "./js/recepty.js?v=20261027a",
@@ -59,6 +64,23 @@ const CORE = [
   "./zal.html"
 ];
 const MEDIA = [
+  "./img/gym/treadmill.webp?v=4",
+  "./img/gym/bike.webp?v=4",
+  "./img/gym/elliptical.webp?v=4",
+  "./img/gym/rack.webp?v=4",
+  "./img/gym/smith.webp?v=4",
+  "./img/gym/bench.webp?v=4",
+  "./img/gym/dumbbells.webp?v=4",
+  "./img/gym/hyperextension.webp?v=4",
+  "./img/gym/lat-pulldown.webp?v=4",
+  "./img/gym/cable-row.webp?v=4",
+  "./img/gym/crossover.webp?v=4",
+  "./img/gym/leg-press.webp?v=4",
+  "./img/gym/leg-extension.webp?v=4",
+  "./img/gym/leg-curl.webp?v=4",
+  "./img/gym/hip-abduction.webp?v=4",
+  "./img/gym/mats.webp?v=4",
+
   "./fonts/unbounded-vietnamese.woff2",
   "./fonts/golos-text-cyrillic-ext.woff2",
   "./fonts/unbounded-cyrillic-ext.woff2",

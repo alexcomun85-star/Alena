@@ -1125,7 +1125,7 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenat
 .bar .inst-btn{width:40px;min-width:40px;padding:0;flex:none}
 
 /* Телефон и планшет: управление внизу, под большим пальцем.
-   Шапка — только логотип и не липнет; нижняя панель: Главная/Наверх/Назад · Мой зал · СТАРТ · Меню.
+   Шапка — только логотип и не липнет; нижняя панель: Главная/Наверх/Назад · Мой зал · Инструменты · Меню.
    Меню — шторка над панелью, пункты прижаты к низу экрана. */
 @media (max-width:1023px){
   body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
@@ -1138,7 +1138,6 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenat
   .dock .home-btn span{white-space:nowrap}
   .dock .home-btn:active,.dock .home-btn[aria-current="page"],.dock .home-btn[aria-expanded="true"]{background:var(--surface-2);color:var(--ink)}
   .dock .zal-dock svg{color:var(--amber)}
-  .dock .dock-start{flex:1.35 1 0;min-height:56px;padding:0 10px;font-size:16px;border-radius:16px}
   .dock .dock-menu .burger{margin:9px 0 7px}
   .menu-open .dock{display:block}
   .menu-open .dock .burger{background:transparent}
@@ -1148,8 +1147,8 @@ h1,h2,h3,h4,.cat b,.lead,.page-hero p{hyphens:auto;-webkit-hyphens:auto;hyphenat
   .m-cta{display:none}
   .zal-toast{bottom:calc(90px + env(safe-area-inset-bottom,0px))}
 }
-@media (max-width:1023px) and (prefers-reduced-motion:no-preference){.menu-open .mnav-in{animation:mnUp .22s ease-out}}
-@keyframes mnUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:1023px) and (prefers-reduced-motion:no-preference){.menu-open .mnav-in{animation:mnUp .2s ease-out}}
+@keyframes mnUp{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 
 /* Промежуточный экран (в том числе раскрытый Fold): больше места без меню ПК. */
 @media (min-width:720px) and (max-width:1023px){
@@ -1204,3 +1203,26 @@ main[tabindex="-1"]:focus{outline:none}
   }
   @media(prefers-reduced-transparency:reduce){.mnav{background:#0d1e1a;backdrop-filter:none;-webkit-backdrop-filter:none}}
 }
+
+/* Короткое появление шторки; скрытое меню по-прежнему сразу освобождает фокус. */
+@media(max-width:1023px) and (prefers-reduced-motion:no-preference){
+  .menu-open .mnav{animation:menuFade .2s ease-out}
+}
+@keyframes menuFade{from{opacity:0}to{opacity:1}}
+
+/* Бренд на узком экране: подпись рядом со знаком остаётся видимой. */
+@media(max-width:1023px){
+ .bar .brand-text,.bar .w:has(.app-back) .brand-text{display:grid!important;gap:4px}
+ .bar .brand-text small{display:block!important;font:500 11px/1.2 var(--body);color:var(--ink);letter-spacing:.01em;white-space:nowrap}
+ .bar .brand{gap:9px;min-width:0}
+}
+/* Три уровня подписи в рамке фотографии, без текста поверх лица и фигуры. */
+.hero .w>.hero-photo{aspect-ratio:auto;margin-bottom:0;background:var(--band);border-radius:28px;display:flex;flex-direction:column;align-self:start}
+.hero-photo>img{position:relative;aspect-ratio:1/1;height:auto;flex:none;object-position:40% 30%}
+.hero-photo::after{bottom:auto;height:100%;background:linear-gradient(180deg,transparent 55%,rgba(13,30,26,.12) 100%);pointer-events:none}
+.hero-brand-copy{position:relative;z-index:2;display:grid;gap:12px;padding:20px;background:var(--band);text-align:left}
+.hero-photo .hero-brand-word{width:128px;height:auto;aspect-ratio:auto;object-fit:contain;object-position:left;filter:none}
+.hero-brand-title{display:block;font:700 clamp(21px,4.8vw,30px)/1.15 var(--display);letter-spacing:-.025em;color:var(--ink)}
+.hero-brand-description{display:block;max-width:52ch;font:400 13px/1.45 var(--body);color:var(--muted);text-wrap:pretty}
+@media(max-width:359px){.hero-brand-copy{padding:16px 14px;gap:10px}.hero-brand-title{font-size:20px}.hero-brand-description{font-size:11px}}
+@media(min-width:1024px){.hero .w>.hero-photo{border-radius:32px}.hero-photo>img{aspect-ratio:1/1}.hero-brand-copy{padding:24px}.hero-brand-title{font-size:clamp(21px,2.2vw,30px)}}
