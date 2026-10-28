@@ -44,7 +44,7 @@
       data=c.data;
     }catch(e){blocked=true;loadNote='Сохранённые данные повреждены или не удалось сохранить исходную копию. Они не перезаписаны. Скачайте исходник ниже или восстановите дневник из проверенного файла.'}
   }
-  function backupUi(){try{$('cycleRestore').disabled=localStorage.getItem(BACK)===null;$('cycleBackup').disabled=$('cycleRestore').disabled;$('cycleOriginal').disabled=!blocked&&localStorage.getItem(ORIGINAL)===null}catch(e){$('cycleRestore').disabled=true;$('cycleBackup').disabled=true;$('cycleOriginal').disabled=true}}
+  function backupUi(){try{$('cycleRestore').disabled=localStorage.getItem(BACK)===null;$('cycleBackup').disabled=$('cycleRestore').disabled;$('cycleOriginal').disabled=!blocked&&localStorage.getItem(ORIGINAL)===null}catch(e){$('cycleRestore').disabled=true;$('cycleBackup').disabled=true;$('cycleOriginal').disabled=true}['cycleRestore','cycleBackup','cycleOriginal'].forEach(function(id){$(id).hidden=$(id).disabled});if($('cycleBackupHint'))$('cycleBackupHint').hidden=!$('cycleBackup').disabled}
   function commit(next){
     if(blocked){notify('Сначала сохраните исходник и восстановите дневник из файла. Повреждённые данные не перезаписаны.');return false}
     try{localStorage.setItem(KEY,JSON.stringify(next));data=next;return true}
@@ -73,7 +73,7 @@
     if(window.Cycle&&Cycle.refresh)Cycle.refresh();
     calc();render();backupUi();return true;
   }
-  function download(raw,name){var blob=new Blob([raw],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name+'-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+  function download(raw,name){if(window.AlenaExport){AlenaExport.save(new Blob([raw],{type:'application/json'}),name+'-'+today()+'.json','cycleTransferMsg');return}var blob=new Blob([raw],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name+'-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
   function pack(s){
     var p={format:'alenafit-cycle-diary',version:1,diary:valid(JSON.parse(s.diary||'[]'),false).data};
     if(Object.prototype.hasOwnProperty.call(s,'settings')){p.settings=s.settings===null?null:settings(JSON.parse(s.settings));p.start=s.start;if(p.start!==null&&!isDate(p.start))throw Error('неверная дата начала цикла')}
@@ -114,9 +114,9 @@
     next.push({date:dt,d:d,e:e,t:t});
     if(commit(next)){render();notify('Сохранено. Записей: '+data.length+'.')}
   });
-  $('cycleExport').addEventListener('click',function(){try{if(blocked)throw Error('сначала скачайте исходник');var s={diary:JSON.stringify(data)};if($('cycleWithSettings').checked){s.settings=localStorage.getItem(SETTINGS);s.start=localStorage.getItem(START)}download(JSON.stringify(pack(s),null,1),'alenafit-cycle-diary');transfer('Копия подготовлена. Файл содержит личные записи; храните его у себя.')}catch(e){transfer('Не удалось подготовить копию: '+e.message+'.')}});
+  $('cycleExport').addEventListener('click',function(){try{if(blocked)throw Error('сначала скачайте исходник');var s={diary:JSON.stringify(data)};if($('cycleWithSettings').checked){s.settings=localStorage.getItem(SETTINGS);s.start=localStorage.getItem(START)}transfer('Файл содержит личные записи; храните его у себя.');download(JSON.stringify(pack(s),null,1),'alenafit-cycle-diary')}catch(e){transfer('Не удалось подготовить копию: '+e.message+'.')}});
   $('cycleOriginal').addEventListener('click',function(){try{var raw=blocked?localStorage.getItem(KEY):localStorage.getItem(ORIGINAL);if(raw===null)throw Error();download(raw,'alenafit-cycle-original')}catch(e){transfer('Не удалось скачать исходную версию.')}});
-  $('cycleBackup').addEventListener('click',function(){try{var raw=readBackup();try{download(JSON.stringify(pack(raw),null,1),'alenafit-cycle-backup');transfer('Резервная копия подготовлена. Её можно восстановить из файла.')}catch(invalid){download(JSON.stringify(raw,null,1),'alenafit-cycle-backup-raw');transfer('Скачана исходная повреждённая версия для восстановления специалистом.')}}catch(e){transfer('Резервной копии пока нет или она недоступна.')}});
+  $('cycleBackup').addEventListener('click',function(){try{var raw=readBackup();try{transfer('Копию можно восстановить из файла.');download(JSON.stringify(pack(raw),null,1),'alenafit-cycle-backup')}catch(invalid){transfer('Исходная повреждённая версия для восстановления специалистом.');download(JSON.stringify(raw,null,1),'alenafit-cycle-backup-raw')}}catch(e){transfer('Резервной копии пока нет или она недоступна.')}});
   $('cycleImport').addEventListener('change',function(){
     var input=this,file=input.files&&input.files[0];if(!file)return;
     if(file.size>5*1024*1024){transfer('Файл не принят: размер больше 5 МБ.');input.value='';return}

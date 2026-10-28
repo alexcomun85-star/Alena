@@ -26,7 +26,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="css/fonts.css?v=20261028b">
-<link rel="stylesheet" href="css/site.css?v=20261028b">
+<link rel="stylesheet" href="css/site.css?v=20261028d">
 <style>:root{color-scheme:dark;background:#132823;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body class="tool-page">
@@ -209,7 +209,8 @@
           <p class="small">Файл содержит ваши записи о самочувствии. Он обрабатывается только в браузере; храните его у себя. Импорт заменяет записи после проверки и подтверждения. Перед заменой и очисткой сохраняется резервная копия.</p>
           <label class="check"><input type="checkbox" id="cycleWithSettings"> Переносить также общие настройки и дату начала цикла (по желанию)</label>
           <p class="small">Без этой отметки выгружаются и восстанавливаются только записи дневника. Включённая отметка позволяет перенести настройки для всех инструментов сайта.</p>
-          <div class="btn-row"><button type="button" class="tbtn" id="cycleExport">Скачать дневник</button><label class="tbtn ghost" for="cycleImport">Восстановить из файла</label><input class="sr-only" id="cycleImport" type="file" accept=".json,application/json"><button type="button" class="tbtn ghost" id="cycleRestore" disabled>Вернуть предыдущую версию</button><button type="button" class="tbtn ghost" id="cycleBackup">Скачать резервную копию</button><button type="button" class="tbtn ghost" id="cycleOriginal" disabled>Скачать исходную версию</button></div>
+          <div class="btn-row"><button type="button" class="tbtn" id="cycleExport">Скачать дневник</button><label class="tbtn ghost" for="cycleImport">Восстановить из файла</label><input class="sr-only" id="cycleImport" type="file" accept=".json,application/json"><button type="button" class="tbtn ghost" id="cycleRestore" hidden disabled>Отменить последнюю замену</button><button type="button" class="tbtn ghost" id="cycleBackup" hidden>Скачать сохранённую версию</button><button type="button" class="tbtn ghost" id="cycleOriginal" hidden disabled>Скачать исходную версию</button></div>
+          <p class="small" id="cycleBackupHint">Копия появится перед восстановлением из файла или очисткой. После этого можно будет отменить замену.</p>
           <p class="verdict" id="cycleTransferMsg" aria-live="polite"></p>
         </details>
         <p class="notice"><b>Записи хранятся только в этом браузере на этом устройстве</b> и никуда не отправляются — ни мне, ни кому-либо ещё. Если почистить данные браузера, они удалятся. Дневник — для настройки тренировок, а не для контрацепции, планирования беременности или медицинских решений. Сильная боль, очень обильные или нерегулярные циклы, отсутствие месячных 3 месяца и дольше — повод обратиться к гинекологу.</p>
@@ -227,6 +228,7 @@
   </section>
 </main>
 <footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a> · <button type="button" class="foot-pwa" data-pwa>Установить приложение</button></span></div></footer>
+<script src="js/export.js?v=20261028d" defer></script>
 <script src="js/nav.js?v=20261028b" defer></script>
 <script src="js/sections.js?v=1" defer></script>
 <script src="js/myzal.js?v=20261028b" defer></script>
@@ -334,7 +336,7 @@
   sum();
 })();
 </script>
-<script src="js/cycle-diary.js?v=20261028b" defer></script>
+<script src="js/cycle-diary.js?v=20261028d" defer></script>
 <script src="js/pwa.js?v=20261028b" defer></script>
 <script src="js/gestures.js?v=20261027q" defer></script>
 </body>

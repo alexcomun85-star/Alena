@@ -296,7 +296,7 @@
   $('vLog').addEventListener('click',function(e){var b=e.target.closest('.del');if(!b)return;D[b.dataset.k].splice(+b.dataset.i,1);save();renderAll()});
 
   /* ---- отчёт и PDF ---- */
-  $('pdfBtn').addEventListener('click',function(){
+  function report(printOnly){
     var name=$('rName').value.trim();D.name=name;save();
     var dates=[].concat(D.lifts.map(function(x){return x.date}),D.tests.map(function(x){return x.date}),D.act.map(function(x){return x.week}),D.body.map(function(x){return x.date})).sort();
     if(!dates.length){msg('pdfMsg','Сначала добавьте хотя бы одну запись.');return}
@@ -304,14 +304,15 @@
     $('report').innerHTML='<header class="r-head"><div><p class="r-brand">Алёна · Сила без перегибов · alenafit.com</p><h1>Отчёт о прогрессе'+(name?': '+esc(name):'')+'</h1><p>Период: '+fd(dates[0])+' — '+fd(dates[dates.length-1])+' · сформирован '+fd(today())+'</p></div></header>'+
       '<section><h2>Силовые</h2>'+liftsHtml(true)+'</section><section><h2>Функциональные тесты</h2>'+testsHtml()+'</section><section><h2>Активность</h2>'+actHtml()+'</section>'+(inc?'<section><h2>Замеры</h2>'+bodyHtml(incC)+'</section>':'')+(incC?'<section><h2>Цикл и результаты</h2>'+cycleHtml()+'</section>':'')+
       '<section class="r-notes"><h2>Как считали</h2><p>Расчётный максимум на 1 повтор (1ПМ) — среднее по формулам Эпли (1985): вес × (1 + повторы / 30) и Бжицки (1993): вес × 36 / (37 − повторы). Точнее всего при 1–10 повторах. Для каждой даты берётся лучший подход.</p><p>Тоннаж — сумма «вес × повторы × подходы» по всем записям упражнения за день. Прирост — (последнее − первое) / первое × 100%, округление до сотых.</p><p>Ориентиры: ВОЗ — силовые от 2 дней в неделю; 7 000 шагов в день — обзор Ding et al., The Lancet Public Health, 2025. Тест «сесть-встать» — Araújo et al., 2025.</p><p>Отчёт не является медицинским документом.</p></section>';
-    msg('pdfMsg','В окне печати выберите «Сохранить как PDF».');
-    setTimeout(function(){window.print()},50);
-  });
+    if(printOnly){msg('pdfMsg','В окне печати выберите сохранение PDF.');window.print();return}
+    if(window.AlenaExport){AlenaExport.pdf($('report'),'Отчёт о прогрессе','alenafit-progress-'+today()+'.pdf','pdfMsg').catch(function(){})}
+    else{msg('pdfMsg','В окне печати выберите «Сохранить как PDF».');window.print()}
+  }
+  $('pdfBtn').addEventListener('click',function(){report(false)});
+  if($('printReport'))$('printReport').addEventListener('click',function(){report(true)});
   /* ---- резервная копия ---- */
   $('expBtn').addEventListener('click',function(){
-    var blob=new Blob([JSON.stringify(D,null,1)],{type:'application/json'});var a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);a.download='progress-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
-    msg('bkMsg','Файл с копией сохранён в загрузки.');
+    AlenaExport.save(new Blob([JSON.stringify(D,null,1)],{type:'application/json'}),'progress-'+today()+'.json','bkMsg');
   });
   function counts(d){return 'силовые — '+d.lifts.length+', тесты — '+d.tests.length+', активность — '+d.act.length+', замеры — '+d.body.length}
   function backupUi(){var b=readBackup(),box=$('bkRestore');if(!box)return;
@@ -345,7 +346,7 @@
     D=x;if(!save()){D=JSON.parse(cur);msg('bkMsg','Не удалось сохранить. Ничего не изменено.');return}
     $('rName').value=D.name||'';renderAll();backupUi();msg('bkMsg','Предыдущие данные возвращены.')});
   $('bkDl').addEventListener('click',function(){var b=readBackup();if(!b)return;
-    var blob=new Blob([b.data],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='progress-backup-'+String(b.at).slice(0,10)+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)});
+    AlenaExport.save(new Blob([b.data],{type:'application/json'}),'progress-backup-'+String(b.at).slice(0,10)+'.json','bkMsg')});
   var wipe=$('wipeBtn'),armed=false;
   wipe.addEventListener('click',function(){if(!armed){armed=true;wipe.textContent='Точно удалить всё? Нажмите ещё раз';setTimeout(function(){armed=false;wipe.textContent='Удалить все данные'},4000);return}
     var had=D.lifts.length+D.tests.length+D.act.length+D.body.length;if(had)keepBackup(JSON.stringify(D),'wipe');

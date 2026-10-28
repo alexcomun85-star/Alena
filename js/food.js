@@ -135,27 +135,35 @@
 
   /* ---- Open Food Facts ---- */
   function offNum(o,k){var v=o&&o[k];return v==null||v===''?null:+v}
-  function offItem(p){var nu=p.nutriments||{};var k=offNum(nu,'energy-kcal_100g');if(k==null&&offNum(nu,'energy_100g')!=null)k=offNum(nu,'energy_100g')/4.184;
+  function offItem(p){if(!p||typeof p!=='object')return null;var title=p.product_name_ru||p.product_name||'';if(typeof title!=='string')return null;var nu=p.nutriments||{};var k=offNum(nu,'energy-kcal_100g');if(k==null&&offNum(nu,'energy_100g')!=null)k=offNum(nu,'energy_100g')/4.184;
     var pr=offNum(nu,'proteins_100g'),fa=offNum(nu,'fat_100g'),ca=offNum(nu,'carbohydrates_100g');
     if(k==null&&pr!=null&&fa!=null&&ca!=null)k=atwater(pr,fa,ca);
-    var name=(p.product_name_ru||p.product_name||'').trim();if(p.brands)name+=' ('+String(p.brands).split(',')[0].trim()+')';
+    var name=title.trim();if(p.brands)name+=' ('+String(p.brands).split(',')[0].trim()+')';
     if(k==null||!name||checkFood(k,pr,fa,ca).err)return null;
     return {name:name,k:k,p:pr||0,f:fa||0,c:ca||0,code:p.code||''}}
   var offRes=[];
   function newId(){var id='c'+Date.now();while(S.custom.some(function(v){return v.id===id}))id+='x';return id}
+  var packaged=null,lastRemote=0;
+  function localProducts(){if(!packaged)packaged=fetch('data/products-ru.json').then(function(r){if(!r.ok)throw Error();return r.json()}).then(function(j){return Array.isArray(j.products)?j.products:[]}).catch(function(){packaged=null;return []});return packaged}
+  function norm(s){return String(s||'').toLocaleLowerCase('ru').replace(/ё/g,'е')}
   $('oBtn').addEventListener('click',function(){
-    var t=$('oQ').value.trim();if(!t){$('oMsg').textContent='Введите название или штрихкод.';return}
+    var t=$('oQ').value.trim();if(!t){$('oMsg').textContent='Введите название по-русски или штрихкод.';return}
     var isCode=/^\d{8,14}$/.test(t),F='code,product_name,product_name_ru,brands,nutriments';
-    var url=isCode?'https://world.openfoodfacts.org/api/v2/product/'+t+'.json?fields='+F:'https://world.openfoodfacts.org/cgi/search.pl?search_terms='+encodeURIComponent(t)+'&search_simple=1&action=process&json=1&page_size=12&fields='+F;
-    $('oMsg').textContent='Ищу в Open Food Facts…';$('oRes').innerHTML='';
-    var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){ctl&&ctl.abort()},12000);
-    fetch(url,ctl?{signal:ctl.signal}:{}).then(function(r){return r.json()}).then(function(j){clearTimeout(tm);
-      var arr=isCode?(j&&j.product?[j.product]:[]):((j&&j.products)||[]);
-      offRes=arr.map(offItem).filter(Boolean);
-      if(!offRes.length){$('oMsg').textContent='Ничего не нашлось с корректной пищевой ценностью. Попробуйте другое название или внесите продукт вручную по этикетке.';return}
-      $('oMsg').textContent='Нашлось: '+offRes.length+'. Проверьте цифры по своей упаковке — базу заполняют пользователи.';
+    var button=$('oBtn');button.disabled=true;button.textContent='Ищу…';$('oMsg').textContent='Проверяю сохранённую выборку товаров…';$('oRes').innerHTML='';
+    var fromSnapshot=false,ctl=window.AbortController?new AbortController():null,tm;
+    localProducts().then(function(items){
+      var words=norm(t).split(/\s+/),found=items.filter(function(p){return isCode?String(p.code)===t:words.every(function(w){return norm((p.product_name_ru||p.product_name||'')+' '+p.brands).includes(w)})});
+      if(found.length){fromSnapshot=true;return found.slice(0,20)}
+      if(Date.now()-lastRemote<6500)throw Error('cooldown');lastRemote=Date.now();
+      $('oMsg').textContent='Ищу в открытой базе. Названия на кириллице поддерживаются…';tm=setTimeout(function(){ctl&&ctl.abort()},12000);
+      var url=isCode?'https://world.openfoodfacts.org/api/v2/product/'+t+'.json?fields='+F:'https://search.openfoodfacts.org/search';
+      var opts=isCode?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:t,langs:['ru','en'],page_size:12,fields:F.split(',')})};if(ctl)opts.signal=ctl.signal;
+      return fetch(url,opts).then(function(r){if(!r.ok)throw Error('http-'+r.status);return r.json()}).then(function(j){return isCode?(j&&j.product?[j.product]:[]):((j&&j.hits)||[])});
+    }).then(function(arr){clearTimeout(tm);offRes=arr.map(offItem).filter(Boolean);
+      if(!offRes.length){$('oMsg').textContent='Не нашлось товара с корректной пищевой ценностью. Попробуйте название марки или штрихкод. Можно внести продукт по этикетке.';return}
+      $('oMsg').textContent='Нашлось: '+offRes.length+(fromSnapshot?' — из сохранённой выборки товаров рынка РФ.':' — из Open Food Facts.')+' Сверьте БЖУ с упаковкой: состав и рецептуры меняются.';
       $('oRes').innerHTML=offRes.map(function(x,i){return '<button type="button" class="fr" data-i="'+i+'"><span>'+esc(x.name)+'</span><small>'+f(x.k,0)+' ккал · Б '+f(x.p)+' · Ж '+f(x.f)+' · У '+f(x.c)+'</small></button>'}).join('');
-    }).catch(function(){clearTimeout(tm);$('oMsg').textContent='База Open Food Facts сейчас не отвечает. Попробуйте позже или внесите продукт вручную по этикетке.'});
+    }).catch(function(e){clearTimeout(tm);$('oMsg').textContent=e.message==='cooldown'?'Подождите несколько секунд перед следующим запросом к внешней базе.':'Не удалось связаться с внешней базой. Это не означает, что товар или русское название отсутствуют. Основные продукты доступны в поиске выше; товар с упаковки можно внести вручную.'}).finally(function(){button.disabled=false;button.textContent='Найти'});
   });
   $('oRes').addEventListener('click',function(e){var b=e.target.closest('.fr');if(!b)return;var x=offRes[+b.dataset.i];
     if(!x)return;
@@ -176,10 +184,19 @@
       return '<div class="meal"><h3>'+m+' <span>'+f(mk,0)+' ккал</span></h3><ul>'+it.map(function(o){return '<li><span>'+esc(o.x.name)+', '+f(o.x.g,0)+' г</span><span>'+f(o.x.k,0)+' ккал · Б '+f(o.x.p)+'</span><button type="button" class="del" data-i="'+o.i+'" aria-label="Удалить">×</button></li>'}).join('')+'</ul></div>'}).join(''):'<p class="small">За этот день записей нет.</p>';
   }
   $('dList').addEventListener('click',function(e){var b=e.target.closest('.del');if(!b)return;var next=copy();(next.days[date]||[]).splice(+b.dataset.i,1);if(!save(next)){$('fMsg').textContent=SAVE_ERR;return}render()});
+  if($('foodPdf'))$('foodPdf').addEventListener('click',function(){
+    if(!window.AlenaExport)return;
+    var list=S.days[date]||[],tot={k:0,p:0,f:0,c:0};list.forEach(function(x){tot.k+=x.k;tot.p+=x.p;tot.f+=x.f;tot.c+=x.c});
+    var rows=[{kind:'heading',text:'Дневник питания'},{kind:'text',text:'Дата: '+date.split('-').reverse().join('.')},{kind:'heading',text:'Итог за день'},{kind:'text',text:f(tot.k,0)+' ккал · белки '+f(tot.p)+' г · жиры '+f(tot.f)+' г · углеводы '+f(tot.c)+' г'}];
+    MEALS.forEach(function(m){var it=list.filter(function(x){return x.meal===m});if(!it.length)return;rows.push({kind:'heading',text:m});it.forEach(function(x){rows.push({kind:'text',text:x.name+', '+f(x.g)+' г: '+f(x.k,0)+' ккал · Б '+f(x.p)+' · Ж '+f(x.f)+' · У '+f(x.c)})})});
+    if(!list.length)rows.push({kind:'text',text:'За этот день записей нет.'});
+    rows.push({kind:'text',text:'Пищевая ценность ориентировочная. Отчёт не задаёт дневную норму и не является медицинским документом.'});
+    AlenaExport.pdf(rows,'Дневник питания','alenafit-food-'+date+'.pdf','foodPdfMsg').catch(function(){});
+  });
   /* ---- перенос и восстановление: файл проверяется до замены, прежняя версия остаётся ---- */
   function transferMsg(t){$('foodTransferMsg').textContent=t}
-  function backupUi(){try{$('foodRestore').disabled=!localStorage.getItem(BKEY);$('foodBackup').disabled=!(localStorage.getItem(BKEY)||localStorage.getItem(BKEY+'_load'))}catch(e){$('foodRestore').disabled=true;$('foodBackup').disabled=true}}
-  function download(raw,name){var u=URL.createObjectURL(new Blob([raw],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name+'-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},1000)}
+  function backupUi(){try{$('foodRestore').disabled=!localStorage.getItem(BKEY);$('foodBackup').disabled=!(localStorage.getItem(BKEY)||localStorage.getItem(BKEY+'_load'))}catch(e){$('foodRestore').disabled=true;$('foodBackup').disabled=true}$('foodRestore').hidden=$('foodRestore').disabled;$('foodBackup').hidden=$('foodBackup').disabled;if($('foodBackupHint'))$('foodBackupHint').hidden=!$('foodBackup').disabled}
+  function download(raw,name){if(window.AlenaExport){AlenaExport.save(new Blob([raw],{type:'application/json'}),name+'-'+today()+'.json','foodTransferMsg');return}var u=URL.createObjectURL(new Blob([raw],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name+'-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},1000)}
   function replace(next){try{var prev=localStorage.getItem(KEY);if(prev!==null)localStorage.setItem(BKEY,prev);localStorage.setItem(KEY,JSON.stringify(next));S=next;blocked=false;return true}catch(e){return false}}
   function refreshed(){sel=null;$('fSel').hidden=true;showRes();render();backupUi()}
   $('foodExport').addEventListener('click',function(){try{var raw=blocked?localStorage.getItem(KEY):JSON.stringify({format:'alenafit-food',version:1,data:S});if(!raw)throw Error();download(raw,'alenafit-food')}catch(e){transferMsg('Не удалось скачать копию. Попробуйте другой браузер.')}});

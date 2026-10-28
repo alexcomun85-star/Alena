@@ -26,7 +26,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="css/fonts.css?v=20261028b">
-<link rel="stylesheet" href="css/site.css?v=20261028b">
+<link rel="stylesheet" href="css/site.css?v=20261028d">
 <style>:root{color-scheme:dark;background:#132823;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body class="tool-page">
@@ -108,6 +108,7 @@
         <div class="cyc-hint" id="dCyc" aria-live="polite"></div>
         <div class="nums" id="dTot"></div>
         <div id="dBar"></div>
+        <div class="btn-row"><button type="button" class="tbtn" id="foodPdf">Скачать отчёт за день в PDF</button></div><p class="verdict" id="foodPdfMsg" aria-live="polite"></p>
         <div id="dList"></div>
         <details class="cyc-more" id="cycSet"><summary>Учитывать цикл (по желанию)</summary><div data-cycle-panel id="cycPanelK" style="margin-top:12px"></div><p class="small" style="margin-top:10px">Подсказка по дню цикла появится над итогом дня. Цифры калорий и БЖУ от этого не меняются: разница между фазами небольшая и у всех разная.</p></details>
         <p class="quiz-note">Здесь нет нормы и «перебора» сознательно: потребности у всех разные. Белок полезно распределять по приёмам пищи — подробнее в разборе <a href="nauka.html#belok">«Сколько белка имеет смысл»</a>. Свой ориентир лучше подобрать с нутрициологом.</p>
@@ -134,9 +135,9 @@
             <h3 style="font-size:17px">Найти в базе по названию или штрихкоду</h3>
             <div class="field"><label for="oQ">Название или цифры штрихкода</label><input id="oQ" autocomplete="off" inputmode="search" placeholder="например, 4600605009504 или «сырок Б.Ю. Александров»"></div>
             <div class="btn-row"><button type="button" class="tbtn" id="oBtn">Найти</button></div>
-            <p class="verdict" id="oMsg" aria-live="polite">Поиск по открытой базе Open Food Facts — там много товаров из российских магазинов.</p>
+            <p class="verdict" id="oMsg" aria-live="polite">Можно вводить русское название, марку или штрихкод. Сначала ищем в сохранённой выборке товаров рынка РФ, затем — в Open Food Facts. Это не полный каталог магазинов.</p>
             <div class="fres" id="oRes"></div>
-            <p class="small">Данные: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>, открытая база (лицензия ODbL). Её заполняют пользователи, поэтому сверяйте цифры с упаковкой.</p>
+            <p class="small">Данные: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>, открытая база (лицензия ODbL). Её заполняют пользователи, поэтому сверяйте цифры с упаковкой. Сохранённая выборка доступна и при сбое внешнего поиска; она не охватывает все товары.</p>
           </div>
         </div>
       </article>
@@ -147,15 +148,16 @@
         <p>Базовые продукты — по справочнику USDA FoodData Central (Министерство сельского хозяйства США), набор SR Legacy: у выбранного продукта видны его состояние (сырой, сухой, варёный, запечённый) и номер записи со ссылкой на источник. Молочные продукты и колбасы — по типичным значениям с российских этикеток (помечены ≈): у разных марок цифры отличаются, сверяйтесь со своей упаковкой. Домашние блюда — борщ, пельмени, плов, оливье, котлеты, сырники — ориентировочно (≈): всё зависит от рецепта. Калории своих продуктов без указанной энергетической ценности считаются по коэффициентам Этуотера: 4 ккал на грамм белков и углеводов, 9 — на грамм жиров.</p>
         <p class="small">Записи хранятся только в этом браузере на этом устройстве и никуда не отправляются.</p>
         <h3 style="margin-top:20px">Копия дневника и перенос на другое устройство</h3>
-        <p class="small">Скачайте файл и храните его у себя. При импорте записи и свои продукты заменяются после проверки и подтверждения; прежняя версия сохраняется в браузере. Файл содержит ваши записи о питании — передавайте его только тем, кому доверяете.</p>
+        <p class="small">Это файл данных JSON для восстановления дневника, а не PDF-отчёт. Скачайте его и храните у себя. При импорте записи и свои продукты заменяются после проверки и подтверждения; прежняя версия сохраняется в браузере. Файл содержит ваши записи о питании — передавайте его только тем, кому доверяете.</p>
         <div class="btn-row">
-          <button type="button" class="tbtn" id="foodExport">Скачать дневник</button>
-          <label class="tbtn ghost" for="foodImport">Импортировать дневник</label>
+          <button type="button" class="tbtn" id="foodExport">Скачать копию для переноса</button>
+          <label class="tbtn ghost" for="foodImport">Восстановить из файла</label>
           <input id="foodImport" class="sr-only" type="file" accept=".json,application/json">
         </div>
+        <p class="small" id="foodBackupHint">Резервной копии пока нет. Она появится перед восстановлением из файла или очисткой дневника — тогда можно будет отменить замену.</p>
         <div class="btn-row">
-          <button type="button" class="tbtn ghost" id="foodRestore" disabled>Вернуть предыдущую версию</button>
-          <button type="button" class="tbtn ghost" id="foodBackup" disabled>Скачать резервную копию</button>
+          <button type="button" class="tbtn ghost" id="foodRestore" hidden disabled>Отменить последнюю замену</button>
+          <button type="button" class="tbtn ghost" id="foodBackup" hidden disabled>Скачать сохранённую версию</button>
         </div>
         <p class="verdict" id="foodTransferMsg" aria-live="polite"></p>
         <div class="btn-row"><button type="button" class="tbtn ghost" id="fWipe">Удалить все записи и мои продукты</button></div>
@@ -174,12 +176,13 @@
 </main>
 <footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a> · <button type="button" class="foot-pwa" data-pwa>Установить приложение</button></span></div></footer>
 <script src="js/food-db.js?v=20261027b" defer></script>
-<script src="js/food.js?v=20261028a" defer></script>
+<script src="js/food.js?v=20261028d" defer></script>
 <script src="js/cycle.js?v=20261028b" defer></script>
 <script>document.addEventListener('DOMContentLoaded',function(){var C=window.Cycle,box=document.getElementById('dCyc'),dt=document.getElementById('fDate');if(!C||!box||!dt)return;
   /* подсказка по дню цикла для выбранной даты; цифры еды не меняются */
   function upd(){box.innerHTML=C.foodHint(dt.value||C.today())}
   dt.addEventListener('change',upd);dt.addEventListener('input',upd);C.onChange(upd);upd();});</script>
+<script src="js/export.js?v=20261028d" defer></script>
 <script src="js/nav.js?v=20261028b" defer></script>
 <script src="js/sections.js?v=1" defer></script>
 <script src="js/myzal.js?v=20261028b" defer></script>

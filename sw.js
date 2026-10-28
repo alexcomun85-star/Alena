@@ -2,14 +2,16 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-v13';
+const VERSION = 'alenafit-v14';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
   "./",
   "./404.html",
   "./blizost.html",
   "./css/fonts.css?v=20261028b",
-  "./css/site.css?v=20261028b",
+  "./css/site.css?v=20261028d",
+  "./data/products-ru.json",
+  "./fonts/golos-pdf.ttf",
   "./fonts/golos-text-cyrillic.woff2",
   "./fonts/golos-text-latin.woff2",
   "./fonts/unbounded-cyrillic.woff2",
@@ -18,11 +20,12 @@ const CORE = [
   "./golod.html",
   "./index.html",
   "./inventar.html",
-  "./js/cycle-diary.js?v=20261028b",
+  "./js/cycle-diary.js?v=20261028d",
   "./js/cycle.js?v=20261028b",
+  "./js/export.js?v=20261028d",
   "./js/feeds.js?v=20261027r",
   "./js/food-db.js?v=20261027b",
-  "./js/food.js?v=20261028a",
+  "./js/food.js?v=20261028d",
   "./js/gadzhety.js?v=20261026h",
   "./js/gestures.js?v=20261027q",
   "./js/golod.js?v=20261026e",
@@ -30,7 +33,7 @@ const CORE = [
   "./js/korzina.js?v=20261026e",
   "./js/myzal.js?v=20261028b",
   "./js/nav.js?v=20261028b",
-  "./js/progress.js?v=20261027c",
+  "./js/progress.js?v=20261028d",
   "./js/pwa.js?v=20261028b",
   "./js/recepty.js?v=20261027a",
   "./js/sections.js?v=1",
