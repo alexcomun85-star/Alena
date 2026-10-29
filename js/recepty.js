@@ -26,6 +26,7 @@
      ing:[['Творог 5% — 150 г','Творог 5%',150],['Греческий йогурт — 50 г','Греческий йогурт 2%',50],['Банан — половинка','Банан',60],['Грецкие орехи — 10 г','Грецкие орехи',10]],
      steps:['Взбейте творог с йогуртом блендером или разомните вилкой до кремовой текстуры.','Выложите в стакан, сверху — кружки банана и рубленые орехи.']}
   ];
+  window.ALENA_RECIPES=R;
   var DB={};(window.FOOD_DB||[]).forEach(function(r){DB[r[0]]=r});
   function calc(r,noOpt){var p=0,k=0,f=0,c=0;r.ing.forEach(function(i){var d=i[1]&&DB[i[1]];if(!d||(noOpt&&i[3]==='opt'))return;var m=i[2]/100;k+=d[1]*m;p+=d[2]*m;f+=d[3]*m;c+=d[4]*m});var s=r.serv;return{k:Math.round(k/s),p:Math.round(p/s),f:Math.round(f/s),c:Math.round(c/s)}}
   function calcNote(r){var t=r.note?r.note+' ':'';

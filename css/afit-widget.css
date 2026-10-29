@@ -28,3 +28,5 @@
 /* The chat has its own navigation; keep the page dock from covering its composer. */
 body.afit-chat-open .dock,body.afit-chat-open .afit-launch{visibility:hidden;pointer-events:none}
 .afit-window{z-index:60}
+
+.afit-tabs{display:flex;gap:6px;padding:6px 12px;flex:none}.afit-tabs button{flex:1;min-height:40px;border:1px solid #819586;border-radius:9px;background:transparent;color:#193b31;font:inherit;cursor:pointer}.afit-tabs button[aria-pressed=true]{background:#173e2f;color:#fff}
