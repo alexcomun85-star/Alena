@@ -223,90 +223,272 @@
               <div class="cal-list">
                 <span>Google Календарь:</span>
                 <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=%D0%AF%D0%B3%D0%BE%D0%B4%D0%B8%D1%86%D1%8B%20%2B%20%D0%BA%D0%BE%D1%80%20%E2%80%94%20%D0%BC%D0%B8%D0%BD%D0%B8-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D0%B0&amp;dates=20261028T100000%2F20261028T105500&amp;ctz=Europe%2FMoscow&amp;details=%D0%9C%D0%B8%D0%BD%D0%B8-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D0%B0%20%D0%90%D0%BB%D1%91%D0%BD%D1%8B%20%C2%AB%D0%A1%D0%B8%D0%BB%D0%B0%20%D0%B1%D0%B5%D0%B7%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B3%D0%B8%D0%B1%D0%BE%D0%B2%C2%BB%2C%2055%20%D0%BC%D0%B8%D0%BD%D1%83%D1%82.%20%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C%D1%81%D1%8F%20%D0%B8%D0%BB%D0%B8%20%D0%BE%D1%82%D0%BC%D0%B5%D0%BD%D0%B8%D1%82%D1%8C%3A%20Telegram%20%40Gym_mom1988.%20%D0%A1%D0%B0%D0%B9%D1%82%3A%20https%3A%2F%2Falenafit.com&amp;location=%D0%A1%D1%82%D1%83%D0%B4%D0%B8%D1%8F%20Sequoia%20D%20Anima%2C%20%D0%BD%D0%B0%D0%B1.%20%D1%80.%20%D0%9C%D0%BE%D0%B9%D0%BA%D0%B8%2C%2062%2F2%2C%20%D0%A1%D0%B0%D0%BD%D0%BA%D1%82-%D0%9F%D0%B5%D1%82%D0%B5%D1%80%D0%B1%D1%83%D1%80%D0%B3%20%28%D0%BC.%20%D0%90%D0%B4%D0%BC%D0%B8%D1%80%D0%B0%D0%BB%D1%82%D0%B5%D0%B9%D1%81%D0%BA%D0%B0%D1%8F%29&amp;recur=RRULE%3AFREQ%3DWEEKLY%3BBYDAY%3DWE" target="_blank" rel="noopener">Ср 10:00</a>
-                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=%D0%AF%D0%B3%D0%BE%D0%B4%D0%B8%D1%86%D1%8B%20%2B%20%D0%BA%D0%BE%D1%80%20%E2%80%94%20%D0%BC%D0%B8%D0%BD%D0%B8-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D0%B0&amp;dates=20261031T110000%2F20261031T115500&amp;ctz=Europe%2FMoscow&amp;details=%D0%9C%D0%B8%D0%BD%D0%B8-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D0%B0%20%D0%90%D0%BB%D1%91%D0%BD%D1%8B%20%C2%AB%D0%A1%D0%B8%D0%BB%D0%B0%20%D0%B1%D0%B5%D0%B7%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B3%D0%B8%D0%B1%D0%BE%D0%B2%C2%BB%2C%2055%20%D0%BC%D0%B8%D0%BD%D1%83%D1%82.%20%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C%D1%81%D1%8F%20%D0%B8%D0%BB%D0%B8%20%D0%BE%D1%82%D0%BC%D0%B5%D0%BD%D0%B8%D1%82%D1%8C%3A%20Telegram%20%40Gym_mom1988.%20%D0%A1%D0%B0%D0%B9%D1%82%3A%20https%3A%2F%2Falenafit.com&amp;location=%D0%A1%D1%82%D1…17207 tokens truncated…u043aи, жиры и углеводы.';return}k=atwater(p,fa,c)}
-    var item={id:newId(),name:name,k:k,p:p,f:fa,c:c,pg:100,pl:'100 г'},next=copy();next.custom.unshift(item);
-    if(!save(next)){$('cMsg').textContent=SAVE_ERR;return}
-    ['cName','cK','cP','cF','cC'].forEach(function(id){$(id).value=''});hint();
-    $('cMsg').textContent='Продукт «'+name+'» сохранён в «Мои продукты».'+(ck.warn?' '+ck.warn:'');pick(item.id);showRes();
-  });
+                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=%D0%AF%D0%B3%D0%BE%D0%B4%D0%B8%D1%86%D1%8B%20%2B%20%D0%BA%D0%BE%D1%80%20%E2%80%94%20%D0%BC%D0%B8%D0%BD%D0%B8-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D0%B0&amp;dates=20261031T110000%2F20261031T115500&amp;ctz=Europe%2FMoscow&amp;details=%D0%9C%D0%B8%D0%BD%D0%B8-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D0%B0%20%D0%90%D0%BB%D1%91%D0%BD%D1%8B%20%C2%AB%D0%A1%D0%B8%D0%BB%D0%B0%20%D0%B1%D0%B5%D0%B7%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B3%D0%B8%D0%B1%D0%BE%D0%B2%C2%BB%2C%2055%20%D0%BC%D0%B8%D0%BD%D1%83%D1%82.%20%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C%D1%81%D1%8F%20%D0%B8%D0%BB%D0%B8%20%D0%BE%D1%82%D0%BC%D0%B5%D0%BD%D0%B8%D1%82%D1%8C%3A%20Telegram%20%40Gym_mom1988.%20%D0%A1%D0%B0%D0%B9%D1%82%3A%20https%3A%2F%2Falenafit.com&amp;location=%D0%A1%D1%82%D1%83%D0%B4%D0%B8%D1%8F%20Sequoia%20D%20Anima%2C%20%D0%BD%D0%B0%D0%B1.%20%D1%80.%20%D0%9C%D0%BE%D0%B9%D0%BA%D0%B8%2C%2062%2F2%2C%20%D0%A1%D0%B0%D0%BD%D0%BA%D1%82-%D0%9F%D0%B5%D1%82%D0%B5%D1%80%D0%B1%D1%83%D1%80%D0%B3%20%28%D0%BC.%20%D0%90%D0%B4%D0%BC%D0%B8%D1%80%D0%B0%D0%BB%D1%82%D0%B5%D0%B9%D1%81%D0%BA%D0%B0%D1%8F%29&amp;recur=RRULE%3AFREQ%3DWEEKLY%3BBYDAY%3DSA" target="_blank" rel="noopener">Сб 11:00</a>
+                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=%D0%A0%D0%B0%D1%81%D1%82%D1%8F%D0%B6%D0%BA%D0%B0%20%E2%80%94%20%D0%BC%D0%B8%D0%BD%D0%B8-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D0%B0&amp;dates=20261031T120000%2F20261031T125500&amp;ctz=Europe%2FMoscow&amp;details=%D0%9C%D0%B8%D0%BD%D0%B8-%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D0%B0%20%D0%90%D0%BB%D1%91%D0%BD%D1%8B%20%C2%AB%D0%A1%D0%B8%D0%BB%D0%B0%20%D0%B1%D0%B5%D0%B7%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B3%D0%B8%D0%B1%D0%BE%D0%B2%C2%BB%2C%2055%20%D0%BC%D0%B8%D0%BD%D1%83%D1%82.%20%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C%D1%81%D1%8F%20%D0%B8%D0%BB%D0%B8%20%D0%BE%D1%82%D0%BC%D0%B5%D0%BD%D0%B8%D1%82%D1%8C%3A%20Telegram%20%40Gym_mom1988.%20%D0%A1%D0%B0%D0%B9%D1%82%3A%20https%3A%2F%2Falenafit.com&amp;location=%D0%A1%D1%82%D1%83%D0%B4%D0%B8%D1%8F%20Sequoia%20D%20Anima%2C%20%D0%BD%D0%B0%D0%B1.%20%D1%80.%20%D0%9C%D0%BE%D0%B9%D0%BA%D0%B8%2C%2062%2F2%2C%20%D0%A1%D0%B0%D0%BD%D0%BA%D1%82-%D0%9F%D0%B5%D1%82%D0%B5%D1%80%D0%B1%D1%83%D1%80%D0%B3%20%28%D0%BC.%20%D0%90%D0%B4%D0%BC%D0%B8%D1%80%D0%B0%D0%BB%D1%82%D0%B5%D0%B9%D1%81%D0%BA%D0%B0%D1%8F%29&amp;recur=RRULE%3AFREQ%3DWEEKLY%3BBYDAY%3DSA" target="_blank" rel="noopener">Сб 12:00</a>
+              </div>
+              <div class="cal-list">
+                <span>По одному занятию:</span>
+                <a href="cal/sreda-10.ics">Ср 10:00</a><a href="cal/subbota-11.ics">Сб 11:00</a><a href="cal/subbota-12.ics">Сб 12:00</a>
+              </div>
+            </div>
+          </details>
+          <div class="pricepair"><span>Пробное — <b>800 ₽</b></span><span>Разовое — <b>1 500 ₽</b></span></div>
+          <a class="btn btn-line btn-wide" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Записаться на пробное</a>
+        </article>
+      </div>
+    </div>
+  </section>
+  <section class="g" id="quiz">
+    <div class="w">
+      <span class="tag">#подбор</span>
+      <h2>Какой формат <em>вам подойдёт?</em></h2>
+      <p class="lede">Четыре вопроса — и подскажу, с чего начать. Ответы никуда не отправляются.</p>
+      <form class="quiz" id="quizForm" novalidate>
+        <fieldset><legend><span>1/4</span>Где вам удобнее тренироваться?</legend>
+          <div class="opts">
+            <input type="radio" name="place" id="q1a" value="self"><label for="q1a">В своём зале или дома</label>
+            <input type="radio" name="place" id="q1b" value="studio"><label for="q1b">В студии в центре СПб</label>
+            <input type="radio" name="place" id="q1c" value="unsure"><label for="q1c">Пока не знаю</label>
+          </div></fieldset>
+        <fieldset><legend><span>2/4</span>Какой у вас опыт?</legend>
+          <div class="opts">
+            <input type="radio" name="exp" id="q2a" value="new"><label for="q2a">Не занималась или очень давно</label>
+            <input type="radio" name="exp" id="q2b" value="pause"><label for="q2b">Занималась, сейчас перерыв</label>
+            <input type="radio" name="exp" id="q2c" value="regular"><label for="q2c">Тренируюсь регулярно</label>
+          </div></fieldset>
+        <fieldset><legend><span>3/4</span>Сколько тренировок в неделю реально?</legend>
+          <div class="opts">
+            <input type="radio" name="freq" id="q3a" value="1-2"><label for="q3a">1–2</label>
+            <input type="radio" name="freq" id="q3b" value="3"><label for="q3b">3</label>
+            <input type="radio" name="freq" id="q3c" value="more"><label for="q3c">Больше</label>
+          </div></fieldset>
+        <fieldset><legend><span>4/4</span>Что для вас важнее всего?</legend>
+          <div class="opts">
+            <input type="radio" name="goal" id="q4a" value="tech"><label for="q4a">Поставить технику</label>
+            <input type="radio" name="goal" id="q4b" value="food"><label for="q4b">Питание без жёстких диет</label>
+            <input type="radio" name="goal" id="q4c" value="habit"><label for="q4c">Регулярность и поддержка</label>
+          </div></fieldset>
+        <p class="quiz-note" id="quizHint">Ответьте на все вопросы, чтобы увидеть подсказку.</p>
+        <div class="result" id="quizResult" hidden aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+  <section class="g" id="zachem">
+    <div class="w">
+      <a class="eat-teaser eat-photo" href="trener.html">
+        <img src="img/trener-thumb.jpg?v=2" alt="Алёна — тренер и нутрициолог" width="480" height="480" loading="lazy">
+        <div><span class="tag">#честно</span><h2>Зачем тренер, <em>если всё есть на сайте?</em></h2><p class="lede">Многим хватит бесплатного. Как понять, хватит ли вам, что говорят исследования и чем отличаются три пути — сам, онлайн или в мини-группе.</p><i>Читать и пройти тест →</i></div>
+      </a>
+    </div>
+  </section>
+  <section class="g" id="tools">
+    <div class="w">
+      <span class="tag">#бесплатно</span>
+      <h2>Бесплатные <em>инструменты</em></h2>
+      <p class="lede">Без регистрации. Записи хранятся только на вашем устройстве.</p>
+      <span class="anchor" id="novichkam"></span><span class="anchor" id="pitanie-teaser"></span><span class="anchor" id="tests"></span><span class="anchor" id="ask"></span>
+      <nav class="task-nav" aria-label="Выберите задачу"><a href="#tools-train"><b>Начать тренироваться</b><span>Тренировка, план и знакомство с залом</span></a><a href="#tools-food"><b>Разобраться с питанием</b><span>Порции, рецепты и состав еды</span></a><a href="#tools-progress"><b>Записать результат</b><span>Тесты, журнал и полезные привычки</span></a></nav>
+      <div class="tool-group" id="tools-train"><h3>Начать тренироваться</h3>
+        <div class="cat-grid">
+        <a class="cat" href="servisy.html#trenirovka"><b>Тренировка дня</b><span>Готовая тренировка на 15–40 минут дома или в зале</span></a>
+        <a class="cat" href="vozvrat.html"><b>План возвращения</b><span>4 недели после паузы, сохраняется в PDF</span></a>
+        <a class="cat" href="zal.html"><b>Карта зала</b><span>Что за тренажёр и как его настроить</span></a>
+        <a class="cat" href="odezhda.html"><b>Экипировка</b><span>Одежда и обувь, инвентарь для дома, гаджеты</span></a>
+        </div>
+      </div>
+      <div class="tool-group" id="tools-food"><h3>Разобраться с питанием</h3>
+        <div class="cat-grid">
+        <a class="cat" href="pitanie.html"><b>Основы питания</b><span>Белок, углеводы, жиры, порции рукой</span></a>
+        <a class="cat" href="golod.html"><b>Голод и перекусы</b><span>Голод или что-то другое — и что съесть</span></a>
+        <a class="cat" href="recepty.html"><b>Рецепты с белком</b><span>Простые блюда, белок на порцию</span></a>
+        <a class="cat" href="kalorii.html"><b>Калории и БЖУ</b><span>Посчитать еду без дневной нормы</span></a>
+        </div>
+      </div>
+      <div class="tool-group" id="tools-progress"><h3>Записать результат</h3>
+        <div class="cat-grid">
+        <a class="cat" href="testy.html"><b>Тесты за 5 минут</b><span>Сила, баланс, активность</span></a>
+        <a class="cat" href="progress.html"><b>Мой прогресс</b><span>Журнал, графики и отчёт в PDF</span></a>
+        <a class="cat" href="servisy.html#taymer"><b>Таймер и трекер</b><span>Интервалы, привычки недели, дневник самочувствия</span></a>
+        <a class="cat" href="vopros.html"><b>Вопросы и предложения</b><span>Предложить тему для разбора в канале</span></a>
+        </div>
+      </div>
+      <div class="row-btns"><a class="btn btn-line" href="servisy.html">Все инструменты</a></div>
+    </div>
+  </section>
+  <section class="g" id="research">
+    <div class="w">
+      <span class="tag">#разбор · из канала</span>
+      <h2>Подход опирается <em>на исследования</em></h2>
+      <p class="lede">Три вывода, на которых строятся мои программы. Полные разборы — в канале.</p>
+      <div class="evid">
+        <article class="ev">
+          <h3>Перерыв <em>не обнуляет</em> результат</h3>
+          <svg viewBox="0 0 320 120" role="img" aria-label="Группа 1 тренировалась 20 недель подряд, группа 2 — 10 недель, пауза 10 недель, ещё 10 недель. Итог по силе и мышцам примерно одинаковый">
+            <text x="0" y="12" font-size="12" fill="#a9c0b7">Группа 1 · 20 недель подряд</text>
+            <rect x="0" y="20" width="270" height="26" rx="6" fill="#2c6e5f"/>
+            <rect x="276" y="20" width="44" height="26" rx="6" fill="#f0a92b"/>
+            <text x="298" y="37" font-size="11" font-weight="600" fill="#132823" text-anchor="middle">итог</text>
+            <text x="0" y="74" font-size="12" fill="#a9c0b7">Группа 2 · с паузой 10 недель</text>
+            <rect x="0" y="82" width="86" height="26" rx="6" fill="#2c6e5f"/>
+            <rect x="92" y="83" width="86" height="24" rx="6" fill="none" stroke="#a9c0b7" stroke-dasharray="4 4"/>
+            <text x="135" y="99" font-size="11" fill="#a9c0b7" text-anchor="middle">пауза</text>
+            <rect x="184" y="82" width="86" height="26" rx="6" fill="#2c6e5f"/>
+            <rect x="276" y="82" width="44" height="26" rx="6" fill="#f0a92b"/>
+            <text x="298" y="99" font-size="11" font-weight="600" fill="#132823" text-anchor="middle">итог</text>
+          </svg>
+          <div class="big"><b>≈5 недель</b><span>чтобы вернуть прежний уровень после паузы</span></div>
+          <p class="src">Университет Ювяскюля, Scand J Med Sci Sports, 2024. Участники — молодые люди без опыта силовых.</p>
+          <details class="pilot-post"><summary>Посмотреть карточку из канала</summary><img loading="lazy" decoding="async" src="img/01_pereryv.jpg" alt="Разбор: перерыв в тренировках не обнуляет результат" width="720" height="900"></details>
+        </article>
+        <article class="ev">
+          <h3>До отказа <em>не обязательно</em></h3>
+          <svg viewBox="0 0 320 96" role="img" aria-label="Шкала повторов в запасе от 0 до 5: от 0 до 5 хватает для роста мышц, 3–5 с тяжёлым весом — для силы">
+            <g font-size="20" font-weight="700" text-anchor="middle">
+              <rect x="0" y="0" width="48" height="56" rx="8" fill="#f0a92b"/><text x="24" y="36" fill="#132823">0</text>
+              <rect x="54" y="0" width="48" height="56" rx="8" fill="#f0a92b"/><text x="78" y="36" fill="#132823">1</text>
+              <rect x="108" y="0" width="48" height="56" rx="8" fill="#f0a92b"/><text x="132" y="36" fill="#132823">2</text>
+              <rect x="162" y="0" width="48" height="56" rx="8" fill="#2c6e5f"/><rect x="162" y="0" width="48" height="28" rx="8" fill="#f0a92b"/><rect x="162" y="20" width="48" height="8" fill="#f0a92b"/><text x="186" y="36" fill="#eef4f1">3</text>
+              <rect x="216" y="0" width="48" height="56" rx="8" fill="#2c6e5f"/><text x="240" y="36" fill="#eef4f1">4</text>
+              <rect x="270" y="0" width="48" height="56" rx="8" fill="#2c6e5f"/><text x="294" y="36" fill="#eef4f1">5</text>
+            </g>
+            <rect x="0" y="70" width="10" height="10" rx="2" fill="#f0a92b"/><text x="16" y="79" font-size="11.5" fill="#a9c0b7">0–5 в запасе — для роста мышц</text>
+            <rect x="0" y="86" width="10" height="10" rx="2" fill="#2c6e5f"/><text x="16" y="95" font-size="11.5" fill="#a9c0b7">3–5 с тяжёлым весом — для силы</text>
+          </svg>
+          <div class="big"><b>0–5</b><span>повторов в запасе хватает для роста мышц</span></div>
+          <p class="src">Robinson et al., Sports Medicine, 2024. Метаанализ исследований силовых программ.</p>
+          <details class="pilot-post"><summary>Посмотреть карточку из канала</summary><img loading="lazy" decoding="async" src="img/02_zapas.jpg" alt="Разбор: тренироваться до отказа не обязательно" width="720" height="900"></details>
+        </article>
+        <article class="ev">
+          <h3>Женщинам нужно <em>меньше</em>, чем кажется</h3>
+          <svg viewBox="0 0 320 84" role="img" aria-label="Минут умеренной активности в неделю для одинакового снижения риска ранней смерти: женщины 140, мужчины 300">
+            <text x="0" y="12" font-size="12" fill="#a9c0b7">Минут в неделю для одинаковой пользы</text>
+            <text x="0" y="41" font-size="12.5" fill="#eef4f1">Женщины</text>
+            <rect x="74" y="24" width="114" height="26" rx="6" fill="#f0a92b"/><text x="84" y="42" font-size="13" font-weight="700" fill="#132823">140</text>
+            <text x="0" y="75" font-size="12.5" fill="#eef4f1">Мужчины</text>
+            <rect x="74" y="58" width="246" height="26" rx="6" fill="#2c6e5f"/><text x="84" y="76" font-size="13" font-weight="700" fill="#eef4f1">300</text>
+          </svg>
+          <div class="big"><b>−19%</b><span>риск смерти у женщин, которые делают силовые (у мужчин −11%)</span></div>
+          <p class="src">Ji et al., JACC, 2024, около 400 000 человек. Наблюдательное исследование: связь, а не доказательство причины.</p>
+          <details class="pilot-post"><summary>Посмотреть карточку из канала</summary><img loading="lazy" decoding="async" src="img/04_zhenshchiny.jpg" alt="Разбор: женщинам нужно меньше активности для той же пользы" width="720" height="900"></details>
+        </article>
+      </div>
+      <div class="row-btns"><a class="btn btn-main" href="nauka.html">Все 8 разборов исследований</a><a class="btn btn-line" href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Читать канал</a></div>
+    </div>
+  </section>
+  <section class="g" id="news">
+    <div class="w">
+      <span class="tag">#новости</span>
+      <h2>Новости науки <em>и канала</em></h2>
+      <div class="tabs" role="tablist" aria-label="Новости">
+        <button type="button" role="tab" id="tab-sci" aria-controls="panel-sci" aria-selected="true">Наука</button>
+        <button type="button" role="tab" id="tab-ch" aria-controls="panel-ch" aria-selected="false" tabindex="-1">Из канала</button>
+      </div>
+      <div class="tab-panel" role="tabpanel" id="panel-sci" aria-labelledby="tab-sci" data-feed-section>
+        <p class="lede">Свежие заголовки научных изданий о тренировках и питании, обновляются каждый день.</p>
+        <div class="feed" data-feed="news" data-limit="3"></div>
+        <p class="updated" data-updated></p>
+      </div>
+      <div class="tab-panel" role="tabpanel" id="panel-ch" aria-labelledby="tab-ch" data-feed-section hidden>
+        <span class="anchor" id="channel"></span>
+        <div class="feed" data-feed="channel" data-limit="3" data-empty="Скоро здесь появятся свежие посты из канала."></div>
+        <p class="updated" data-updated></p>
+      </div>
+      <div class="row-btns"><a class="btn btn-main" href="novosti.html">Все новости</a><a class="btn btn-line" href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a></div>
+    </div>
+  </section>
+  <section class="g" id="faq">
+    <div class="w">
+      <span class="tag">#вопрос</span>
+      <h2>Частые <em>вопросы</em></h2>
+      <div class="faq">
+        <details><summary>Нужен ли опыт?</summary><p>Нет. Программа строится от вашего уровня, технику разбираем с первых тренировок.</p></details>
+        <details><summary>Можно заниматься дома?</summary><p>Да. Программу собираю под то, что есть: зал, гантели дома или собственный вес.</p></details>
+        <details><summary>Как проходит проверка техники?</summary><p>В первый месяц после каждой тренировки присылаете видео подхода. Какой подход снимать и с какого ракурса, подскажу под ваши упражнения. Я смотрю и пишу, что поправить.</p></details>
+        <details><summary>А если пропущу неделю?</summary><p>Ничего страшного. Подстроим программу и вернёмся в ритм без «отработок».</p></details>
+        <details><summary>Будет план питания?</summary><p>Да, после разбора рациона. Без универсальных диет, «сушек» и запретов на любимую еду.</p></details>
+        <details><summary>Обещаете минус N килограммов?</summary><p>Нет. Результат зависит от регулярности, сна, питания и здоровья. Обещаю понятный план и внимание к технике.</p></details>
+        <details><summary>Как оплатить?</summary><p>По СБП или по ссылке. Я работаю как самозанятая и присылаю чек.</p></details>
+      </div>
+    </div>
+  </section>
+  <section class="final g final-invite" id="start" aria-labelledby="inviteTitle">
+    <div class="w">
+      <div class="invite-card">
+        <span class="invite-watermark" aria-hidden="true">ALENAFIT</span>
+        <figure class="invite-portrait" data-invite-reveal>
+          <img src="img/alena-invitation.webp" alt="Алёна Вислова в фирменной спортивной форме AlenaFit" width="1536" height="857" loading="lazy" decoding="async">
 
-  /* ---- Open Food Facts ---- */
-  function offNum(o,k){var v=o&&o[k];return v==null||v===''?null:+v}
-  function offItem(p){if(!p||typeof p!=='object')return null;var title=p.product_name_ru||p.product_name||'';if(typeof title!=='string')return null;var nu=p.nutriments||{};var k=offNum(nu,'energy-kcal_100g');if(k==null&&offNum(nu,'energy_100g')!=null)k=offNum(nu,'energy_100g')/4.184;
-    var pr=offNum(nu,'proteins_100g'),fa=offNum(nu,'fat_100g'),ca=offNum(nu,'carbohydrates_100g');
-    if(k==null&&pr!=null&&fa!=null&&ca!=null)k=atwater(pr,fa,ca);
-    var name=title.trim();if(p.brands)name+=' ('+String(p.brands).split(',')[0].trim()+')';
-    if(k==null||!name||checkFood(k,pr,fa,ca).err)return null;
-    return {name:name,k:k,p:pr||0,f:fa||0,c:ca||0,code:p.code||''}}
-  var offRes=[];
-  function newId(){var id='c'+Date.now();while(S.custom.some(function(v){return v.id===id}))id+='x';return id}
-  var packaged=null;
-  function localProducts(){if(!packaged)packaged=fetch('data/products-ru.json').then(function(r){if(!r.ok)throw Error();return r.json()}).then(function(j){return Array.isArray(j.products)?j.products:[]}).catch(function(){packaged=null;return []});return packaged}
-  $('oBtn').addEventListener('click',function(){
-    var t=$('oQ').value.trim(),button=$('oBtn');
-    if(!t){$('oMsg').textContent='Введите название или штрихкод.';return}
-    button.disabled=true;button.textContent='Ищу…';$('oRes').innerHTML='';
-    var code=/^\d{8,14}$/.test(t),words=norm(t).split(/\s+/);
-    localProducts().then(function(items){
-      offRes=items.filter(function(p){return code?String(p.code)===t:words.every(function(w){return norm((p.product_name_ru||p.product_name||'')+' '+(p.brands||'')).indexOf(w)>=0})}).map(offItem).filter(Boolean).slice(0,20);
-      if(!offRes.length){$('oMsg').textContent='В сохранённой выборке товар не найден. Для обычной еды используйте поиск выше. Для конкретной марки внесите БЖУ с упаковки — продукт сохранится для следующих записей.';return}
-      $('oMsg').textContent='Найдено в сохранённой выборке: '+offRes.length+'. Сверьте значения с вашей упаковкой.';
-      $('oRes').innerHTML=offRes.map(function(x,i){return '<button type="button" class="fr" data-i="'+i+'"><span>'+esc(x.name)+'</span><small>'+f(x.k,0)+' ккал · Б '+f(x.p)+' · Ж '+f(x.f)+' · У '+f(x.c)+'</small></button>'}).join('');
-    }).catch(function(){$('oMsg').textContent='Выборка недоступна. Используйте основной поиск или добавьте продукт по этикетке.'}).finally(function(){button.disabled=false;button.textContent='Найти'});
-  });
-  $('oQ').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('oBtn').click()}});
-  $('oRes').addEventListener('click',function(e){var b=e.target.closest('.fr');if(!b)return;var x=offRes[+b.dataset.i];
-    if(!x)return;
-    var item={id:newId(),name:x.name,k:x.k,p:x.p,f:x.f,c:x.c,pg:100,pl:'100 г',src0:'O'},next=copy();next.custom.unshift(item);
-    if(!save(next)){$('oMsg').textContent=SAVE_ERR;return}
-    $('oMsg').textContent='«'+x.name+'» сохранён в «Мои продукты».';pick(item.id);location.hash='#dobavit';});
+        </figure>
+        <div class="invite-copy" data-invite-reveal>
+          <span class="invite-eyebrow"><img src="img/brand/mark-light.svg" alt="" width="32" height="27">Сила без перегибов</span>
+          <h2 id="inviteTitle">Сильнее —<br><em>в своём<br>темпе.</em></h2>
+          <p class="invite-message">Не нужно сначала приходить в форму, чтобы начать. Напишите мне — вместе определим первый шаг.</p>
+          <ul class="invite-values" aria-label="Принципы работы"><li>Техника</li><li>Поддержка</li><li>Ваш темп</li></ul>
+          <a class="btn btn-main invite-action" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Обсудить первый шаг <span aria-hidden="true">↗</span></a>
+          <p class="invite-note">Откроется Telegram · Ответит Алёна</p>
+          <div class="invite-contact"><span id="handle">@Gym_mom1988</span><button type="button" class="invite-copy-btn" id="copy" aria-label="Скопировать Telegram Алёны">Скопировать</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
 
-  document.addEventListener('perek:select',function(event){var x=event.detail;if(!x||x.unit!=='г'||typeof x.name!=='string'||!/^https:\/\/perek\.us\/food\//.test(x.url||'')||![x.k,x.p,x.f,x.c].every(function(v){return typeof v==='number'&&isFinite(v)})||checkFood(x.k,x.p,x.f,x.c).err)return;var item={id:newId(),name:(x.name+(x.brand?' ('+x.brand+')':'')).slice(0,100),k:x.k,p:x.p,f:x.f,c:x.c,pg:100,pl:'100 г',src0:'P',sourceUrl:x.url},next=copy();next.custom.unshift(item);if(!save(next)){$('fMsg').textContent=SAVE_ERR;return}q.value='';showRes();pick(item.id);$('fMsg').textContent='Выбран продукт из perek.us. Укажите вес порции.';location.hash='#dobavit';});
-  /* ---- день ---- */
-  $('fDate').addEventListener('change',function(){date=this.value||today();render()});
-  function render(){
-    var list=S.days[date]||[],tot={k:0,p:0,f:0,c:0};
-    list.forEach(function(x){tot.k+=x.k;tot.p+=x.p;tot.f+=x.f;tot.c+=x.c});
-    $('dTot').innerHTML='<div><b>'+f(tot.k,0)+'</b><span>ккал</span></div><div><b>'+f(tot.p)+'</b><span>белки, г</span></div><div><b>'+f(tot.f)+'</b><span>жиры, г</span></div><div><b>'+f(tot.c)+'</b><span>углеводы, г</span></div>';
-    var e=tot.p*4+tot.f*9+tot.c*4;
-    $('dBar').innerHTML=e?'<div class="mbar"><i class="mb-p" style="width:'+(tot.p*4/e*100)+'%"></i><i class="mb-f" style="width:'+(tot.f*9/e*100)+'%"></i><i class="mb-c" style="width:'+(tot.c*4/e*100)+'%"></i></div><p class="small">Доля калорий: белки '+f(tot.p*4/e*100,0)+'% · жиры '+f(tot.f*9/e*100,0)+'% · углеводы '+f(tot.c*4/e*100,0)+'%</p>':'';
-    $('dList').innerHTML=list.length?MEALS.map(function(m){var it=list.map(function(x,i){return {x:x,i:i}}).filter(function(o){return o.x.meal===m});if(!it.length)return '';
-      var mk=it.reduce(function(a,o){return a+o.x.k},0);
-      return '<div class="meal"><h3>'+m+' <span>'+f(mk,0)+' ккал</span></h3><ul>'+it.map(function(o){return '<li><span>'+esc(o.x.name)+', '+f(o.x.g,0)+' г</span><span>'+f(o.x.k,0)+' ккал · Б '+f(o.x.p)+'</span><button type="button" class="del" data-i="'+o.i+'" aria-label="Удалить">×</button></li>'}).join('')+'</ul></div>'}).join(''):'<p class="small">За этот день записей нет.</p>';
+<footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a> · <button type="button" class="foot-pwa" data-pwa>Установить приложение</button></span></div></footer>
+
+
+
+<script>
+document.getElementById('copy').addEventListener('click',function(){
+  var b=this,el=document.getElementById('handle');
+  function ok(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Скопировать'},1600)}
+  function fb(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Выделено'}
+  try{navigator.clipboard.writeText('@Gym_mom1988').then(ok,fb)}catch(e){fb()}
+});
+
+
+(function(){
+  var form=document.getElementById('quizForm');if(!form)return;
+  var out=document.getElementById('quizResult'),hint=document.getElementById('quizHint');
+  var TG='https://t.me/Gym_mom1988';
+  var R={
+    online:{t:'Онлайн-сопровождение',p:'Программа под ваш зал или дом, проверка техники по видео после каждой тренировки в первый месяц и разбор питания.',price:'Первый месяц — 5 000 ₽, далее 8 000 ₽.'},
+    group:{t:'Мини-группы в студии',p:'Тренировка до 6 человек, я рядом и поправляю технику вживую. Среда 10:00, суббота 11:00 и 12:00, м. Адмиралтейская.',price:'Пробное занятие — 800 ₽.'},
+    trial:{t:'Начните с пробного занятия',p:'Если пока не знаете формат, приходите на пробное в группу: посмотрим технику вживую и решим, как продолжать — в студии или онлайн.',price:'Пробное занятие — 800 ₽.'}
+  };
+  function val(n){var e=form.querySelector('input[name="'+n+'"]:checked');return e?e.value:null}
+  function upd(){
+    var place=val('place'),exp=val('exp'),freq=val('freq'),goal=val('goal');
+    if(!(place&&exp&&freq&&goal)){out.hidden=true;hint.hidden=false;return}
+    var key=place==='self'?'online':place==='studio'?'group':(exp==='regular'?'online':'trial');
+    var extra=[];
+    if(goal==='food'&&key!=='online')extra.push('Разбор питания входит в онлайн-сопровождение — его можно совместить с группой, обсудим на созвоне.');
+    if(freq==='1-2'&&key==='online')extra.push('Программа рассчитана на 3 тренировки в неделю. Если реально 1–2, скажите об этом на созвоне — честно скажу, что получится.');
+    var r=R[key];
+    out.innerHTML='<h3>'+r.t+'</h3><p>'+r.p+'</p><p><b>'+r.price+'</b></p>'+extra.map(function(x){return '<p class="small">'+x+'</p>'}).join('')+
+      '<a class="btn btn-main" href="'+TG+'" target="_blank" rel="noopener">Написать «СТАРТ»</a><p class="small">Это подсказка. Окончательно формат выберем вместе на коротком созвоне.</p>';
+    out.hidden=false;hint.hidden=true;
   }
-  $('dList').addEventListener('click',function(e){var b=e.target.closest('.del');if(!b)return;var next=copy();(next.days[date]||[]).splice(+b.dataset.i,1);if(!save(next)){$('fMsg').textContent=SAVE_ERR;return}render()});
-  if($('foodPdf'))$('foodPdf').addEventListener('click',function(){
-    if(!window.AlenaExport)return;
-    var list=S.days[date]||[],tot={k:0,p:0,f:0,c:0};list.forEach(function(x){tot.k+=x.k;tot.p+=x.p;tot.f+=x.f;tot.c+=x.c});
-    var rows=[{kind:'heading',text:'Дневник питания'},{kind:'text',text:'Дата: '+date.split('-').reverse().join('.')},{kind:'heading',text:'Итог за день'},{kind:'text',text:f(tot.k,0)+' ккал · белки '+f(tot.p)+' г · жиры '+f(tot.f)+' г · углеводы '+f(tot.c)+' г'}];
-    MEALS.forEach(function(m){var it=list.filter(function(x){return x.meal===m});if(!it.length)return;rows.push({kind:'heading',text:m});it.forEach(function(x){rows.push({kind:'text',text:x.name+', '+f(x.g)+' г: '+f(x.k,0)+' ккал · Б '+f(x.p)+' · Ж '+f(x.f)+' · У '+f(x.c)})})});
-    if(!list.length)rows.push({kind:'text',text:'За этот день записей нет.'});
-    rows.push({kind:'text',text:'Пищевая ценность ориентировочная. Отчёт не задаёт дневную норму и не является медицинским документом.'});
-    AlenaExport.pdf(rows,'Дневник питания','alenafit-food-'+date+'.pdf','foodPdfMsg').catch(function(){});
-  });
-  /* ---- перенос и восстановление: файл проверяется до замены, прежняя версия остаётся ---- */
-  function transferMsg(t){$('foodTransferMsg').textContent=t}
-  function backupUi(){try{$('foodRestore').disabled=!localStorage.getItem(BKEY);$('foodBackup').disabled=!(localStorage.getItem(BKEY)||localStorage.getItem(BKEY+'_load'))}catch(e){$('foodRestore').disabled=true;$('foodBackup').disabled=true}$('foodRestore').hidden=$('foodRestore').disabled;$('foodBackup').hidden=$('foodBackup').disabled;if($('foodBackupHint'))$('foodBackupHint').hidden=!$('foodBackup').disabled}
-  function download(raw,name){if(window.AlenaExport){AlenaExport.save(new Blob([raw],{type:'application/json'}),name+'-'+today()+'.json','foodTransferMsg');return}var u=URL.createObjectURL(new Blob([raw],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name+'-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},1000)}
-  function replace(next){try{var prev=localStorage.getItem(KEY);if(prev!==null)localStorage.setItem(BKEY,prev);localStorage.setItem(KEY,JSON.stringify(next));S=next;blocked=false;return true}catch(e){return false}}
-  function refreshed(){sel=null;$('fSel').hidden=true;showRes();render();backupUi()}
-  $('foodExport').addEventListener('click',function(){try{var raw=blocked?localStorage.getItem(KEY):JSON.stringify({format:'alenafit-food',version:1,data:S});if(!raw)throw Error();download(raw,'alenafit-food')}catch(e){transferMsg('Не удалось скачать копию. Попробуйте другой браузер.')}});
-  $('foodImport').addEventListener('change',function(){var input=this,file=input.files[0];if(!file)return;
-    if(file.size>5*1024*1024){transferMsg('Файл не принят: размер больше 5 МБ. Данные не изменены.');input.value='';return}
-    var reader=new FileReader();reader.onerror=function(){transferMsg('Не удалось прочитать файл. Данные не изменены.');input.value=''};
-    reader.onload=function(){try{var x=JSON.parse(reader.result);if(x&&x.format==='alenafit-food'){if(x.version!==1)throw Error('неподдерживаемая версия');x=x.data}var next=validate(x);
-      if(!confirm('Заменить дневник питания данными из файла? Текущая версия останется в резервной копии.'))return;
-      if(!replace(next)){transferMsg(SAVE_ERR);return}refreshed();transferMsg('Дневник импортирован. Предыдущую версию можно вернуть.');
-    }catch(e){transferMsg('Файл не принят: '+(e.message||'неверные данные')+'. Данные не изменены.')}finally{input.value=''}};reader.readAsText(file);
-  });
-  $('foodRestore').addEventListener('click',function(){try{var raw=localStorage.getItem(BKEY);if(!raw)throw Error('копии нет');var c=validate(JSON.parse(raw),true),next=c.data;
-    if(!confirm('Вернуть предыдущую версию дневника?'+(c.skipped?' Неверные записи ('+c.skipped+') будут пропущены.':'')+' Нынешняя версия станет резервной копией.'))return;
-    if(!replace(next)){transferMsg(SAVE_ERR);return}refreshed();transferMsg('Предыдущая версия восстановлена.');
-  }catch(e){transferMsg('Копию не удалось восстановить. Её можно скачать для проверки.')}});
-  /* Резервная копия; если при загрузке старые записи были скрыты, а копия уже была занята, исходник лежит в _load — скачиваем и его */
-  $('foodBackup').addEventListener('click',function(){try{var raw=localStorage.getItem(BKEY),orig=localStorage.getItem(BKEY+'_load');if(raw)download(raw,'alenafit-food-backup');if(orig)download(orig,'alenafit-food-original')}catch(e){transferMsg('Не удалось скачать резервную копию.')}});
-  var w=$('fWipe'),armed=false;
-  w.addEventListener('click',function(){if(!armed){armed=true;w.textContent='Точно удалить всё? Нажмите ещё раз';setTimeout(function(){armed=false;w.textContent='Удалить все записи и мои продукты'},4000);return}
-    if(!replace({custom:[],days:{}})){transferMsg(SAVE_ERR);return}armed=false;w.textContent='Удалить все записи и мои продукты';refreshed();transferMsg('Дневник очищен. Прежние данные можно вернуть из резервной копии.')});
-  load();showRes();render();backupUi();if(loadNote)transferMsg(loadNote);if(blocked)transferMsg('Хранилище недоступно или данные повреждены. Исходные данные не перезаписаны. Скачайте копию и импортируйте проверенный файл.');
+  form.addEventListener('change',upd);
+  form.addEventListener('submit',function(e){e.preventDefault()});
 })();
+</script>
+
+<script>
+(function(){var tabs=[].slice.call(document.querySelectorAll('#news [role=tab]'));if(!tabs.length)return;
+function sel(t){tabs.forEach(function(x){var on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute('aria-controls')).hidden=!on})}
+tabs.forEach(function(t,i){t.addEventListener('click',function(){sel(t)});t.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();var n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];sel(n);n.focus()}})});
+if(location.hash==='#channel'){sel(tabs[1]);setTimeout(function(){document.getElementById('news').scrollIntoView()},50)}})();
+</script>
+<script src="js/feeds.js?v=20261027r" defer></script>
+<script src="js/nav.js?v=20261028f" defer></script>
+<script src="js/sections.js?v=1" defer></script>
+<script src="js/myzal.js?v=20261028b" defer></script>
+<script src="js/pwa.js?v=20261028b" defer></script>
+<script src="js/gestures.js?v=20261027q" defer></script>
+<script src="js/design-pilot.js?v=20261029a" defer></script>
+
+<script src="js/brand-pilot.js?v=1" defer></script>
+<script src="js/editorial-refine.js?v=1" defer></script>
+<script src="js/card-reveal.js?v=3" defer></script>
+</body>
+</html>
