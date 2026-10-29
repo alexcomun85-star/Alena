@@ -21,6 +21,14 @@ function recipesView(){work.innerHTML='<p class="eyebrow">ПИТАНИЕ БЕЗ 
  work.querySelector('#pantry-form').onsubmit=e=>{e.preventDefault();state.submitted=!!state.recipe.trim();state.excluded=[...work.querySelectorAll('.exclusions input:checked')].map(x=>x.value);renderRecipes()};
  work.querySelectorAll('.exclusions input').forEach(i=>i.onchange=()=>{state.excluded=[...work.querySelectorAll('.exclusions input:checked')].map(x=>x.value);if(state.submitted)renderRecipes()});renderRecipes();
 }
+function askAfita(box){
+ const d=document.createElement('details');d.className='ai-fallback';d.innerHTML='<summary>Нужна идея для другого сочетания?</summary><p class="meta">Подготовлю вопрос для чата. Ответ модели расходует лимит только после вашей отправки.</p>';
+ const b=document.createElement('button');b.type='button';b.className='subtle';b.textContent='Скопировать вопрос для Афиты';
+ b.onclick=async()=>{const excluded=state.excluded.map(ingredient),prompt='Предложи 2 простых блюда из продуктов: '+state.recipe+'. Не добавляй основные ингредиенты молча. Если чего-то не хватает, отдельно перечисли покупки.'+(excluded.length?' Исключить: '+excluded.join(', ')+'.':'')+' Дай короткие шаги. Если сочетание неудачное, скажи прямо и предложи ближайший вариант.';
+ try{if(!navigator.clipboard?.writeText)throw Error();await navigator.clipboard.writeText(prompt);announce('Вопрос скопирован. Вставьте его в чат и отправьте.');if(parent!==window)parent.postMessage({type:'afita:open-chat'},location.origin)}
+ catch(e){let t=d.querySelector('textarea');if(!t){t=document.createElement('textarea');t.readOnly=true;t.setAttribute('aria-label','Готовый вопрос для чата');d.append(t)}t.value=prompt;t.focus();t.select();announce('Скопируйте выделенный вопрос и вставьте его во вкладке «Чат».')}
+ };d.append(b);box.append(d)
+}
 function renderRecipes(){const box=work.querySelector('#recipe-results');if(!box)return;box.replaceChildren();
  function paragraph(text,cls){const p=document.createElement('p');p.textContent=text;if(cls)p.className=cls;box.append(p)}
  function starters(){paragraph('БЫСТРЫЕ НАБОРЫ','group-title');['Макароны и сосиски','Яйца помидоры сыр','Творог банан','Курица гречка'].forEach(s=>{const b=document.createElement('button');b.className='starter';b.type='button';b.innerHTML=esc(s)+'<small>Выбрать</small>';b.onclick=()=>{state.recipe=s;state.submitted=true;work.querySelector('#ingredients').value=s;renderRecipes()};box.append(b)})}
@@ -28,11 +36,12 @@ function renderRecipes(){const box=work.querySelector('#recipe-results');if(!box
  const found=engine.find(state.recipe,{excluded:state.excluded});
  if(found.pantry.labels.length){paragraph('РАСПОЗНАННЫЕ ПРОДУКТЫ','group-title');const chips=document.createElement('div');chips.className='chips';found.pantry.ids.forEach(id=>{const c=document.createElement('span');c.className='chip';c.textContent=ingredient(id);chips.append(c)});box.append(chips)}
  if(found.pantry.unknown.length)paragraph('Не удалось распознать: '+found.pantry.unknown.join(', ')+'. Уточните названия в поле выше.','hint');
- if(!found.pantry.ids.length){paragraph('Пока не удалось определить продукты для блюда. Выберите быстрый набор — покажу состав и приготовление.','hint');starters();return}
+ if(!found.pantry.ids.length){paragraph('Пока не удалось определить продукты для блюда. Выберите быстрый набор — покажу состав и приготовление.','hint');starters();askAfita(box);return}
  if(found.exact.length){paragraph('МОЖНО ПРИГОТОВИТЬ СЕЙЧАС','group-title');found.exact.forEach(r=>box.append(recipeCard(r,'exact')))}
  else paragraph('Полного набора для этих блюд пока нет. Ниже — варианты с небольшим списком покупок.','hint');
  if(found.near.length){const d=document.createElement('details');d.className='alternatives';d.open=!found.exact.length;d.innerHTML='<summary>Если добавить 1–2 продукта</summary>';found.near.forEach(r=>d.append(recipeCard(r,'near')));box.append(d)}
  if(!found.exact.length&&!found.near.length){paragraph('В этой подборке пока нет сочетания для ваших продуктов. Попробуйте быстрые наборы ниже.','hint');starters()}
+ askAfita(box);
  paragraph('Это подбор из проверяемых шаблонов домашней кухни, а не генерация произвольного рецепта. Состав и аллергены сверяйте с упаковками.','meta');
 }
 function loadProducts(){if(!productsPromise)productsPromise=fetch('data/products-ru.json').then(r=>{if(!r.ok)throw Error();return r.json()}).then(d=>{(d.products||[]).forEach(r=>{const n=r.nutriments||{},v={name:[r.product_name_ru||r.product_name,r.brands].filter(Boolean).join(' · '),k:n['energy-kcal_100g'],p:n.proteins_100g,f:n.fat_100g,c:n.carbohydrates_100g,source:'Open Food Facts; сверяйте с упаковкой'};if(v.name&&[v.k,v.p,v.f,v.c].every(x=>Number.isFinite(x)&&x>=0)&&v.k<=910&&v.p<=100&&v.f<=100&&v.c<=100)foods.push(v)})}).catch(()=>{if(state.view==='food')announce('Каталог марок не загрузился. Базовые продукты доступны; можно ввести этикетку.')});return productsPromise}

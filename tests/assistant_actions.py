@@ -35,6 +35,7 @@ with sync_playwright() as p:
         page.locator('#ingredients').fill('абракадабра')
         page.get_by_role('button',name='Подобрать блюда',exact=True).click()
         expect(page.locator('#recipe-results')).to_contain_text('Не удалось распознать: абракадабра')
+        expect(page.locator('.ai-fallback')).to_contain_text('Нужна идея для другого сочетания?')
         expect(page.locator('#recipe-results')).to_contain_text('БЫСТРЫЕ НАБОРЫ')
         page.locator('#ingredients').fill('курица гречка')
         page.get_by_role('button',name='Подобрать блюда',exact=True).click()
