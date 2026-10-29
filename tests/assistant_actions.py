@@ -1,5 +1,8 @@
 """Run against the local preview before releasing assistant actions."""
-from playwright.sync_api import sync_playwright
+from pathlib import Path
+import subprocess
+from playwright.sync_api import sync_playwright, expect
+Path("qa-output").mkdir(exist_ok=True)
 with sync_playwright() as p:
     browser=p.chromium.launch()
     page=browser.new_page()
@@ -10,10 +13,10 @@ with sync_playwright() as p:
         page.goto('http://localhost:8766/assistant-tools.html')
         page.locator('#search').fill('яблоко')
         page.locator('#grams').fill('200')
-        assert '104 ккал' in page.locator('#results').inner_text()
+        expect(page.locator('#results')).to_contain_text('104 ккал')
         page.get_by_text('Включить в итог',exact=True).first.click()
         page.locator('#grams').fill('-1')
-        assert 'от 1 до 3000' in page.locator('#results').inner_text()
+        expect(page.locator('#results')).to_contain_text('от 1 до 3000')
         page.get_by_role('button',name='Что приготовить',exact=True).click()
         page.locator('#ingredients').fill('курица, гречка')
         assert 'Курица с гречкой' in page.locator('#results').inner_text()
@@ -28,8 +31,37 @@ with sync_playwright() as p:
         assert page.locator('#result script').count()==0
         assert 'Gym_mom1988' in page.locator('#result a').get_attribute('href')
         page.get_by_role('button',name='Итог в PDF',exact=True).click()
-        assert '104 ккал' in page.locator('#report').inner_text()
+        expect(page.locator('#report')).to_contain_text('104 ккал')
+        with page.expect_download() as download:
+            page.get_by_role('button',name='Скачать PDF',exact=True).click()
+        pdf=Path('qa-output') / ('afita-'+str(width)+'.pdf')
+        download.value.save_as(pdf)
+        text=subprocess.check_output(['pdftotext',str(pdf),'-'],text=True)
+        assert '104 ккал' in text and 'Афита' in text
+        page.screenshot(path='qa-output/afita-'+str(width)+'.png',full_page=True)
+        page.get_by_role('button',name='Очистить итог',exact=True).click()
+        assert 'Добавьте расчёты' in page.locator('#report').inner_text()
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+    # Widget keeps the conversation frame alive when switching to actions.
+    page.route('https://assistant.alenafit.com/**',lambda route:route.fulfill(status=200,content_type='text/html',body='<p>Тестовый чат</p>'))
+    page.set_viewport_size({'width':390,'height':844})
+    page.goto('http://localhost:8766/')
+    page.locator('.afit-launch').click()
+    panel=page.locator('.afit-window')
+    expect(panel).to_be_visible()
+    panel.get_by_role('button',name='Действия',exact=True).click()
+    tools=page.frame_locator('iframe[title="Инструменты Афиты"]')
+    expect(tools.locator('#search')).to_be_visible()
+    tools.locator('#search').fill('яблоко')
+    tools.locator('#grams').fill('200')
+    expect(tools.locator('#results')).to_contain_text('104 ккал')
+    panel.get_by_role('button',name='Чат',exact=True).click()
+    expect(page.locator('iframe[title="Чат с Афитой"]')).to_be_visible()
+    panel.get_by_role('button',name='Действия',exact=True).click()
+    expect(tools.locator('#search')).to_have_value('яблоко')
+    page.locator('.afit-close').click()
+    expect(panel).to_be_hidden()
+    expect(page.locator('.afit-launch')).to_be_focused()
     assert not errors,errors
     browser.close()
 print('Assistant actions: four viewport sizes, calculations, validation, recipes, format, request escaping and report OK')
