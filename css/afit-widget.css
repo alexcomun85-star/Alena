@@ -23,3 +23,8 @@
 @media(prefers-reduced-motion:reduce){.afit-launch,.afit-launch .afit-symbol,.afit-window{animation:none!important;transition:none!important}}
 @media(prefers-reduced-transparency:reduce){.afit-launch{background:#173e2f;backdrop-filter:none;-webkit-backdrop-filter:none}}
 @supports not (backdrop-filter:blur(1px)){.afit-launch{background:#173e2f}}
+
+
+/* The chat has its own navigation; keep the page dock from covering its composer. */
+body.afit-chat-open .dock,body.afit-chat-open .afit-launch{visibility:hidden;pointer-events:none}
+.afit-window{z-index:60}
