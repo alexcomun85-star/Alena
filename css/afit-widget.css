@@ -3,3 +3,7 @@
 
 @media(max-width:480px){.afit-window{right:10px;width:calc(100% - 20px);bottom:calc(156px + env(safe-area-inset-bottom,0px));height:calc(100dvh - 180px)}.afit-launch{right:15px;bottom:calc(82px + env(safe-area-inset-bottom,0px))}.afit-launch small{display:none}.afit-launch .afit-symbol{width:34px;height:34px;padding:6px}}
 @media print{.afit-launch,.afit-window{display:none!important}}
+
+/* Maximize space for the conversation, including when the keyboard is open. */
+.afit-window header{flex:none;padding:8px 12px}.afit-window header small{display:none}.afit-window .afit-access{flex:none;padding:6px 12px;font-size:10px}.afit-window .afit-fallback{flex:none;padding:5px 12px;font-size:10px}.afit-window .afit-fallback a{white-space:normal}.afit-window iframe{min-height:0;flex:1 1 0}
+@media(max-height:500px){.afit-window .afit-access{display:none}.afit-window header{padding:3px 10px}.afit-window .afit-symbol{width:30px;height:30px;padding:5px}.afit-window .afit-fallback{padding:3px 10px}}
