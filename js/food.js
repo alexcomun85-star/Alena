@@ -57,7 +57,7 @@
     function bad(t){if(lenient){skipped++;return true}throw Error(t)}
     x.custom.forEach(function(v){
       if(!named(v)||typeof v.id!=='string'||!/^c[\w-]{1,80}$/.test(v.id)||ids[v.id]||!finite(v.k,0,KMAX)||!finite(v.p,0,100)||!finite(v.f,0,100)||!finite(v.c,0,100)||checkFood(v.k,v.p,v.f,v.c).err){bad('неверный продукт');return}
-      ids[v.id]=true;var z={id:v.id,name:nm(v),k:v.k,p:v.p,f:v.f,c:v.c,pg:100,pl:'100 г'};if(v.src0==='O')z.src0='O';out.custom.push(z);
+      ids[v.id]=true;var z={id:v.id,name:nm(v),k:v.k,p:v.p,f:v.f,c:v.c,pg:100,pl:'100 г'};if(v.src0==='O')z.src0='O';if(v.src0==='P'&&typeof v.sourceUrl==='string'&&/^https:\/\/perek\.us\/food\//.test(v.sourceUrl)){z.src0='P';z.sourceUrl=v.sourceUrl.slice(0,500)}out.custom.push(z);
     });
     Object.keys(x.days).forEach(function(day){
       if(!isDate(day)||!Array.isArray(x.days[day])||(count+=x.days[day].length)>20000){bad('неверная дата или список записей');return}
@@ -80,12 +80,12 @@
   function norm(s){return s.toLowerCase().replace(/ё/g,'е')}
   function showRes(){
     var t=norm(q.value.trim());
-    var list=all().filter(function(x){return !t||norm(x.name).indexOf(t)>=0});
+    var list=all().filter(function(x){return !t||t.split(/\s+/).every(function(w){return norm(x.name).indexOf(w)>=0})});
     if(t)list.sort(function(a,b){var ia=norm(a.name).indexOf(t),ib=norm(b.name).indexOf(t);return (ia===0?0:1)-(ib===0?0:1)||ia-ib});
     if(!t){var cats={};list=list.filter(function(x){if(x.src==='C')return true;cats[x.cat]=(cats[x.cat]||0)+1;return false})}
     var html=list.slice(0,40).map(function(x){return '<button type="button" class="fr" data-id="'+x.id+'"><span>'+esc(x.name)+(x.src==='D'||x.src==='L'?' <i title="ориентировочно">≈</i>':'')+'</span><small>'+f(x.k,0)+' ккал · Б '+f(x.p)+'</small></button>'}).join('');
     if(!t&&!S.custom.length)html='<p class="small">Начните вводить название: «гречка», «творог», «яблоко»…</p>';
-    else if(t&&!list.length)html='<p class="small">Такого продукта нет в списке. Добавьте его ниже или найдите в базе Open Food Facts.</p>';
+    else if(t&&!list.length)html='<p class="small">Такого продукта нет в списке. Добавьте его ниже по данным этикетки.</p>';
     res.innerHTML=html;
   }
   q.addEventListener('input',showRes);
@@ -93,7 +93,7 @@
   function pick(id){
     sel=all().find(function(x){return x.id===id});if(!sel)return;
     $('fSel').hidden=false;$('fSelName').textContent=sel.name;
-    $('fSelInfo').innerHTML='На 100 г'+(sel.st?' ('+esc(sel.st)+')':'')+': '+f(sel.k,0)+' ккал · Б '+f(sel.p)+' · Ж '+f(sel.f)+' · У '+f(sel.c)+(sel.src==='D'?' · домашнее блюдо, значения ориентировочные':sel.src==='L'?' · типичные значения с этикеток, сверяйте со своей упаковкой':sel.src==='O'?' · данные Open Food Facts':sel.fdc?' · <a href="https://fdc.nal.usda.gov/food-details/'+sel.fdc+'/nutrients" target="_blank" rel="noopener">USDA FDC '+sel.fdc+'</a>':sel.src==='U'?' · по USDA, сводное значение':'');
+    $('fSelInfo').innerHTML='На 100 г'+(sel.st?' ('+esc(sel.st)+')':'')+': '+f(sel.k,0)+' ккал · Б '+f(sel.p)+' · Ж '+f(sel.f)+' · У '+f(sel.c)+(sel.src==='D'?' · домашнее блюдо, значения ориентировочные':sel.src==='L'?' · типичные значения с этикеток, сверяйте со своей упаковкой':sel.src==='P'?' · <a href="'+esc(sel.sourceUrl)+'" target="_blank" rel="noopener">Данные: perek.us</a>':sel.src==='O'?' · данные Open Food Facts':sel.fdc?' · <a href="https://fdc.nal.usda.gov/food-details/'+sel.fdc+'/nutrients" target="_blank" rel="noopener">USDA FDC '+sel.fdc+'</a>':sel.src==='U'?' · по USDA, сводное значение':'');
     $('fG').value=sel.pg||100;
     $('fPortions').innerHTML=(sel.pg?'<button type="button" class="chipbtn" data-g="'+sel.pg+'">'+esc(sel.pl||'порция')+' · '+sel.pg+' г</button>':'')+[50,100,150,200].map(function(g){return '<button type="button" class="chipbtn" data-g="'+g+'">'+g+' г</button>'}).join('');
     calcSel();$('fG').focus();
@@ -143,34 +143,28 @@
     return {name:name,k:k,p:pr||0,f:fa||0,c:ca||0,code:p.code||''}}
   var offRes=[];
   function newId(){var id='c'+Date.now();while(S.custom.some(function(v){return v.id===id}))id+='x';return id}
-  var packaged=null,lastRemote=0;
+  var packaged=null;
   function localProducts(){if(!packaged)packaged=fetch('data/products-ru.json').then(function(r){if(!r.ok)throw Error();return r.json()}).then(function(j){return Array.isArray(j.products)?j.products:[]}).catch(function(){packaged=null;return []});return packaged}
-  function norm(s){return String(s||'').toLocaleLowerCase('ru').replace(/ё/g,'е')}
   $('oBtn').addEventListener('click',function(){
-    var t=$('oQ').value.trim();if(!t){$('oMsg').textContent='Введите название по-русски или штрихкод.';return}
-    var isCode=/^\d{8,14}$/.test(t),F='code,product_name,product_name_ru,brands,nutriments';
-    var button=$('oBtn');button.disabled=true;button.textContent='Ищу…';$('oMsg').textContent='Проверяю сохранённую выборку товаров…';$('oRes').innerHTML='';
-    var fromSnapshot=false,ctl=window.AbortController?new AbortController():null,tm;
+    var t=$('oQ').value.trim(),button=$('oBtn');
+    if(!t){$('oMsg').textContent='Введите название или штрихкод.';return}
+    button.disabled=true;button.textContent='Ищу…';$('oRes').innerHTML='';
+    var code=/^\d{8,14}$/.test(t),words=norm(t).split(/\s+/);
     localProducts().then(function(items){
-      var words=norm(t).split(/\s+/),found=items.filter(function(p){return isCode?String(p.code)===t:words.every(function(w){return norm((p.product_name_ru||p.product_name||'')+' '+p.brands).includes(w)})});
-      if(found.length){fromSnapshot=true;return found.slice(0,20)}
-      if(Date.now()-lastRemote<6500)throw Error('cooldown');lastRemote=Date.now();
-      $('oMsg').textContent='Ищу в открытой базе. Названия на кириллице поддерживаются…';tm=setTimeout(function(){ctl&&ctl.abort()},12000);
-      var url=isCode?'https://world.openfoodfacts.org/api/v2/product/'+t+'.json?fields='+F:'https://search.openfoodfacts.org/search';
-      var opts=isCode?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:t,langs:['ru','en'],page_size:12,fields:F.split(',')})};if(ctl)opts.signal=ctl.signal;
-      return fetch(url,opts).then(function(r){if(!r.ok)throw Error('http-'+r.status);return r.json()}).then(function(j){return isCode?(j&&j.product?[j.product]:[]):((j&&j.hits)||[])});
-    }).then(function(arr){clearTimeout(tm);offRes=arr.map(offItem).filter(Boolean);
-      if(!offRes.length){$('oMsg').textContent='Не нашлось товара с корректной пищевой ценностью. Попробуйте название марки или штрихкод. Можно внести продукт по этикетке.';return}
-      $('oMsg').textContent='Нашлось: '+offRes.length+(fromSnapshot?' — из сохранённой выборки товаров рынка РФ.':' — из Open Food Facts.')+' Сверьте БЖУ с упаковкой: состав и рецептуры меняются.';
+      offRes=items.filter(function(p){return code?String(p.code)===t:words.every(function(w){return norm((p.product_name_ru||p.product_name||'')+' '+(p.brands||'')).indexOf(w)>=0})}).map(offItem).filter(Boolean).slice(0,20);
+      if(!offRes.length){$('oMsg').textContent='В сохранённой выборке товар не найден. Для обычной еды используйте поиск выше. Для конкретной марки внесите БЖУ с упаковки — продукт сохранится для следующих записей.';return}
+      $('oMsg').textContent='Найдено в сохранённой выборке: '+offRes.length+'. Сверьте значения с вашей упаковкой.';
       $('oRes').innerHTML=offRes.map(function(x,i){return '<button type="button" class="fr" data-i="'+i+'"><span>'+esc(x.name)+'</span><small>'+f(x.k,0)+' ккал · Б '+f(x.p)+' · Ж '+f(x.f)+' · У '+f(x.c)+'</small></button>'}).join('');
-    }).catch(function(e){clearTimeout(tm);$('oMsg').textContent=e.message==='cooldown'?'Подождите несколько секунд перед следующим запросом к внешней базе.':'Не удалось связаться с внешней базой. Это не означает, что товар или русское название отсутствуют. Основные продукты доступны в поиске выше; товар с упаковки можно внести вручную.'}).finally(function(){button.disabled=false;button.textContent='Найти'});
+    }).catch(function(){$('oMsg').textContent='Выборка недоступна. Используйте основной поиск или добавьте продукт по этикетке.'}).finally(function(){button.disabled=false;button.textContent='Найти'});
   });
+  $('oQ').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('oBtn').click()}});
   $('oRes').addEventListener('click',function(e){var b=e.target.closest('.fr');if(!b)return;var x=offRes[+b.dataset.i];
     if(!x)return;
     var item={id:newId(),name:x.name,k:x.k,p:x.p,f:x.f,c:x.c,pg:100,pl:'100 г',src0:'O'},next=copy();next.custom.unshift(item);
     if(!save(next)){$('oMsg').textContent=SAVE_ERR;return}
     $('oMsg').textContent='«'+x.name+'» сохранён в «Мои продукты».';pick(item.id);location.hash='#dobavit';});
 
+  document.addEventListener('perek:select',function(event){var x=event.detail;if(!x||x.unit!=='г'||typeof x.name!=='string'||!/^https:\/\/perek\.us\/food\//.test(x.url||'')||![x.k,x.p,x.f,x.c].every(function(v){return typeof v==='number'&&isFinite(v)})||checkFood(x.k,x.p,x.f,x.c).err)return;var item={id:newId(),name:(x.name+(x.brand?' ('+x.brand+')':'')).slice(0,100),k:x.k,p:x.p,f:x.f,c:x.c,pg:100,pl:'100 г',src0:'P',sourceUrl:x.url},next=copy();next.custom.unshift(item);if(!save(next)){$('fMsg').textContent=SAVE_ERR;return}q.value='';showRes();pick(item.id);$('fMsg').textContent='Выбран продукт из perek.us. Укажите вес порции.';location.hash='#dobavit';});
   /* ---- день ---- */
   $('fDate').addEventListener('change',function(){date=this.value||today();render()});
   function render(){

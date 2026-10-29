@@ -2,9 +2,11 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-v26';
+const VERSION = 'alenafit-perek-test-v21';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
+  "./css/design-pilot.css?v=20261029a",
+  "./js/design-pilot.js?v=20261029a",
   "./img/alena-invitation.webp",
   "./css/final-invite.css?v=20261028d",
   "./js/final-invite.js?v=20261028a",
@@ -160,6 +162,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+  if(url.pathname==='/api/foods')return;
   if (url.origin !== location.origin) return; /* внешние сервисы — без вмешательства */
 
   const isPage = req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html');

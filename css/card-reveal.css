@@ -1,0 +1,36 @@
+/* No JS: everything stays visible. Focus and reduced motion reveal immediately. */
+@media(prefers-reduced-motion:no-preference){
+ .card-wait{opacity:0!important;animation:none!important}
+ .card-wait:focus-within{opacity:1!important}
+ .editorial-refine .card-arrive,.final-invite .invite-copy>.card-arrive{animation:cardArrival 1.15s cubic-bezier(.16,1,.3,1) both!important}
+ .final-invite #inviteTitle.card-arrive{animation:finalTitleArrival 1.5s cubic-bezier(.16,1,.3,1) both!important}
+ .final-invite .invite-action.card-arrive{animation:finalActionArrival 1.25s cubic-bezier(.16,1,.3,1) both!important}
+ .editorial-refine #who.refine-in .who article:not(.card-arrive){animation:none}
+ .coaching-demo.is-seen .demo-card:not(.card-arrive){animation:none}
+}
+@keyframes cardArrival{from{opacity:0;transform:translateY(32px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes finalTitleArrival{from{opacity:0;transform:translateY(40px);clip-path:inset(0 0 100% 0)}to{opacity:1;transform:none;clip-path:inset(0)}}
+@keyframes finalActionArrival{0%{opacity:0;transform:translateY(24px)}65%{opacity:1;box-shadow:0 0 0 8px rgba(240,169,43,.14)}100%{opacity:1;transform:none;box-shadow:0 0 0 0 transparent}}
+@media(prefers-reduced-motion:reduce){.card-wait,.card-arrive{opacity:1!important;animation:none!important;transform:none!important;clip-path:none!important}}
+@media print{.card-wait,.card-arrive{opacity:1!important;animation:none!important;transform:none!important;clip-path:none!important}}
+
+/* A single timeline owns the final invitation. Its children never compete. */
+@media(prefers-reduced-motion:no-preference){
+ .final-sequence-wait>*{opacity:0!important;animation:none!important}
+ .final-sequence-wait:focus-within>*{opacity:1!important}
+ .final-sequence-play>*{animation:finalSequenceIn .85s cubic-bezier(.2,.65,.25,1) both!important}
+ .final-sequence-play>.invite-eyebrow{animation-delay:0s!important}
+ .final-sequence-play>#inviteTitle{animation-delay:.2s!important;animation-duration:1s!important}
+ .final-sequence-play>.invite-message{animation-delay:.65s!important}
+ .final-sequence-play>.invite-values{animation-delay:.95s!important}
+ .final-sequence-play>.invite-action{animation-delay:1.2s!important}
+ .final-sequence-play>.invite-note{animation-delay:1.4s!important}
+ .final-sequence-play>.invite-contact{animation-delay:1.55s!important}
+}
+@keyframes finalSequenceIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.final-sequence-wait>*,.final-sequence-play>*{opacity:1!important;animation:none!important;transform:none!important}}
+@media print{.final-sequence-wait>*,.final-sequence-play>*{opacity:1!important;animation:none!important;transform:none!important}}
+
+/* The final copy must never remain an empty panel while waiting. */
+@media(prefers-reduced-motion:no-preference){.final-sequence-wait>*{opacity:1!important}.final-sequence-play>*{animation-name:finalReadableSequence!important}}
+@keyframes finalReadableSequence{from{opacity:.3;transform:translateY(18px)}to{opacity:1;transform:none}}
