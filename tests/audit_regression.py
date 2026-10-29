@@ -192,12 +192,37 @@ def t_offline(browser):
     ctx.close()
 
 
+def t_afit(browser):
+    ctx=browser.new_context(viewport={'width':390,'height':844}, service_workers='block')
+    local_only(ctx)
+    # Test the panel and fallback without authentication or paid API calls.
+    ctx.route('https://assistant.alenafit.com/**', lambda route: route.fulfill(status=200, content_type='text/html', body='<p>Тестовый чат</p>'))
+    p=ctx.new_page()
+    p.goto(BASE)
+    check('Афит: панель закрыта до нажатия', False, p.is_visible('#afit-window'))
+    check('Афит: чат не загружается заранее', None, p.locator('#afit-window iframe').get_attribute('src'))
+    for width,height in [(320,740),(390,844),(768,900),(1200,900)]:
+        p.set_viewport_size({'width':width,'height':height})
+        p.click('.afit-launch')
+        check('Афит: открыт '+str(width), True, p.is_visible('#afit-window'))
+        check('Афит: фирменный знак '+str(width), True, p.locator('.afit-window .afit-symbol img').evaluate('(e)=>e.complete && e.naturalWidth>0'))
+        box=p.locator('#afit-window').bounding_box()
+        check('Афит: панель внутри экрана '+str(width), True, box['x']>=0 and box['y']>=0 and box['x']+box['width']<=width and box['y']+box['height']<=height)
+        check('Афит: ссылка резервного открытия '+str(width), 'https://assistant.alenafit.com/', p.locator('.afit-fallback a').get_attribute('href'))
+        p.screenshot(path=str(OUT / f'afit-{width}.png'))
+        p.keyboard.press('Escape')
+        check('Афит: Escape закрывает панель '+str(width), False, p.is_visible('#afit-window'))
+        check('Афит: возврат фокуса '+str(width), True, p.locator('.afit-launch').evaluate('(e)=>document.activeElement===e'))
+    ctx.close()
+
+
 def main():
     with sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=os.environ.get("ALENAFIT_CHROMIUM"))
         t_food(browser)
         t_tabs(browser)
         t_fold(browser)
+        t_afit(browser)
         t_offline(browser)
         browser.close()
     failed = [r for r in RESULTS if not r[0]]
