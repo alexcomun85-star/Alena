@@ -69,7 +69,7 @@ def main():
         check('корзина: флажок читается без замены на вопрос',True,'[ ]' in txt and '?' not in txt)
         p.close()
         p=fresh(ctx,'index.html');p.click('#dockMenu')
-        check('меню: полупрозрачный фон',True,'0.88' in p.locator('#mnav').evaluate('(e)=>getComputedStyle(e).backgroundColor'))
+        check('меню: полупрозрачный фон',True,'0.78' in p.locator('#mnav').evaluate('(e)=>getComputedStyle(e).backgroundColor'))
         check('меню: есть размытие',True,'18px' in p.locator('#mnav').evaluate('(e)=>getComputedStyle(e).backdropFilter'))
         p.wait_for_function("getComputedStyle(document.querySelector('.mnav-in')).opacity==='1'")
         p.screenshot(path=str(OUT/'glass-menu-mobile.png'))
