@@ -200,7 +200,7 @@ def t_afit(browser):
     p=ctx.new_page()
     p.goto(BASE)
     check('Афит: панель закрыта до нажатия', False, p.is_visible('#afit-window'))
-    check('Афит: чат не загружается заранее', None, p.locator('#afit-window iframe').get_attribute('src'))
+    check('Афит: чат не загружается заранее', None, p.locator('#afit-window iframe[title="Чат с Афитой"]').get_attribute('src'))
     for width,height in [(320,740),(390,844),(768,900),(1200,900)]:
         p.set_viewport_size({'width':width,'height':height})
         p.click('.afit-launch')
