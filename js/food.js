@@ -152,7 +152,7 @@
     var code=/^\d{8,14}$/.test(t),words=norm(t).split(/\s+/);
     localProducts().then(function(items){
       offRes=items.filter(function(p){return code?String(p.code)===t:words.every(function(w){return norm((p.product_name_ru||p.product_name||'')+' '+(p.brands||'')).indexOf(w)>=0})}).map(offItem).filter(Boolean).slice(0,20);
-      if(!offRes.length){$('oMsg').textContent='В сохранённой выборке товар не найден. Для обычной еды используйте поиск выше. Для конкретной марки внесите БЖУ с упаковки — продукт сохранится для следующих записей.';return}
+      if(!offRes.length){if(window.AlenaProductSearch)return window.AlenaProductSearch(t,$('oMsg'),$('oRes'));$('oMsg').textContent='В сохранённой выборке товара нет. Живой поиск perek.us временно недоступен — добавьте данные с этикетки.';return}
       $('oMsg').textContent='Найдено в сохранённой выборке: '+offRes.length+'. Сверьте значения с вашей упаковкой.';
       $('oRes').innerHTML=offRes.map(function(x,i){return '<button type="button" class="fr" data-i="'+i+'"><span>'+esc(x.name)+'</span><small>'+f(x.k,0)+' ккал · Б '+f(x.p)+' · Ж '+f(x.f)+' · У '+f(x.c)+'</small></button>'}).join('');
     }).catch(function(){$('oMsg').textContent='Выборка недоступна. Используйте основной поиск или добавьте продукт по этикетке.'}).finally(function(){button.disabled=false;button.textContent='Найти'});
