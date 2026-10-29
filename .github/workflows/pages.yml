@@ -58,6 +58,7 @@ jobs:
           node tests/nav_resize.test.cjs
           node tests/cycle_diary.test.cjs
           node tests/export.test.cjs
+          node tests/recipe_engine.test.cjs
           python tests/assistant_actions.py
           retry python tests/regression.py
           retry python tests/audit_regression.py
