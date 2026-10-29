@@ -7,6 +7,7 @@ let checks = 0;
 function eq(a, b) { assert.deepEqual(a, b); checks++; }
 
 function app(initial) {
+  const events = {};
   const nodes = new Map(), data = new Map(Object.entries(initial || {}));
   let denied = false, accept = true;
   function el(id) {
@@ -20,7 +21,7 @@ function app(initial) {
   }
   const context = {
     window: { FOOD_DB: [['Яблоко', 52, .3, .2, 13.8, 'Фрукты', 'U', 180, 'яблоко']] },
-    document: { getElementById: el, createElement: () => el('download'), body: { appendChild() {} } },
+    document: { addEventListener(type, callback) { events[type] = callback; }, getElementById: el, createElement: () => el('download'), body: { appendChild() {} } },
     localStorage: {
       getItem(k) { return data.has(k) ? data.get(k) : null; },
       setItem(k, v) { if (denied) throw Error('QuotaExceededError'); data.set(k, v); },
@@ -34,7 +35,7 @@ function app(initial) {
   vm.runInNewContext(source, context);
   function fire(id, type, event = {}) { return el(id).events[type].call(el(id), event); }
   return {
-    el, data, fire, deny(v) { denied = v; }, accept(v) { accept = v; },
+    el, data, fire, dispatch(type, detail) { events[type]({detail}); }, deny(v) { denied = v; }, accept(v) { accept = v; },
     raw() { return data.get('food_v1'); },
     state() { return JSON.parse(data.get('food_v1') || '{"custom":[],"days":{}}'); },
     product() {
@@ -100,4 +101,17 @@ a.product();eq(a.state().custom.length, 2);
 const ok = {custom: [], days: {'2026-10-21': [{name: 'Соль', g: .5, meal: 'Обед', k: 0, p: 0, f: 0, c: 0}]}};
 a = app({food_v1: JSON.stringify(ok)});
 eq(a.el('foodTransferMsg').textContent, '');eq(a.data.has('food_v1_backup'), false);
+a = app();
+const product = {name: 'Творог', brand: 'Простоквашино', unit: 'г', k:121, p:16, f:5, c:3, url:'https://perek.us/food/test'};
+a.dispatch('perek:select', product);
+eq(a.state().custom[0].src0, 'P');
+eq(a.state().custom[0].sourceUrl, product.url);
+a.el('fG').value = '200';a.fire('fG', 'input');a.fire('fAdd', 'click');
+eq(Object.values(a.state().days)[0][0].k, 242);
+const savedPerek = a.raw();
+a = app({food_v1:savedPerek});
+eq(a.state().custom[0].src0, 'P');
+a.dispatch('perek:select', {...product, unit:'мл'});eq(a.raw(), savedPerek);
+a.dispatch('perek:select', {...product, url:'https://example.com/food/test'});eq(a.raw(), savedPerek);
+a.dispatch('perek:select', {...product, k:NaN});eq(a.raw(), savedPerek);
 console.log(`${checks} проверок food.js пройдены`);

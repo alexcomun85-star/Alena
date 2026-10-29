@@ -28,7 +28,7 @@
 <link rel="stylesheet" href="css/fonts.css?v=20261028b">
 <link rel="stylesheet" href="css/site.css?v=20261028k">
 <style>:root{color-scheme:dark;background:#132823;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding-bottom:0}img{max-width:100%}[hidden]{display:none!important}</style>
-</head>
+<style>.perek-result{padding:14px 0;border-bottom:1px solid var(--line)}.perek-result .fr{width:100%}.perek-result a{display:inline-block;margin-top:7px}.perek-result .fr:disabled{opacity:.6;cursor:default}</style></head>
 <body class="tool-page">
 <!-- nav:start -->
 <a class="skip-link" href="#top">К основному содержимому</a>
@@ -78,7 +78,7 @@
   <section class="g" style="padding-top:24px">
     <div class="w">
 
-      <article class="test" id="dobavit">
+      <article class="test" id="perekSearch"><span class="tag">Поиск продуктов</span><h2>Продукты <em>российских марок</em></h2><div class="test-body"><p class="small">Поиск по названию, бренду или штрихкоду через perek.us. В сервис передаётся только ваш поисковый запрос.</p><div class="field"><label for="perekQ">Название или штрихкод</label><input id="perekQ" type="search" maxlength="100" placeholder="Например, творог Простоквашино"></div><button class="tbtn" type="button">Найти в perek.us</button><p class="verdict" role="status" aria-live="polite">Выберите продукт, затем укажите вес и добавьте его в дневник.</p><div class="fres"></div></div></article><article class="test" id="dobavit">
         <span class="tag">Шаг 1</span>
         <h2>Что вы <em>съели</em></h2>
         <div class="test-body">
@@ -119,7 +119,7 @@
         <h2>Добавить <em>свой продукт</em></h2>
         <div class="test-body">
           <div class="tool">
-            <h3 style="font-size:17px">По этикетке</h3>
+            <h3 style="font-size:17px">Продукт вашей марки — по этикетке</h3><p class="small">Введите данные на 100 г один раз. Продукт сохранится в этом браузере и появится в основном поиске.</p>
             <div class="field"><label for="cName">Название</label><input id="cName" autocomplete="off" placeholder="например, Сырок глазированный"></div>
             <div class="calc-grid g4">
               <div class="field"><label for="cK">Ккал на 100 г</label><input id="cK" type="number" inputmode="decimal" min="0" max="910"></div>
@@ -132,12 +132,12 @@
             <p class="verdict" id="cMsg" aria-live="polite">Продукт появится в поиске в разделе «Мои продукты».</p>
           </div>
           <div class="tool">
-            <h3 style="font-size:17px">Найти в базе по названию или штрихкоду</h3>
+            <h3 style="font-size:17px">Сохранённая выборка товаров</h3>
             <div class="field"><label for="oQ">Название или цифры штрихкода</label><input id="oQ" autocomplete="off" inputmode="search" placeholder="например, 4600605009504 или «сырок Б.Ю. Александров»"></div>
             <div class="btn-row"><button type="button" class="tbtn" id="oBtn">Найти</button></div>
-            <p class="verdict" id="oMsg" aria-live="polite">Можно вводить русское название, марку или штрихкод. Сначала ищем в сохранённой выборке товаров рынка РФ, затем — в Open Food Facts. Это не полный каталог магазинов.</p>
+            <p class="verdict" id="oMsg" aria-live="polite">Поиск по сохранённой выборке на этом сайте. Запросы к зарубежному сервису не отправляются. Если марки нет — добавьте её по этикетке выше.</p>
             <div class="fres" id="oRes"></div>
-            <p class="small">Данные: <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>, открытая база (лицензия ODbL). Её заполняют пользователи, поэтому сверяйте цифры с упаковкой. Сохранённая выборка доступна и при сбое внешнего поиска; она не охватывает все товары.</p>
+            <p class="small">Данные: Open Food Facts, открытая база (лицензия ODbL). Её заполняют пользователи, поэтому сверяйте цифры с упаковкой. Это ограниченная сохранённая выборка, а не полный каталог российских товаров.</p>
           </div>
         </div>
       </article>
@@ -176,7 +176,7 @@
 </main>
 <footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a> · <button type="button" class="foot-pwa" data-pwa>Установить приложение</button></span></div></footer>
 <script src="js/food-db.js?v=20261027b" defer></script>
-<script src="js/food.js?v=20261028d" defer></script>
+<script src="js/food.js?v=perek1-local2-20261028d" defer></script>
 <script src="js/cycle.js?v=20261028b" defer></script>
 <script>document.addEventListener('DOMContentLoaded',function(){var C=window.Cycle,box=document.getElementById('dCyc'),dt=document.getElementById('fDate');if(!C||!box||!dt)return;
   /* подсказка по дню цикла для выбранной даты; цифры еды не меняются */
@@ -188,5 +188,5 @@
 <script src="js/myzal.js?v=20261028b" defer></script>
 <script src="js/pwa.js?v=20261028b" defer></script>
 <script src="js/gestures.js?v=20261027q" defer></script>
-</body>
+<script src="js/perek-search.js?v=release1" defer></script></body>
 </html>
