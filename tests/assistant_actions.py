@@ -24,6 +24,7 @@ with sync_playwright() as p:
         page.get_by_role('button',name='Подобрать блюда',exact=True).click()
         expect(page.locator('#recipe-results')).to_contain_text('Макароны с сосисками')
         expect(page.locator('#recipe-results')).to_contain_text('МОЖНО ПРИГОТОВИТЬ СЕЙЧАС')
+        expect(page.locator('#recipe-results .recipe h2').first).to_be_in_viewport()
         page.screenshot(path='qa-output/afita-pantry-'+str(width)+'.png',full_page=True)
         page.get_by_role('button',name='Сохранить в итог',exact=True).first.click()
         page.locator('#ingredients').fill('макароны')

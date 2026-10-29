@@ -2,13 +2,13 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-release-20261029-v37-pantry';
+const VERSION = 'alenafit-release-20261029-v38-pantry';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
   "./js/recipe-engine.js?v=20261029pantry2",
   "./assistant-tools.html",
   "./css/assistant-tools.css?v=20261029pantry2",
-  "./js/assistant-tools.js?v=20261029pantry2",
+  "./js/assistant-tools.js?v=20261029pantry3",
   "./img/alena-invitation.webp",
   "./",
   "./404.html",
