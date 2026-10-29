@@ -50,6 +50,15 @@ def main():
         p.click('#perekSearch .fr');p.fill('#fG','200');p.click('#fAdd')
         check('внешний поиск: продукт сохранён с источником','P',json.loads(p.evaluate("localStorage.getItem('food_v1')"))['custom'][0]['src0'])
         check('внешний поиск: порция 200 г пересчитана',True,'242 ккал' in p.inner_text('#dList'))
+        # Тот же нижний поиск сам переходит к perek.us, если локальной записи нет.
+        p.fill('#oQ','Сметана');p.click('#oBtn')
+        p.wait_for_function("!document.getElementById('oBtn').disabled")
+        check('товары: локальный промах продолжен через API','Сметана',seen[-1])
+        check('товары: удалённый результат показан в этом же блоке',True,'Проверка кириллицы' in p.inner_text('#oRes'))
+        check('товары: источник результата явно подписан',True,'perek.us' in p.inner_text('#oMsg'))
+        before_custom=len(json.loads(p.evaluate("localStorage.getItem('food_v1')"))['custom'])
+        p.click('#oRes .fr')
+        check('товары: удалённый результат выбирается один раз',before_custom+1,len(json.loads(p.evaluate("localStorage.getItem('food_v1')"))['custom']))
         p.evaluate("""()=>{Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>true});
           Object.defineProperty(navigator,'share',{configurable:true,value:({files})=>{window.shared={name:files[0].name,type:files[0].type};return Promise.resolve()}})}""")
         p.click('#foodExport');p.wait_for_function('window.shared')

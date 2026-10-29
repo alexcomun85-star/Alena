@@ -132,12 +132,12 @@
             <p class="verdict" id="cMsg" aria-live="polite">Продукт появится в поиске в разделе «Мои продукты».</p>
           </div>
           <div class="tool">
-            <h3 style="font-size:17px">Дополнительная база · Open Food Facts</h3>
+            <h3 style="font-size:17px">Поиск по сохранённой базе и perek.us</h3>
             <div class="field"><label for="oQ">Название или цифры штрихкода</label><input id="oQ" autocomplete="off" inputmode="search" placeholder="например, 4600605009504 или «сырок Б.Ю. Александров»"></div>
             <div class="btn-row"><button type="button" class="tbtn" id="oBtn">Найти</button></div>
-            <p class="verdict" id="oMsg" aria-live="polite">Это сохранённая копия Open Food Facts на нашем сайте. Для актуального поиска российских марок используйте perek.us выше. Если товара нет — добавьте данные с этикетки.</p>
+            <p class="verdict" id="oMsg" aria-live="polite">Сначала проверяем сохранённую базу. Если товара нет, автоматически продолжаем поиск в perek.us — результаты появятся здесь же.</p>
             <div class="fres" id="oRes"></div>
-            <p class="small">Источник этой дополнительной базы: Open Food Facts, открытая база (лицензия ODbL). Её заполняют пользователи, поэтому сверяйте цифры с упаковкой. Это ограниченная сохранённая выборка, а не полный каталог российских товаров.</p>
+            <p class="small">Источники: perek.us (живой поиск) и сохранённая копия Open Food Facts, открытая база (лицензия ODbL). Её заполняют пользователи, поэтому сверяйте цифры с упаковкой. Это ограниченная сохранённая выборка, а не полный каталог российских товаров.</p>
           </div>
         </div>
       </article>
@@ -176,7 +176,7 @@
 </main>
 <footer class="g"><div class="w"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT — сила без перегибов" width="150" height="96" loading="lazy"><span>Алёна · тренер и нутрициолог · Санкт-Петербург</span><span>Самозанятая. Не является медицинской услугой.</span><span class="foot-links"><a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">Канал в Telegram</a> · <a href="https://t.me/Gym_mom1988" target="_blank" rel="noopener">Написать Алёне</a> · <a href="vopros.html">Предложить тему</a> · <button type="button" class="foot-pwa" data-pwa>Установить приложение</button></span></div></footer>
 <script src="js/food-db.js?v=20261027b" defer></script>
-<script src="js/food.js?v=perek1-local2-20261028d" defer></script>
+<script src="js/food.js?v=20261029fallback" defer></script>
 <script src="js/cycle.js?v=20261028b" defer></script>
 <script>document.addEventListener('DOMContentLoaded',function(){var C=window.Cycle,box=document.getElementById('dCyc'),dt=document.getElementById('fDate');if(!C||!box||!dt)return;
   /* подсказка по дню цикла для выбранной даты; цифры еды не меняются */
@@ -188,5 +188,5 @@
 <script src="js/myzal.js?v=20261028b" defer></script>
 <script src="js/pwa.js?v=20261028b" defer></script>
 <script src="js/gestures.js?v=20261027q" defer></script>
-<script src="js/perek-search.js?v=release1" defer></script></body>
+<script src="js/perek-search.js?v=20261029fallback" defer></script></body>
 </html>
