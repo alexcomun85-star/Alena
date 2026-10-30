@@ -28,3 +28,13 @@ env=await environment();let replacementSchema;
 response=await aiRoute(request(replaceReq),env,{fetcher:async(url,init)=>{replacementSchema=JSON.parse(init.body).text.format.schema;return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify({meals:[body.days[0].meals[0]]})}]}]})}});
 assert.equal(replacementSchema.properties.meals.minItems,1);assert.equal(replacementSchema.properties.meals.maxItems,1);assert.equal(response.status,200);
 console.log('Structured shape: exactly seven days x four meals, one replacement, useful validation reason OK');
+
+const {createHash}=await import('node:crypto');
+const fixed=Date.UTC(2026,9,30,12),epoch=Math.floor(fixed/86400000);
+env=await environment();const owner=createHash('sha256').update(env.AI_BUDGET_SALT+':'+epoch+':192.0.2.1').digest('hex');
+const normalized=globalThis.AfitaAIContract.request(req),hash=createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
+await env.DB.prepare('INSERT INTO ai_requests (id, request_hash, owner, status, result, expires) VALUES (?, ?, ?, ?, NULL, ?)').bind(req.requestId,hash,owner,'pending',fixed+86400000).run();
+let unexpectedCalls=0;const noProvider=async()=>{unexpectedCalls++;throw Error('must not call provider')};
+response=await aiRoute(request(),env,{fetcher:noProvider,now:()=>fixed+10000});assert.equal(response.status,409);assert.equal((await response.json()).code,'in_progress');
+response=await aiRoute(request(),env,{fetcher:noProvider,now:()=>fixed+211000});assert.equal(response.status,410);assert.equal((await response.json()).code,'interrupted');assert.equal(unexpectedCalls,0);assert.equal(env.DB.sqlite.prepare('SELECT status FROM ai_requests').get().status,'failed');
+console.log('Pending lease: active requests retained, abandoned requests released without paid calls OK');

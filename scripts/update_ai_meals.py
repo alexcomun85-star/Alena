@@ -9,15 +9,18 @@ def main():
  if len(mounts)!=1:raise SystemExit('Cannot identify existing source mount; nothing changed')
  root=pathlib.Path(mounts[0]['Source']).resolve()
  if not root.is_relative_to('/opt/alenafit-assistant/ai-meals'):raise SystemExit('Unexpected source path; nothing changed')
- target=root/'handler.js';old=target.read_bytes()
- url=f'https://raw.githubusercontent.com/alexcomun85-star/Alena/{a.commit}/server/meal-plan/handler.js'
- with urllib.request.urlopen(url,timeout=30) as r:new=r.read(100000)
- if b'minItems:7,maxItems:7' not in new or b'minItems:4,maxItems:4' not in new:raise SystemExit('Expected schema fix missing')
+ names=['handler.js','contract.js'];old={};new={}
+ for name in names:
+  old[name]=(root/name).read_bytes()
+  url=f'https://raw.githubusercontent.com/alexcomun85-star/Alena/{a.commit}/server/meal-plan/{name}'
+  with urllib.request.urlopen(url,timeout=30) as r:new[name]=r.read(100000)
+ if b'minItems:7,maxItems:7' not in new['handler.js'] or b"code:'interrupted'" not in new['handler.js'] or b'warnings.push' not in new['contract.js']:raise SystemExit('Expected fixes missing')
  if new==old:print('Обновление уже установлено');return
- backup=root/('handler.before-shape-fix-'+str(int(time.time()))+'.js');backup.write_bytes(old)
+ stamp=str(int(time.time()))
+ for name in names:(root/(name+'.before-update-'+stamp)).write_bytes(old[name])
  try:
-  target.write_bytes(new)
-  subprocess.run(['docker','exec','afita-meals','node','--check','handler.js'],check=True)
+  for name in names:(root/name).write_bytes(new[name])
+  for name in names:subprocess.run(['docker','exec','afita-meals','node','--check',name],check=True)
   subprocess.run(['docker','restart','afita-meals'],check=True,stdout=subprocess.DEVNULL)
   for attempt in range(30):
    try:
@@ -27,6 +30,8 @@ def main():
    time.sleep(.5)
   else:raise RuntimeError('Service not ready')
  except Exception:
-  target.write_bytes(old);subprocess.run(['docker','restart','afita-meals'],stdout=subprocess.DEVNULL);raise
- print('ГОТОВО: строгая схема 7 дней × 4 блюда установлена. Можно проверять генерацию.')
+  
+  for name in names:(root/name).write_bytes(old[name])
+  subprocess.run(['docker','restart','afita-meals'],stdout=subprocess.DEVNULL);raise
+ print('ГОТОВО: обновлены проверка меню и обработка прерванных запросов. Обновите страницу сайта.')
 if __name__=='__main__':main()
