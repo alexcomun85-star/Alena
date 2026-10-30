@@ -4,7 +4,7 @@ ok(N.templates.length>=45,'use a varied curated catalogue');
 for(const t of N.templates){ok(N.totals(t.parts).k>0);ok(t.steps.length>20);ok(t.source[1].startsWith('https://'));ok(t.time>=5&&t.time<=60)}
 for(const target of [1300,1800,2400])for(const seed of [0,1,7]){
  const profile={adult:true,target,goal:'maintain',targets:T.calculate({mode:'manual',target,goal:'maintain'})};const p=N.generate(profile,seed),ids=p.days.flatMap(d=>d.meals.map(m=>m.id));ok(new Set(ids).size===28,'no dish repeats in an unrestricted week');
- for(const d of p.days){ok(d.meals[1].id!==d.meals[3].id);for(const m of d.meals){const t=N.templates.find(t=>t.id===m.id),ratios=m.parts.map((x,i)=>x[1]/t.parts[i][1]),scale=ratios.reduce((a,b)=>a+b,0)/ratios.length;
+ for(const d of p.days){ok(d.meals[1].id!==d.meals[3].id);const staple=m=>m.parts.find(([n])=>/^(Макароны|Рис |Гречка|Булгур|Картофель)/.test(n))?.[0].split(' ')[0];ok(!staple(d.meals[1])||staple(d.meals[1])!==staple(d.meals[3]),'different lunch and dinner staples');for(const m of d.meals){const t=N.templates.find(t=>t.id===m.id),ratios=m.parts.map((x,i)=>x[1]/t.parts[i][1]),scale=ratios.reduce((a,b)=>a+b,0)/ratios.length;
   const lower=Math.max(...m.parts.map(([n,g],i)=>(g-(n==='Яйцо куриное'?0:n.startsWith('Масло')?.5:2.5))/t.parts[i][1]));const upper=Math.min(...m.parts.map(([n,g],i)=>(g+(n==='Яйцо куриное'?0:n.startsWith('Масло')?.5:2.5))/t.parts[i][1]));ok(lower<=upper+1e-9,'a single whole-recipe scale explains every ingredient');
   for(const [name,g] of m.parts){if(name==='Яйцо куриное')ok(g%50===0,'whole eggs');else if(!name.startsWith('Масло'))ok(g%5===0,'weighable quantities')}
   ok(m.parts.reduce((s,x)=>s+x[1],0)<=(t.slot==='main'?750:t.slot==='snack'?400:650),'bounded ordinary plate');
