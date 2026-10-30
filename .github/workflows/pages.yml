@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
       - name: Установить средства проверки
         timeout-minutes: 8
         run: |
@@ -63,8 +63,12 @@ jobs:
           node tests/nutrition_plan.test.cjs
           node tests/nutrition_targets.test.cjs
           node tests/meal_quality.test.cjs
+          node tests/ai_meal_contract.test.cjs
+          node server/meal-plan/test.mjs
+          python tests/ai_installer_test.py
           python tests/nutrition_actions.py
           python tests/simple_actions.py
+          python tests/ai_actions.py
           python tests/assistant_actions.py
           retry python tests/regression.py
           retry python tests/audit_regression.py
