@@ -33,14 +33,14 @@
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&openDd){var b=openDd.querySelector('.dd-btn');close(openDd);b.focus()}});
 
   /* Телефон и планшет: всё управление — в нижней панели под большим пальцем.
-     Главная (на главной — «СТАРТ» в Telegram, в режиме приложения — «Назад») · Мой зал · Инструменты · Меню.
+     Главная (на главной — «Наверх», в режиме приложения — «Назад») · Мой зал · Инструменты · Меню.
      Меню открывается шторкой снизу, пункты прижаты к низу экрана. */
   var menu=document.getElementById('mnav'),btn=document.getElementById('menuBtn');
   var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
   var home=path==='index.html'||path==='';
-  var I={home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/>',up:'<path d="M12 19V5M6 11l6-6 6 6"/>',back:'<path d="M15 5l-7 7 7 7"/>',tools:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8"/>',star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'};
+  var I={home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/>',up:'<path d="M12 19V5M6 11l6-6 6 6"/>',back:'<path d="M15 5l-7 7 7 7"/>',tools:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'};
   function ico(d){return '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>'}
-  var first=home?'<a class="home-btn dock-start" href="https://t.me/Gym_mom1988" target="_blank" rel="noopener" aria-label="Написать «СТАРТ» в Telegram">'+ico(I.chat)+'<span>СТАРТ</span></a>'
+  var first=home?'<button type="button" class="home-btn dock-top">'+ico(I.up)+'<span>Наверх</span></button>'
     :standalone?'<button type="button" class="home-btn dock-back">'+ico(I.back)+'<span>Назад</span></button>'
     :'<a class="home-btn" href="./">'+ico(I.home)+'<span>Главная</span></a>';
   var dock=document.createElement('nav');dock.className='dock';dock.setAttribute('aria-label','Быстрые действия');
@@ -50,6 +50,7 @@
     (menu?'<button type="button" class="home-btn dock-menu" id="dockMenu" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span><span class="dm-t">Меню</span></button>':'')+
     '</div>';
   document.body.appendChild(dock);
+  var t=dock.querySelector('.dock-top');if(t)t.addEventListener('click',function(){window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'})});
   var bk=dock.querySelector('.dock-back');if(bk)bk.addEventListener('click',function(){if(history.length>1)history.back();else location.href='./'});
   if(!menu)return;
   var dm=document.getElementById('dockMenu');
