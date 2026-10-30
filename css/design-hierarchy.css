@@ -1,0 +1,75 @@
+/* Иерархия главной, 30.10.2026. Подключается последним; откат — удалить строку подключения в index.html.
+   1) янтарь — только для действия и цены; 2) секции разделены фоном на главы;
+   3) Афита — компактная кнопка; 4) карточки не прячутся до анимации. */
+
+/* --- 1. Первый экран: одна мысль. Подпись под фото дублировала логотип и спорила с концепцией. --- */
+.hero-brand-copy{display:none}
+@media(max-width:1023px){
+  .design-pilot .hero-photo>img{max-height:250px}
+  .hero{padding-bottom:28px}
+  .hero h1{margin-top:10px}
+  .hero .sub{margin-top:12px}
+  .hero .cta{margin-top:18px}
+}
+
+/* --- 2. Меньше янтаря: заголовки разделов выделяют мысль светлым, а не цветом действия. --- */
+main h2 em{color:#cfe3da}
+.hero h1 em,#plans h2 em,#start h2 em{color:var(--amber)}
+main section:not(.hero):not(#plans):not(#start) .tag{color:#86b8a8}
+.task-nav b{color:var(--ink)}
+
+/* --- 3. Главы страницы: знакомство (тёмная) → кто я и как работаю (полоса) → цены (светлая) → библиотека → финал. --- */
+#about,#how,#coaching-demo{background:var(--band)}
+#about{margin-top:56px;padding-top:56px}
+#coaching-demo{padding-bottom:56px}
+#limits{padding-bottom:0}
+
+#plans,#quiz{
+  --ink:#16302a; --muted:#4f665e; --line:#d8d0bf;
+  background:#f3eee3; color:var(--ink);
+}
+#plans{margin-top:0;padding-top:56px}
+#quiz{padding-bottom:56px}
+#plans h2 em{color:#a3600a}
+#plans .tag{color:#a3600a}
+#quiz .tag{color:#3f6f62}
+#quiz h2 em{color:#2c6e5f}
+/* карточки внутри светлой главы остаются тёмными — так они читаются как «предметы» */
+#plans .plan,#quiz .quiz{--ink:#eef4f1; --muted:#a9c0b7; --line:#2a4740; color:var(--ink)}
+#plans .plan{box-shadow:0 18px 40px -24px rgba(13,30,26,.55)}
+#plans .plan.primary{background:var(--band)}
+#plans .plan:not(.primary){background:#183530}
+#quiz .quiz{background:#183530;border-color:#2a4740}
+#zachem{margin-top:56px}
+
+@media(min-width:1024px){
+  #about{margin-top:96px;padding-top:96px}
+  #coaching-demo,#quiz{padding-bottom:96px}
+  #plans{padding-top:96px}
+  #zachem{margin-top:96px}
+}
+
+/* --- 4. Плитки инструментов: широкий Unbounded только в крупных заголовках. --- */
+#tools .cat b,#tools .task-nav b,#tools .tool-group h3{font-family:var(--body);font-weight:700;letter-spacing:0}
+#tools .cat b{font-size:16px}
+#tools .tool-group h3{font-size:18px}
+
+/* --- 5. Карточки видны всегда; при прокрутке только мягко «подъезжают». --- */
+@media(prefers-reduced-motion:no-preference){
+  .card-wait{opacity:1!important}
+}
+@keyframes cardArrival{from{transform:translateY(18px)}to{transform:none}}
+
+/* --- 6. Афита: компактная круглая кнопка, не перекрывает текст. --- */
+.afit-launch{padding:6px;gap:0;border-radius:50%;width:56px;height:56px;justify-content:center;bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+.afit-launch>span:not(.afit-symbol){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.afit-launch .afit-symbol{width:42px;height:42px}
+@media(max-width:1023px){
+  .afit-launch{right:12px;width:48px;height:48px;bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .afit-launch .afit-symbol{width:36px;height:36px;padding:7px}
+}
+@media(min-width:1024px){.afit-launch{right:24px;bottom:24px}}
+
+/* --- 7. Нижняя панель на главной: «СТАРТ» вместо «Наверх». --- */
+.dock .home-btn.dock-start{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--amber);color:var(--amber-ink);text-decoration:none;border-radius:14px;font-weight:700}
+.dock .home-btn.dock-start:active{background:#ffbd4a;color:var(--amber-ink)}
