@@ -4,7 +4,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 
 fixture=json.loads(Path('tests/fixtures/ai-menu.json').read_text())['body']
-fixture['days'][0]['meals'][0]['steps']='1. '+fixture['days'][0]['meals'][0]['steps']+'\n2. Выложите готовую порцию на тарелку.\n3. Подайте сразу после приготовления.'
+fixture['days'][0]['meals'][0]['steps']='1. '+fixture['days'][0]['meals'][0]['steps']+'\n0.5 минуты дайте блюду постоять перед подачей.\n3. Подайте сразу после приготовления.'
 Path('qa-output').mkdir(exist_ok=True)
 with sync_playwright() as p:
  b=p.chromium.launch();page=b.new_page();calls=[];errors=[];state={'bad':False}
@@ -33,6 +33,7 @@ with sync_playwright() as p:
  expect(page.locator('.week-day')).to_have_count(7);expect(page.locator('.ai-provenance')).to_contain_text('сама еду не пробую')
  assert len(calls)==1 and calls[0]['preferences'].startswith('Люблю')
  expect(page.locator('.week-meal').first.locator('.cooking-steps li')).to_have_count(3)
+ expect(page.locator('.week-meal').first.locator('.cooking-steps li').nth(1)).to_contain_text('0.5 минуты')
  assert page.locator('.week-meal .recipe-source').count()==0
  assert 'ИИ может ошибаться в рецепте' not in page.locator('#week-output').text_content()
  before=page.locator('.week-meal h3').all_text_contents();before_parts=page.locator('.week-day').nth(1).text_content()

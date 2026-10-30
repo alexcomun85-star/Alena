@@ -15,7 +15,7 @@ function macro(m){return num(m.k)+' ккал · Б '+num(m.p)+' г · Ж '+num(m
 function parts(m){return m.parts.map(([n,g])=>esc(n)+' — '+g+' г'+(n==='Яйцо куриное'?' (≈ '+num(g/50)+' шт. без скорлупы)':'')).join('; ')}
 function recipeCredit(m){if(m.ai)return '';return '<p class="meta recipe-source">'+(m.adapted?'Домашняя адаптация идеи · ':'Домашний рецепт · ')+'<a href="'+esc(m.source[1])+'" target="_blank" rel="noopener">'+esc(m.source[0])+'</a></p>'}
 
-function cookingSteps(text){const lines=String(text).split(/\n+/).map(x=>x.trim().replace(/^\d+[.)]\s*/, '')).filter(Boolean);return lines.length>1?'<ol class="cooking-steps">'+lines.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ol>':'<p>'+esc(text)+'</p>'}
+function cookingSteps(text){const lines=String(text).split(/\n+/).map(x=>x.trim().replace(/^\d+[.)]\s+/, '')).filter(Boolean);return lines.length>1?'<ol class="cooking-steps">'+lines.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ol>':'<p>'+esc(text)+'</p>'}
 const slots=['Завтрак','Обед','Перекус','Ужин'];
 const vitaminSources=[['NIH: витамин C и продукты','https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/'],['NIH: витамин A и каротиноиды','https://ods.od.nih.gov/factsheets/VitaminA-Consumer/']];
 function produceText(day){const p=N.produce(day.meals);return 'Овощи, фрукты и ягоды: '+num(p.g)+' г · '+p.names.length+' видов. '+(p.met?'Ориентир 400 г достигнут.':'Меньше ориентира 400 г — замените блюдо или перекус на вариант с овощами и фруктами.')}
