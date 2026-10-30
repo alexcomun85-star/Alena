@@ -13,3 +13,5 @@ try{
  assert.equal((await fetch(base+'/chat')).status,404);
  console.log('Existing-server adapter: SQLite, CORS, fail-closed config and route separation OK');
 }finally{server.close();}
+
+await import('./generation.test.mjs');
