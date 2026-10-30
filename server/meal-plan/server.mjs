@@ -14,7 +14,8 @@ export function repairBudgets(DB,time=Date.now()){
  const epoch=Math.floor(time/86400000),start=(epoch+1)*86400000,end=(epoch+2)*86400000,prefix='user:'+epoch+':';const db=DB.sqlite;
  db.exec('BEGIN IMMEDIATE');
  try{
-  db.prepare("UPDATE ai_requests SET status='failed_refunded' WHERE status='failed' OR (status='pending' AND expires < ?)").run(time+86400000-210000);
+  // A single service process owns this DB: prior pending tasks cannot finish after restart.
+  db.prepare("UPDATE ai_requests SET status='failed_refunded' WHERE status IN ('failed','pending')").run();
   const count=db.prepare('SELECT COUNT(*) AS n FROM ai_requests WHERE expires >= ? AND expires < ?').get(start,end).n;
   db.prepare('INSERT INTO ai_budget (bucket, used, expires) VALUES (?, ?, ?) ON CONFLICT(bucket) DO UPDATE SET used=excluded.used, expires=excluded.expires').run('global:'+epoch,count,end);
   db.prepare("UPDATE ai_budget SET used=(SELECT COUNT(*) FROM ai_requests WHERE owner=substr(ai_budget.bucket, ?) AND status IN ('done','pending') AND expires >= ? AND expires < ?) WHERE bucket LIKE ?").run(prefix.length+1,start,end,prefix+'%');

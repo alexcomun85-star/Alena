@@ -25,7 +25,7 @@ repairDB.sqlite.prepare('INSERT INTO ai_budget (bucket,used,expires) VALUES (?,?
 repairDB.sqlite.prepare('INSERT INTO ai_budget (bucket,used,expires) VALUES (?,?,?)').run('user:'+day+':owner-a',5,time+86400000);
 repairBudgets(repairDB,time);
 assert.equal(repairDB.sqlite.prepare('SELECT used FROM ai_budget WHERE bucket=?').get('global:'+day).used,7,'preserve all real attempts, remove only inflated blocked-click charges');
-assert.equal(repairDB.sqlite.prepare('SELECT used FROM ai_budget WHERE bucket=?').get('user:'+day+':owner-a').used,3,'only two done and one active menu consume personal allowance');
-assert.equal(repairDB.sqlite.prepare("SELECT COUNT(*) AS n FROM ai_requests WHERE status='failed_refunded'").get().n,4);
+assert.equal(repairDB.sqlite.prepare('SELECT used FROM ai_budget WHERE bucket=?').get('user:'+day+':owner-a').used,2,'restart abandons old in-flight work; only the two completed menus consume personal allowance');
+assert.equal(repairDB.sqlite.prepare("SELECT COUNT(*) AS n FROM ai_requests WHERE status='failed_refunded'").get().n,5);
 repairBudgets(repairDB,time);assert.equal(repairDB.sqlite.prepare('SELECT used FROM ai_budget WHERE bucket=?').get('global:'+day).used,7,'restart repair is idempotent');
 console.log('Existing quota repair: legacy failed/stale menus credited, real service attempts retained, inflated counts repaired idempotently OK');
