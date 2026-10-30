@@ -62,7 +62,7 @@
       while(measure(word,size)>503){var cut=word.length-1;while(cut>1&&measure(word.slice(0,cut),size)>503)cut--;if(line){text(line,size,'0.07 0.16 0.14');line=''}text(word.slice(0,cut),size,'0.07 0.16 0.14');word=word.slice(cut)}
       if(line&&measure(line+' '+word,size)>503){text(line,size,'0.07 0.16 0.14');line=word}else line+=(line?' ':'')+word;
     });if(line)text(line,size,'0.07 0.16 0.14')}
-    items.forEach(function(b){if(b.kind==='page'){if(lines.length)page();return}var size=b.kind==='heading'?15:b.kind==='row'?10:11;if(b.kind==='heading'){if(y<110)page();y-=10}wrap(b.text,size);y-=b.kind==='row'?4:8});page();
+    items.forEach(function(b){if(b.kind==='page'){if(lines.length)page();return}var size=b.kind==='heading'?15:b.kind==='subheading'?12:b.kind==='row'?10:11;if(b.kind==='heading'||b.kind==='subheading'){if(y<110)page();y-=b.kind==='heading'?10:5}wrap(b.text,size);y-=b.kind==='row'?4:8});page();
     var objs=[null];function add(body){objs.push(body);return objs.length-1}function ascii(s){return enc.encode(s)}
     function stream(bytes,extra){var a=ascii('<< /Length '+bytes.length+(extra?' '+extra:'')+' >>\nstream\n'),z=ascii('\nendstream'),all=new Uint8Array(a.length+bytes.length+z.length);all.set(a);all.set(bytes,a.length);all.set(z,a.length+bytes.length);return all}
     var fontFile=add(stream(ft.bytes,'/Length1 '+ft.bytes.length)),descriptor=add('<< /Type /FontDescriptor /FontName /GolosText /Flags 32 /FontBBox ['+ft.bbox.join(' ')+'] /ItalicAngle 0 /Ascent '+Math.round(ft.ascent)+' /Descent '+Math.round(ft.descent)+' /CapHeight 720 /StemV 80 /FontFile2 '+fontFile+' 0 R >>');

@@ -1,0 +1,39 @@
+from playwright.sync_api import sync_playwright,expect
+from pathlib import Path
+Path('qa-output').mkdir(exist_ok=True)
+with sync_playwright() as p:
+ b=p.chromium.launch();page=b.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+ for width in (320,390,768,1280):
+  page.set_viewport_size({'width':width,'height':844});page.goto('http://localhost:8766/assistant-tools.html')
+  expect(page.locator('.task-card')).to_have_count(6)
+  assert page.locator('input:visible').count()==0
+  page.get_by_role('button',name='Рацион на неделю',exact=True).click()
+  page.locator('[name=mode][value=manual]').check()
+  assert page.locator('input[type=number]:visible').count()==1
+  assert page.locator('#auto-fields input:enabled').count()==0
+  page.locator('#nutrition-target').fill('1300');page.locator('[name=adult]').check()
+  page.get_by_role('button',name='Составить мой рацион',exact=True).click()
+  expect(page.locator('.week-day')).to_have_count(7)
+  expect(page.locator('.macro-targets')).to_contain_text('Белки')
+  expect(page.locator('.macro-targets')).to_contain_text('Углеводы')
+  expect(page.locator('.macro-targets')).to_contain_text('1\u00a0300')
+  page.locator('#week-settings>summary').click()
+  page.locator('#nutrition-target').fill('1100');page.get_by_role('button',name='Составить мой рацион',exact=True).click()
+  expect(page.locator('#week-error')).to_contain_text('1200')
+  page.locator('[name=mode][value=auto]').check()
+  page.locator('[name=age]').fill('35');page.locator('[name=height]').fill('160');page.locator('[name=weight]').fill('60');page.locator('[name=sex]').select_option('female')
+  page.get_by_role('button',name='Составить мой рацион',exact=True).click()
+  expect(page.locator('.macro-targets')).to_contain_text('1\u00a0770')
+  page.locator('.calculation-method>summary').click()
+  expect(page.locator('.calculation-method')).to_contain_text('1264')
+  expect(page.locator('.calculation-method a')).to_have_count(8)
+  page.get_by_role('button',name='Все возможности Афиты',exact=True).click()
+  expect(page.locator('.task-card')).to_have_count(6)
+  page.get_by_role('button',name='Рацион на неделю',exact=True).click()
+  page.locator('#week-settings>summary').click()
+  expect(page.locator('[name=height]')).to_have_value('160')
+  assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+  page.screenshot(path='qa-output/simple-'+str(width)+'.png',full_page=True)
+ assert not errors,errors
+ b.close()
+print('Simple UX: home, one-field path, 1300 kcal, clinical guard, auto formula, sources and session reuse at four widths OK')
