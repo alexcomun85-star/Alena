@@ -10,22 +10,34 @@ class D1 {
 }
 async function environment(){const DB=new D1();DB.sqlite.exec(await readFile(new URL('./schema.sql',import.meta.url),'utf8'));return {DB,AI_ENABLED:'true',OPENAI_API_KEY:'unit-test-placeholder',AI_BUDGET_SALT:'unit-test-only-salt',AI_DAY_REQUESTS:'20',AI_USER_DAY_REQUESTS:'5'};}
 function request(data=req,ip='192.0.2.1'){return new Request('https://unit.invalid/api/meal-plan',{method:'POST',headers:{'Content-Type':'application/json','CF-Connecting-IP':ip},body:JSON.stringify(data)})}
-let calls=0;const provider=async(url,init)=>{calls++;assert.equal(url,'https://api.openai.com/v1/responses');const p=JSON.parse(init.body);assert.equal(p.store,false);assert.ok(p.input[0].content.includes('Пиши пошагово'));assert.ok(p.input[0].content.includes('По умолчанию объясняй приготовление с нуля'));assert.ok(p.input[0].content.includes('отвесьте готовую порцию по составу'));assert.ok(p.input[0].content.includes('FoodSafety.gov'));assert.equal(p.max_output_tokens,20000);assert.equal(p.text.format.strict,true);const days=p.text.format.schema.properties.days;assert.equal(days.minItems,7);assert.equal(days.maxItems,7);assert.equal(days.items.properties.meals.minItems,4);assert.equal(days.items.properties.meals.maxItems,4);assert.equal(days.items.properties.meals.items.properties.time.minimum,5);assert.equal(days.items.properties.meals.items.properties.parts.items.properties.grams.maximum,500);assert.equal(p.text.format.type,'json_schema');assert.equal(p.tools,undefined);const input=JSON.parse(p.input[1].content);assert.equal(input.request.weight,undefined);assert.equal(input.request.age,undefined);assert.ok(!init.body.includes('unit-test-placeholder'));return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(body)}]}]})};
+function answer(value){return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(value)}]}]})}
+let calls=0;
+const provider=async(url,init)=>{calls++;assert.equal(url,'https://api.openai.com/v1/responses');const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);assert.equal(p.store,false);assert.equal(p.text.format.strict,true);assert.ok(!init.body.includes('unit-test-placeholder'));
+ if(input.stage==='cooking')return answer({recipes:input.recipes.map(e=>({id:e.id,steps:body.days[Number(e.id.split(':')[0])].meals[Number(e.id.split(':')[1])].steps}))});
+ assert.equal(input.stage,'composition');assert.equal(input.request.weight,undefined);assert.equal(input.request.age,undefined);
+ const m=p.text.format.schema.properties.days?.items.properties.meals.items||p.text.format.schema.properties.meals.items;assert.equal(m.properties.steps,undefined,'composition does not generate cooking text');
+ return answer(input.request.action==='replace'?{meals:[body.days[input.request.day].meals[input.request.index]]}:body);
+};
 let env=await environment();assert.equal((await aiStatus({}).json()).ready,false);
 assert.equal((await aiRoute(request(),{...env,OPENAI_API_KEY:undefined},{fetcher:provider})).status,503);assert.equal(calls,0);
-let response=await aiRoute(request(),env,{fetcher:provider});assert.equal(response.status,200);assert.equal((await response.json()).kind,'ai');assert.equal(calls,1);
-response=await aiRoute(request(),env,{fetcher:provider});assert.equal(response.status,200);assert.equal(calls,1,'identical retry returns cached recipes, no second model call');
-assert.equal((await aiRoute(request({...req,preferences:'different'}),env,{fetcher:provider})).status,409);assert.equal(calls,1);
+let response=await aiRoute(request(),env,{fetcher:provider});assert.equal(response.status,200);assert.equal((await response.json()).kind,'ai');assert.equal(calls,2);
+response=await aiRoute(request(),env,{fetcher:provider});assert.equal(response.status,200);assert.equal(calls,2,'identical retry returns cached recipes, no second model call');
+assert.equal((await aiRoute(request({...req,preferences:'different'}),env,{fetcher:provider})).status,409);assert.equal(calls,2);
 assert.equal((await aiRoute(request(req,'192.0.2.2'),env,{fetcher:provider})).status,409,'do not return another caller\'s cached menu');
 env=await environment();env.AI_DAY_REQUESTS='1';await aiRoute(request(),env,{fetcher:provider});response=await aiRoute(request({...req,requestId:'another_request_id_000002'}),env,{fetcher:provider});assert.equal(response.status,429,'persistent atomic daily budget');
-env=await environment();let attempts=0;const repair=async(...args)=>{attempts++;if(attempts===1){const bad=structuredClone(body);bad.days[0].meals[0].parts[0].food='Unknown';return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify(bad)}]}]})}const input=JSON.parse(JSON.parse(args[1].body).input[1].content);assert.ok(input.correction);assert.equal(input.previousDraft.days[0].meals[0].parts[0].food,'Unknown','repair receives the actual rejected recipe');assert.deepEqual(input.previousDraft.days[1],body.days[1],'valid days retained in repair context');return provider(...args)};
-response=await aiRoute(request(),env,{fetcher:repair});assert.equal(response.status,200);assert.equal(attempts,2,'one bounded correction');
-env=await environment();attempts=0;const invalid=async()=>{attempts++;return Response.json({status:'completed',output:[{content:[{type:'output_text',text:'{"days":[]}'}]}]})};response=await aiRoute(request(),env,{fetcher:invalid});assert.equal(response.status,502);assert.equal((await response.clone().json()).reason,'ИИ должен составить семь дней.');assert.equal(attempts,2);assert.equal(env.DB.sqlite.prepare('SELECT result FROM ai_requests').get().result,null,'never cache unvalidated recipes');
+env=await environment();let attempts=0;const repair=async(url,init)=>{attempts++;const input=JSON.parse(JSON.parse(init.body).input[1].content);
+ if(input.stage==='composition'){const bad=structuredClone(body);bad.days[0].meals[0].parts[0].food='Unknown';return answer(bad);}
+ if(input.stage==='repair'){assert.equal(input.recipes.length,1,'only broken dish is sent for repair');assert.equal(input.recipes[0].meal.parts[0].food,'Unknown');return answer({repairs:[{id:'0:0',meal:body.days[0].meals[0]}]});}
+ return provider(url,init);
+};
+response=await aiRoute(request(),env,{fetcher:repair});assert.equal(response.status,200);assert.equal(attempts,3,'composition, one targeted correction, cooking');
+const repairedBody=(await response.json()).body;assert.deepEqual(repairedBody.days[1].meals,body.days[1].meals,'valid day preserved exactly');
+env=await environment();attempts=0;const invalid=async()=>{attempts++;return answer({days:[]})};response=await aiRoute(request(),env,{fetcher:invalid});assert.equal(response.status,502);assert.equal(attempts,1,'malformed response does not start unbounded regeneration');assert.equal(env.DB.sqlite.prepare('SELECT result FROM ai_requests').get().result,null);
 console.log('AI server: fail-closed setup, structured provider request, SQLite budget, idempotency, privacy, single correction and invalid-output rejection OK');
 
 const replaceReq={...req,requestId:'replacement_schema_check_000001',action:'replace',day:0,index:0,otherMeals:body.days[0].meals.slice(1),avoidTitles:[]};
 env=await environment();let replacementSchema;
-response=await aiRoute(request(replaceReq),env,{fetcher:async(url,init)=>{replacementSchema=JSON.parse(init.body).text.format.schema;return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify({meals:[body.days[0].meals[0]]})}]}]})}});
+response=await aiRoute(request(replaceReq),env,{fetcher:async(url,init)=>{const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);if(input.stage==='composition')replacementSchema=p.text.format.schema;return provider(url,init);}});
 assert.equal(replacementSchema.properties.meals.minItems,1);assert.equal(replacementSchema.properties.meals.maxItems,1);assert.equal(response.status,200);
 console.log('Structured shape: exactly seven days x four meals, one replacement, useful validation reason OK');
 
@@ -55,3 +67,29 @@ await aiRoute(request(),env,{fetcher:provider});
 response=await aiRoute(request({...req,requestId:'different_user_global_cap_0001'},'192.0.2.99'),env,{fetcher:provider});assert.equal(response.status,429);assert.equal((await response.json()).limit,'service');
 assert.equal(env.DB.sqlite.prepare("SELECT SUM(used) AS n FROM ai_budget WHERE bucket LIKE 'user:%'").get().n,1,'service cap must refund the second user reservation');
 console.log('Quota accounting: failed menus refunded personally, real attempts retained globally, blocked clicks cost nothing, personal and service caps distinguished OK');
+
+// Cooking correction is confined to one meal and cannot change verified composition.
+env=await environment();let cookingCalls=0;let wrongCooking=true;
+const cookRepair=async(url,init)=>{
+ cookingCalls++;const input=JSON.parse(JSON.parse(init.body).input[1].content);
+ if(input.stage==='cooking')return answer({recipes:input.recipes.map((e,i)=>({id:e.id,steps:body.days[Number(e.id.split(':')[0])].meals[Number(e.id.split(':')[1])].steps+(i===0?' Добавьте майонез.':'')}))});
+ if(input.stage==='repair'){
+  assert.equal(input.recipes.length,1);assert.equal(input.recipes[0].id,'0:0');
+  const meal=structuredClone(input.recipes[0].meal);meal.steps=body.days[0].meals[0].steps;if(!wrongCooking)meal.parts[0].grams+=5;
+  return answer({repairs:[{id:'0:0',meal}]});
+ }
+ return provider(url,init);
+};
+response=await aiRoute(request(),env,{fetcher:cookRepair});assert.equal(response.status,200);assert.equal(cookingCalls,3);
+const cooked=(await response.json()).body;assert.deepEqual(cooked.days[1],body.days[1]);
+response=await aiRoute(request(),env,{fetcher:cookRepair});assert.equal(response.status,200);assert.equal(cookingCalls,3,'cached final recipe never pays for cooking again');
+wrongCooking=false;env=await environment();response=await aiRoute(request(),env,{fetcher:cookRepair});assert.equal(response.status,502,'cooking repair cannot modify verified weights');assert.match((await response.json()).reason,/проверенное блюдо/);
+
+// A repair cannot address another meal or return duplicate IDs.
+env=await environment();response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
+ const input=JSON.parse(JSON.parse(init.body).input[1].content);
+ if(input.stage==='composition'){const bad=structuredClone(body);bad.days[0].meals[0].parts[0].food='Unknown';return answer(bad);}
+ if(input.stage==='repair')return answer({repairs:[{id:'1:0',meal:body.days[1].meals[0]}]});
+ throw Error('must not cook invalid composition');
+}});assert.equal(response.status,502);assert.match((await response.json()).reason,/адрес исправления/);
+console.log('Staged recipes: verified composition before cooking, targeted repair, immutable valid dishes, immutable cooking weights, bounded calls and offline cache OK');
