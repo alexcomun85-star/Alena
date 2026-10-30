@@ -1,7 +1,7 @@
 """Run as root on Afita's existing server; never copies or prints the API key."""
 import argparse, json, pathlib, re, shutil, subprocess, time, urllib.request
 
-FILES = ['package.json', 'server.mjs', 'handler.js', 'contract.js', 'foods.js', 'schema.sql']
+FILES = ['package.json', 'server.mjs', 'handler.js', 'balance.js', 'contract.js', 'foods.js', 'schema.sql']
 LOCATION = '''
     # AFITA_AI_MEALS_V1
     location ^~ /api/meal-plan {

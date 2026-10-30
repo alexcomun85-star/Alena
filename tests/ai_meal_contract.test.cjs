@@ -19,6 +19,7 @@ assert.throws(()=>C.meal(raw,'snack',{...req,excluded:['milk']},FOOD_DB),/иск
 raw.parts[0]={food:'Майонез 67%',grams:10};assert.throws(()=>C.meal(raw,'snack',{...req,excluded:['egg']},FOOD_DB),/исключения/);
 raw.parts[0]={food:'Греческий йогурт 2%',grams:120};raw.steps+=' Добавьте масло.';assert.throws(()=>C.meal(raw,'snack',req,FOOD_DB),/неучтённый/);
 assert.throws(()=>C.request({...req,targets:{k:1800,p:90,f:60,c:10}}),/КБЖУ/);
+x=copy();x.days.forEach(d=>d.meals[0].family='other');assert.equal(C.normalize(x,req,FOOD_DB).warnings.length,1,'breakfast family repetition is advisory, not an empty week');
 // Saved plans contain complete recipes. Reload never calls a provider or trusts cached calorie fields.
 const context={window:{FOOD_DB,AfitaAIContract:C,AfitaTargets},crypto:require('node:crypto').webcrypto,AbortSignal,fetch:()=>{throw Error('restore must be offline')},module:{exports:{}}};
 vm.runInNewContext(read('js/ai-meal-client.js'),context);const A=context.window.AfitaAI;
@@ -26,3 +27,5 @@ const saved={kind:'ai',version:1,profile,ai:{requestId:req.requestId,model:'test
 const plan=A.restore(saved),again=A.restore(A.serialize(plan));assert.equal(again.days[0].k,fixture.days[0].k);assert.equal(JSON.stringify(again.days.map(d=>d.meals.map(m=>m.parts))),JSON.stringify(fixture.days.map(d=>d.meals.map(m=>m.parts))));
 console.log('AI contract: independent arithmetic, constraints, hidden ingredients, preferences privacy and offline full-recipe restore OK');
 module.exports={body,profile,req};
+
+assert.doesNotThrow(()=>C.meal({slot:'snack',family:'other',title:'Овощная нарезка',time:5,steps:'Нарежьте сырой огурец и морковь, подайте свежими.',seasonings:[],parts:[{food:'Огурец',grams:100},{food:'Морковь',grams:100}]},'snack',req,FOOD_DB),'сырой must not imply unlisted cheese');

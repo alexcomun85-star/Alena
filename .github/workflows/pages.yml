@@ -64,6 +64,7 @@ jobs:
           node tests/nutrition_targets.test.cjs
           node tests/meal_quality.test.cjs
           node tests/ai_meal_contract.test.cjs
+          node tests/ai_meal_pending.test.cjs
           node server/meal-plan/test.mjs
           python tests/ai_installer_test.py
           python tests/nutrition_actions.py
