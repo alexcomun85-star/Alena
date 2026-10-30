@@ -15,3 +15,5 @@ try{
 }finally{server.close();}
 
 await import('./generation.test.mjs');
+
+await import('./balance.test.mjs');

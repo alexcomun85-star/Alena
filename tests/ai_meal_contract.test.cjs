@@ -27,3 +27,5 @@ const saved={kind:'ai',version:1,profile,ai:{requestId:req.requestId,model:'test
 const plan=A.restore(saved),again=A.restore(A.serialize(plan));assert.equal(again.days[0].k,fixture.days[0].k);assert.equal(JSON.stringify(again.days.map(d=>d.meals.map(m=>m.parts))),JSON.stringify(fixture.days.map(d=>d.meals.map(m=>m.parts))));
 console.log('AI contract: independent arithmetic, constraints, hidden ingredients, preferences privacy and offline full-recipe restore OK');
 module.exports={body,profile,req};
+
+assert.doesNotThrow(()=>C.meal({slot:'snack',family:'other',title:'Овощная нарезка',time:5,steps:'Нарежьте сырой огурец и морковь, подайте свежими.',seasonings:[],parts:[{food:'Огурец',grams:100},{food:'Морковь',grams:100}]},'snack',req,FOOD_DB),'сырой must not imply unlisted cheese');

@@ -9,15 +9,16 @@ def main():
  if len(mounts)!=1:raise SystemExit('Cannot identify existing source mount; nothing changed')
  root=pathlib.Path(mounts[0]['Source']).resolve()
  if not root.is_relative_to('/opt/alenafit-assistant/ai-meals'):raise SystemExit('Unexpected source path; nothing changed')
- names=['handler.js','contract.js'];old={};new={}
+ names=['handler.js','contract.js','balance.js'];old={};new={}
  for name in names:
-  old[name]=(root/name).read_bytes()
+  old[name]=(root/name).read_bytes() if (root/name).exists() else None
   url=f'https://raw.githubusercontent.com/alexcomun85-star/Alena/{a.commit}/server/meal-plan/{name}'
   with urllib.request.urlopen(url,timeout=30) as r:new[name]=r.read(100000)
  if b'minItems:7,maxItems:7' not in new['handler.js'] or b"code:'interrupted'" not in new['handler.js'] or b'warnings.push' not in new['contract.js']:raise SystemExit('Expected fixes missing')
  if new==old:print('Обновление уже установлено');return
  stamp=str(int(time.time()))
- for name in names:(root/(name+'.before-update-'+stamp)).write_bytes(old[name])
+ for name in names:
+  if old[name] is not None:(root/(name+'.before-update-'+stamp)).write_bytes(old[name])
  try:
   for name in names:(root/name).write_bytes(new[name])
   for name in names:subprocess.run(['docker','exec','afita-meals','node','--check',name],check=True)
@@ -31,7 +32,9 @@ def main():
   else:raise RuntimeError('Service not ready')
  except Exception:
   
-  for name in names:(root/name).write_bytes(old[name])
+  for name in names:
+   if old[name] is None:(root/name).unlink(missing_ok=True)
+   else:(root/name).write_bytes(old[name])
   subprocess.run(['docker','restart','afita-meals'],stdout=subprocess.DEVNULL);raise
  print('ГОТОВО: обновлены проверка меню и обработка прерванных запросов. Обновите страницу сайта.')
 if __name__=='__main__':main()
