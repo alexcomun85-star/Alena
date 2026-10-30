@@ -1,12 +1,23 @@
 """Run against the local preview before releasing assistant actions."""
 from pathlib import Path
-import subprocess
+import subprocess,json
+from urllib.parse import urlparse,parse_qs
 from playwright.sync_api import sync_playwright, expect
 Path("qa-output").mkdir(exist_ok=True)
 with sync_playwright() as p:
     browser=p.chromium.launch()
     page=browser.new_page()
     errors=[]
+    def gateway(route):
+        url=urlparse(route.request.url)
+        query=parse_qs(url.query).get('q',[''])[0]
+        if url.path.endswith('/recipes'):
+            rows=[{'id':'wiki-test','title':'Чечевичный суп из открытого источника','ingredients':['Чечевица — 100 г','Морковь — 1 шт.'],'steps':['Промойте чечевицу и сварите согласно упаковке.','Добавьте морковь и доведите до готовности.'],'source':'Викиучебник','url':'https://ru.wikibooks.org/wiki/Рецепт:Тест','license':'CC BY-SA'}] if 'чечевица' in query else []
+            data={'recipes':rows}
+        else:
+            data={'foods':[{'name':'Тестовый продукт из интернета','brand':'Тест','unit':'г','k':100,'p':10,'f':4,'c':6,'url':'https://perek.us/food/test','source':'perek.us'}]}
+        route.fulfill(status=200,headers={'Access-Control-Allow-Origin':'*'},content_type='application/json',body=json.dumps(data,ensure_ascii=False))
+    page.route('https://alenafit-food-api.honeycivet19.chatgpt.site/api/**',gateway)
     page.on('pageerror',lambda e: errors.append(str(e)))
     for width in (320,390,768,1280):
         page.set_viewport_size({'width':width,'height':844})
@@ -36,7 +47,7 @@ with sync_playwright() as p:
         page.locator('#ingredients').fill('абракадабра')
         page.get_by_role('button',name='Подобрать блюда',exact=True).click()
         expect(page.locator('#recipe-results')).to_contain_text('Не удалось распознать: абракадабра')
-        expect(page.locator('.ai-fallback')).to_contain_text('Нужна идея для другого сочетания?')
+        expect(page.locator('.online-results')).to_contain_text('подходящих рецептов не найдено')
         expect(page.locator('#recipe-results')).to_contain_text('БЫСТРЫЕ НАБОРЫ')
         page.locator('#ingredients').fill('курица гречка')
         page.get_by_role('button',name='Подобрать блюда',exact=True).click()
@@ -64,6 +75,16 @@ with sync_playwright() as p:
         page.get_by_role('button',name='Очистить итог',exact=True).click()
         assert 'Здесь пока пусто' in page.locator('#report').inner_text()
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
+        page.get_by_role('button',name='Что приготовить',exact=True).click()
+        page.locator('#ingredients').fill('чечевица')
+        page.get_by_role('button',name='Подобрать блюда',exact=True).click()
+        expect(page.locator('.online-results')).to_contain_text('Чечевичный суп из открытого источника')
+        expect(page.locator('.online-results a').first).to_have_attribute('href','https://ru.wikibooks.org/wiki/%D0%A0%D0%B5%D1%86%D0%B5%D0%BF%D1%82:%D0%A2%D0%B5%D1%81%D1%82')
+        page.get_by_role('button',name='Продукты и калории',exact=True).click()
+        page.locator('#grams').fill('200')
+        page.locator('#search').fill('Незнакомый продукт')
+        expect(page.locator('#food-results')).to_contain_text('Тестовый продукт из интернета')
+        expect(page.locator('#food-results')).to_contain_text('200 ккал')
     # Widget keeps the conversation frame alive when switching to actions.
     page.route('https://assistant.alenafit.com/**',lambda route:route.fulfill(status=200,content_type='text/html',body='<p>Тестовый чат</p>'))
     page.set_viewport_size({'width':390,'height':844})

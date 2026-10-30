@@ -3,16 +3,9 @@
  const launch=document.querySelector('.afit-launch'),panel=document.querySelector('.afit-window');
  if(!launch||!panel)return;
  const close=panel.querySelector('.afit-close'),frame=panel.querySelector('iframe');let previous=launch;
- const tools=document.createElement('iframe');tools.title='Инструменты Афиты';tools.setAttribute('allow','microphone; clipboard-write');tools.hidden=true;tools.style.display='none';frame.after(tools);
+ const tools=document.createElement('iframe');tools.title='Инструменты Афиты';tools.setAttribute('allow','microphone');tools.hidden=true;tools.style.display='none';frame.after(tools);
  const tabs=document.createElement('nav');tabs.className='afit-tabs';tabs.setAttribute('aria-label','Режим помощника');
- ['Чат','Действия'].forEach((label,index)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.setAttribute('aria-pressed',String(index===0));b.onclick=()=>{if(index&&!tools.getAttribute('src'))tools.src='assistant-tools.html?v=20261029pantry3';frame.hidden=!!index;frame.style.display=index?'none':'';tools.hidden=!index;tools.style.display=index?'block':'none';tabs.querySelectorAll('button').forEach((t,i)=>t.setAttribute('aria-pressed',String(i===index)))};tabs.append(b)});frame.before(tabs);
- // Only this same-origin tools frame can request switching; no automatic chat send.
- window.addEventListener('message',event=>{
-  if(event.origin!==location.origin||event.source!==tools.contentWindow||event.data?.type!=='afita:open-chat')return;
-  tabs.querySelector('button').click();
-  const note=panel.querySelector('.afit-access');
-  if(note)note.textContent='Вопрос скопирован. Вставьте его в чат и отправьте. Ответ модели расходует лимит.';
- });
+ ['Чат','Действия'].forEach((label,index)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.setAttribute('aria-pressed',String(index===0));b.onclick=()=>{if(index&&!tools.getAttribute('src'))tools.src='assistant-tools.html?v=20261030online1';frame.hidden=!!index;frame.style.display=index?'none':'';tools.hidden=!index;tools.style.display=index?'block':'none';tabs.querySelectorAll('button').forEach((t,i)=>t.setAttribute('aria-pressed',String(i===index)))};tabs.append(b)});frame.before(tabs);
  const viewport=window.visualViewport;
  function fit(){
   if(!viewport||panel.hidden)return;

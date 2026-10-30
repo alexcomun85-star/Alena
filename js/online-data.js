@@ -1,0 +1,10 @@
+/* Fixed public-source gateway. Only the current product/ingredient query is sent. */
+(function(root){'use strict';
+const API='https://alenafit-food-api.honeycivet19.chatgpt.site/api/';const cache=new Map();
+function safeUrl(s,hosts){try{const u=new URL(s);return u.protocol==='https:'&&hosts.includes(u.hostname)?u.href:null}catch{return null}}
+async function lookup(kind,q,signal){q=String(q||'').trim().slice(0,120);if(q.length<2)return {};const key=kind+':'+q.toLowerCase(),old=cache.get(key);if(old&&old.until>Date.now())return old.data;
+ const r=await fetch(API+kind+'?q='+encodeURIComponent(q),{signal:signal||AbortSignal.timeout(25000),credentials:'omit',referrerPolicy:'no-referrer'});let d;try{d=await r.json()}catch{throw Error('Источник вернул неполные данные. Попробуйте позже.')}if(!r.ok)throw Error(d.error||'Внешний поиск временно недоступен.');if(cache.size>=50)cache.delete(cache.keys().next().value);cache.set(key,{until:Date.now()+1800000,data:d});return d}
+async function recipes(q,signal){const d=await lookup('recipes',q,signal);return (Array.isArray(d.recipes)?d.recipes:[]).slice(0,4).map(r=>({...r,url:safeUrl(r.url,['ru.wikibooks.org']),historyUrl:safeUrl(r.historyUrl,['ru.wikibooks.org']),ingredients:Array.isArray(r.ingredients)?r.ingredients.filter(x=>typeof x==='string'&&x.length<=500).slice(0,24):[],steps:Array.isArray(r.steps)?r.steps.filter(x=>typeof x==='string'&&x.length<=3000).slice(0,20):[]})).filter(r=>typeof r.title==='string'&&r.url&&r.ingredients.length&&r.steps.length)}
+async function foods(q,signal){const d=await lookup('foods',q,signal);return (Array.isArray(d.foods)?d.foods:[]).slice(0,8).map(x=>({...x,url:safeUrl(x.url,['perek.us','world.openfoodfacts.org','ru.openfoodfacts.org'])})).filter(x=>typeof x.name==='string'&&x.url&&[x.k,x.p,x.f,x.c].every(v=>typeof v==='number'&&Number.isFinite(v)&&v>=0)&&x.k<=910&&x.p<=100&&x.f<=100&&x.c<=100)}
+root.AfitaOnline={recipes,foods,safeUrl};if(typeof module!=='undefined'&&module.exports)module.exports=root.AfitaOnline;
+})(typeof window!=='undefined'?window:globalThis);
