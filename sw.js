@@ -2,17 +2,19 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-release-20261030-v45-everyday';
+const VERSION = 'alenafit-release-20261030-v46-ai';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
   "./js/nutrition-targets.js?v=20261030simple1",
-  "./js/nutrition-plan.js?v=20261030everyday1",
-  "./js/nutrition-ui.js?v=20261030everyday1",
+  "./js/nutrition-plan.js?v=20261030ai1",
+  "./js/ai-meal-contract.js?v=20261030ai1",
+  "./js/ai-meal-client.js?v=20261030ai1",
+  "./js/nutrition-ui.js?v=20261030ai1",
   "./js/online-data.js?v=20261030online1",
   "./js/recipe-engine.js?v=20261029pantry2",
   "./assistant-tools.html",
   "./css/assistant-tools.css?v=20261030simple1",
-  "./js/assistant-tools.js?v=20261030simple1",
+  "./js/assistant-tools.js?v=20261030ai1",
   "./img/alena-invitation.webp",
   "./",
   "./404.html",
@@ -53,7 +55,7 @@ const CORE = [
   "./css/gym-images.css?v=20261028j",
   "./css/home-motion.css?v=20261028b",
   "./css/afit-widget.css?v=20261029pantry2",
-  "./js/afit-widget.js?v=20261030everyday1",
+  "./js/afit-widget.js?v=20261030ai1",
   "./css/site.css?v=20261029m",
   "./js/brand-pilot.js?v=1",
   "./js/card-reveal.js?v=3",

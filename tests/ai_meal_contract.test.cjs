@@ -1,0 +1,28 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),path=require('node:path');const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+vm.runInNewContext(read('js/food-db.js'),{window:global});global.AfitaTargets=require('../js/nutrition-targets.js');
+const N=require('../js/nutrition-plan.js'),C=require('../js/ai-meal-contract.js');
+const targets=AfitaTargets.calculate({mode:'manual',target:1800,goal:'maintain'}),profile={adult:true,target:1800,goal:'maintain',targets,pulses:false,excluded:[]};
+const fixture=N.generate(profile),body={days:fixture.days.map(d=>({meals:d.meals.map((m,i)=>({...C.toRaw({...m,slot:C.slots[i],family:i===0?N.templates.find(t=>t.id===m.id).family:'other',seasonings:[]})}))}))};
+const req=C.request({action:'week',requestId:'test_request_week_00000001',...profile,preferences:'Люблю домашнюю кухню',age:50,weight:80,apiKey:'must-not-leave-client'});
+assert.equal(req.age,undefined);assert.equal(req.weight,undefined);assert.equal(req.apiKey,undefined);
+const parsed=C.normalize(body,req,FOOD_DB);assert.equal(parsed.days.length,7);assert.equal(parsed.days[0].k,fixture.days[0].k);
+const copy=()=>structuredClone(body);
+let x=copy();x.days[0].meals[0].k=999999;assert.equal(C.normalize(x,req,FOOD_DB).days[0].k,fixture.days[0].k,'ignore invented nutrition');
+x=copy();x.days[0].meals[0].parts[0].food='Неведомый суперфуд';assert.throws(()=>C.normalize(x,req,FOOD_DB),/ингредиент/);
+x=copy();x.days[0].meals[0].parts[0].grams=3000;assert.throws(()=>C.normalize(x,req,FOOD_DB),/ингредиент/);
+x=copy();x.days[0].meals[0].title='<img src=x onerror=alert(1)>';assert.throws(()=>C.normalize(x,req,FOOD_DB),/название/);
+x=copy();x.days[0].meals[0].seasonings=['масло'];assert.throws(()=>C.normalize(x,req,FOOD_DB),/приправы/);
+x=copy();x.days[1].meals[0]=structuredClone(x.days[0].meals[0]);assert.throws(()=>C.normalize(x,req,FOOD_DB),/повторил/);
+x=copy();x.days[0].meals[0].parts.push({food:'Нут варёный',grams:50});assert.throws(()=>C.normalize(x,req,FOOD_DB),/исключения/);
+const raw={slot:'snack',family:'other',title:'Десерт из шоколада',time:5,steps:'Подайте нарезанный фрукт с отмеренным шоколадом. Вымойте фрукт перед подачей.',seasonings:[],parts:[{food:'Шоколад молочный',grams:20},{food:'Яблоко',grams:100}]};
+assert.throws(()=>C.meal(raw,'snack',{...req,excluded:['milk']},FOOD_DB),/исключения/);
+raw.parts[0]={food:'Майонез 67%',grams:10};assert.throws(()=>C.meal(raw,'snack',{...req,excluded:['egg']},FOOD_DB),/исключения/);
+raw.parts[0]={food:'Греческий йогурт 2%',grams:120};raw.steps+=' Добавьте масло.';assert.throws(()=>C.meal(raw,'snack',req,FOOD_DB),/неучтённый/);
+assert.throws(()=>C.request({...req,targets:{k:1800,p:90,f:60,c:10}}),/КБЖУ/);
+// Saved plans contain complete recipes. Reload never calls a provider or trusts cached calorie fields.
+const context={window:{FOOD_DB,AfitaAIContract:C,AfitaTargets},crypto:require('node:crypto').webcrypto,AbortSignal,fetch:()=>{throw Error('restore must be offline')},module:{exports:{}}};
+vm.runInNewContext(read('js/ai-meal-client.js'),context);const A=context.window.AfitaAI;
+const saved={kind:'ai',version:1,profile,ai:{requestId:req.requestId,model:'test-fixture',generatedAt:'2026-10-30T12:00:00Z'},body};
+const plan=A.restore(saved),again=A.restore(A.serialize(plan));assert.equal(again.days[0].k,fixture.days[0].k);assert.equal(JSON.stringify(again.days.map(d=>d.meals.map(m=>m.parts))),JSON.stringify(fixture.days.map(d=>d.meals.map(m=>m.parts))));
+console.log('AI contract: independent arithmetic, constraints, hidden ingredients, preferences privacy and offline full-recipe restore OK');
+module.exports={body,profile,req};

@@ -12,6 +12,7 @@ with sync_playwright() as p:
         page.set_viewport_size({'width':width,'height':844})
         page.goto('http://localhost:8766/assistant-tools.html')
         page.get_by_role('button',name='Рацион на неделю',exact=True).click()
+        page.locator('[name=menuSource][value=catalog]').check()
         page.locator('[name=mode][value=manual]').check()
         page.locator('#nutrition-target').fill('2000')
         page.locator('#nutrition-goal').select_option('lose')

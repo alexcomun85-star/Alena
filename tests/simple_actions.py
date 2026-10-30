@@ -8,6 +8,7 @@ with sync_playwright() as p:
   expect(page.locator('.task-card')).to_have_count(6)
   assert page.locator('input:visible').count()==0
   page.get_by_role('button',name='Рацион на неделю',exact=True).click()
+  page.locator('[name=menuSource][value=catalog]').check()
   page.locator('[name=mode][value=manual]').check()
   assert page.locator('input[type=number]:visible').count()==1
   assert page.locator('#auto-fields input:enabled').count()==0
