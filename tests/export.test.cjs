@@ -29,6 +29,12 @@ vm.runInNewContext(code,{window:win,document:doc,navigator,Blob,File,TextEncoder
   await win.AlenaExport.save(new Blob(['{}']),'backup.json','status');assert.equal(clicks,1);assert.equal(status.textContent,'Сохранение отменено.');
   navigator.share=async()=>{throw new Error('share unavailable')};
   await win.AlenaExport.save(new Blob(['{}']),'backup.json','status');assert.equal(clicks,2);
+  const pdfBlob=await win.AlenaExport.blob(items,'Рацион');
+  const eml=await win.AlenaExport.email(pdfBlob,'alex@example.org','alenafit-week.pdf');
+  const mime=await eml.text();assert.ok(mime.includes('To: alex@example.org')&&mime.includes('X-Unsent: 1')&&mime.includes('Content-Disposition: attachment; filename="alenafit-week.pdf"'));
+  const part=mime.split('Content-Transfer-Encoding: base64')[2].split('--AlenafitPdfAttachment--')[0].trim();
+  assert.deepEqual(Buffer.from(part,'base64'),Buffer.from(await pdfBlob.arrayBuffer()));
+  await assert.rejects(()=>win.AlenaExport.email(pdfBlob,'a@example.org\r\nBcc: other@example.org','x.pdf'));
   console.log('PDF: кириллица, несколько страниц, полный текст; JSON share, отмена и fallback — OK');
  }finally{rmSync(dir,{recursive:true,force:true})}
 })().catch(e=>{console.error(e);process.exitCode=1});
