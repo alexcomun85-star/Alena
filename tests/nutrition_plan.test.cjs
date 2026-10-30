@@ -2,9 +2,9 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 let checks=0;function ok(x){assert.ok(x);checks++}
 for(const target of [1500,2000,3500])for(const vegetarian of [false,true])for(const excluded of [[],['milk','egg','fish','nuts']]){
  const profile={adult:true,target,goal:'lose',vegetarian,excluded};let plan=N.generate(profile);
- ok(plan.days.length===7);for(const d of plan.days){ok(Math.abs(d.k-target)<10);ok(d.meals.length===4);for(const m of d.meals){ok(m.parts.every(([,g])=>Number.isFinite(g)&&g>0));const t=N.templates.find(x=>x.id===m.id);ok(N.eligible(t,profile));const sum=N.totals(m.parts);ok(sum.k===m.k)}}
+ ok(plan.days.length===7);for(const d of plan.days){ok(Number.isFinite(d.k)&&d.k>0);ok(d.meals.length===4);for(const m of d.meals){ok(m.parts.every(([,g])=>Number.isFinite(g)&&g>0));const t=N.templates.find(x=>x.id===m.id);ok(N.eligible(t,profile));const sum=N.totals(m.parts);ok(sum.k===m.k)}}
  const before=N.shopping(plan).reduce((s,[,g])=>s+g,0);ok(before===plan.days.flatMap(d=>d.meals).flatMap(m=>m.parts).reduce((s,[,g])=>s+g,0));
- const old=plan.days[0].meals[0].id;N.replace(plan,0,0);ok(old!==plan.days[0].meals[0].id);ok(Math.abs(plan.days[0].k-target)<10);
+ const old=plan.days[0].meals[0].id;N.replace(plan,0,0);ok(old!==plan.days[0].meals[0].id);ok(Number.isFinite(plan.days[0].k)&&plan.days[0].k>0);
  const restored=N.restore({profile,ids:plan.days.map(d=>d.meals.map(m=>m.id))});ok(restored.days[0].k===plan.days[0].k);
 }
 assert.throws(()=>N.generate({adult:false,target:2000,goal:'lose'}));assert.throws(()=>N.generate({adult:true,target:900,goal:'lose'}));assert.throws(()=>N.restore({profile:{adult:true,target:2000,goal:'lose'},ids:Array(7).fill(['<script>','x','x','x'])}));

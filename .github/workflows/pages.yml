@@ -62,6 +62,7 @@ jobs:
           node tests/online_data.test.cjs
           node tests/nutrition_plan.test.cjs
           node tests/nutrition_targets.test.cjs
+          node tests/meal_quality.test.cjs
           python tests/nutrition_actions.py
           python tests/simple_actions.py
           python tests/assistant_actions.py
