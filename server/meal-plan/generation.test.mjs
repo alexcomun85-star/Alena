@@ -36,5 +36,22 @@ const normalized=globalThis.AfitaAIContract.request(req),hash=createHash('sha256
 await env.DB.prepare('INSERT INTO ai_requests (id, request_hash, owner, status, result, expires) VALUES (?, ?, ?, ?, NULL, ?)').bind(req.requestId,hash,owner,'pending',fixed+86400000).run();
 let unexpectedCalls=0;const noProvider=async()=>{unexpectedCalls++;throw Error('must not call provider')};
 response=await aiRoute(request(),env,{fetcher:noProvider,now:()=>fixed+10000});assert.equal(response.status,409);assert.equal((await response.json()).code,'in_progress');
-response=await aiRoute(request(),env,{fetcher:noProvider,now:()=>fixed+211000});assert.equal(response.status,410);assert.equal((await response.json()).code,'interrupted');assert.equal(unexpectedCalls,0);assert.equal(env.DB.sqlite.prepare('SELECT status FROM ai_requests').get().status,'failed');
+response=await aiRoute(request(),env,{fetcher:noProvider,now:()=>fixed+211000});assert.equal(response.status,410);assert.equal((await response.json()).code,'interrupted');assert.equal(unexpectedCalls,0);assert.equal(env.DB.sqlite.prepare('SELECT status FROM ai_requests').get().status,'failed_refunded');
 console.log('Pending lease: active requests retained, abandoned requests released without paid calls OK');
+
+// Failed generation refunds the personal allowance, while real attempts retain the service budget.
+env=await environment();env.AI_USER_DAY_REQUESTS='1';
+response=await aiRoute(request(),env,{fetcher:invalid});assert.equal(response.status,502);
+assert.equal(env.DB.sqlite.prepare("SELECT used FROM ai_budget WHERE bucket LIKE 'user:%'").get().used,0);
+assert.equal(env.DB.sqlite.prepare("SELECT used FROM ai_budget WHERE bucket LIKE 'global:%'").get().used,1);
+response=await aiRoute(request({...req,requestId:'after_failed_request_000001'}),env,{fetcher:provider});assert.equal(response.status,200,'failed menu must not deny a real retry');
+const callsBeforeLimit=calls;
+for(let i=0;i<10;i++){
+ response=await aiRoute(request({...req,requestId:'blocked_request_00000'+i}),env,{fetcher:provider});assert.equal(response.status,429);assert.equal((await response.json()).limit,'user');
+}
+assert.equal(calls,callsBeforeLimit);assert.equal(env.DB.sqlite.prepare("SELECT used FROM ai_budget WHERE bucket LIKE 'global:%'").get().used,2,'blocked clicks never spend the service budget');
+env=await environment();env.AI_DAY_REQUESTS='1';
+await aiRoute(request(),env,{fetcher:provider});
+response=await aiRoute(request({...req,requestId:'different_user_global_cap_0001'},'192.0.2.99'),env,{fetcher:provider});assert.equal(response.status,429);assert.equal((await response.json()).limit,'service');
+assert.equal(env.DB.sqlite.prepare("SELECT SUM(used) AS n FROM ai_budget WHERE bucket LIKE 'user:%'").get().n,1,'service cap must refund the second user reservation');
+console.log('Quota accounting: failed menus refunded personally, real attempts retained globally, blocked clicks cost nothing, personal and service caps distinguished OK');

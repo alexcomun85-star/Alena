@@ -9,7 +9,7 @@ def main():
  if len(mounts)!=1:raise SystemExit('Cannot identify existing source mount; nothing changed')
  root=pathlib.Path(mounts[0]['Source']).resolve()
  if not root.is_relative_to('/opt/alenafit-assistant/ai-meals'):raise SystemExit('Unexpected source path; nothing changed')
- names=['handler.js','contract.js','balance.js'];old={};new={}
+ names=['handler.js','contract.js','balance.js','server.mjs'];old={};new={}
  for name in names:
   old[name]=(root/name).read_bytes() if (root/name).exists() else None
   url=f'https://raw.githubusercontent.com/alexcomun85-star/Alena/{a.commit}/server/meal-plan/{name}'
@@ -36,5 +36,5 @@ def main():
    if old[name] is None:(root/name).unlink(missing_ok=True)
    else:(root/name).write_bytes(old[name])
   subprocess.run(['docker','restart','afita-meals'],stdout=subprocess.DEVNULL);raise
- print('ГОТОВО: обновлены проверка меню и обработка прерванных запросов. Обновите страницу сайта.')
+ print('ГОТОВО: исправлен учёт лимитов. Неудачные попытки возвращены; общий бюджет учитывает реальные запросы к ИИ.')
 if __name__=='__main__':main()
