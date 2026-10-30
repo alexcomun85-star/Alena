@@ -94,6 +94,7 @@ with sync_playwright() as p:
     expect(panel).to_be_visible()
     panel.get_by_role('button',name='Действия',exact=True).click()
     tools=page.frame_locator('iframe[title="Инструменты Афиты"]')
+    tools.get_by_role('button',name='Что приготовить',exact=True).click()
     expect(tools.locator('#ingredients')).to_be_visible()
     tools.get_by_role('button',name='Продукты и калории',exact=True).click()
     expect(tools.locator('#search')).to_be_visible()

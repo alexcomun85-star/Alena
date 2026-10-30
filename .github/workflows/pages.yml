@@ -61,7 +61,9 @@ jobs:
           node tests/recipe_engine.test.cjs
           node tests/online_data.test.cjs
           node tests/nutrition_plan.test.cjs
+          node tests/nutrition_targets.test.cjs
           python tests/nutrition_actions.py
+          python tests/simple_actions.py
           python tests/assistant_actions.py
           retry python tests/regression.py
           retry python tests/audit_regression.py
