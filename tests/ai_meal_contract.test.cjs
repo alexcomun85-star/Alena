@@ -36,3 +36,10 @@ assert.throws(()=>C.meal({...noOil,steps:noOil.steps+' Затем добавьт
 assert.throws(()=>C.meal({...noOil,steps:'Смешайте хлопья с молоком и яйцом. Выпекайте на сковороде.'},'breakfast',req,FOOD_DB),/неучтённый ингредиент: молоко/);
 const several=copy();several.days[0].meals[0].parts[0].food='Неизвестный продукт';several.days[1].meals[0].parts[0].food='Другой неизвестный продукт';
 assert.throws(()=>C.normalize(several,req,FOOD_DB),e=>e.message.includes('День 1')&&e.message.includes('День 2'),'report all affected meals for a single focused repair');
+
+// Regression: the VPS used substring matching and interpreted «сырой» as cheese.
+const casserole={slot:'breakfast',family:'bake',title:'Творожная запеканка с изюмом',time:40,steps:'1. Промойте изюм. Смешайте творог с яйцом и хлопьями. Сырой смесью заполните силиконовую форму без масла.\n2. Запекайте при 180 °C до готовности: внутри не менее 71 °C. Дайте немного остыть.',seasonings:[],parts:[{food:'Творог 5%',grams:150},{food:'Яйцо куриное',grams:50},{food:'Овсяные хлопья сухие',grams:20},{food:'Изюм',grams:20}]};
+assert.doesNotThrow(()=>C.meal(casserole,'breakfast',req,FOOD_DB));
+for(const [step,label] of [[' Добавьте сыр.','сыр'],[' Смажьте форму маслом.','масло'],[' Добавьте мёд.','мёд'],[' Добавьте медом сладость.','мёд']])assert.throws(()=>C.meal({...casserole,steps:casserole.steps+step},'breakfast',req,FOOD_DB),e=>e.message.includes('неучтённый ингредиент: '+label));
+assert.doesNotThrow(()=>C.meal({...casserole,steps:casserole.steps+' Подавайте как небольшие медальоны.'},'breakfast',req,FOOD_DB),'medallions are not honey');
+assert.equal(read('js/ai-meal-contract.js'),read('server/meal-plan/contract.js'),'browser and server must apply exactly the same validation');

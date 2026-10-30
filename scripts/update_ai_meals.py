@@ -25,8 +25,8 @@ def main():
   subprocess.run(['docker','restart','afita-meals'],check=True,stdout=subprocess.DEVNULL)
   for attempt in range(30):
    try:
-    with urllib.request.urlopen('http://127.0.0.1:18081/api/meal-plan/status',timeout=2) as r:ready=json.load(r).get('ready')
-    if ready:break
+    with urllib.request.urlopen('http://127.0.0.1:18081/api/meal-plan/status',timeout=2) as r:status=json.load(r);ready=status.get('ready')
+    if ready and status.get('revision')=='staged-recipes-20261030-3':break
    except OSError:pass
    time.sleep(.5)
   else:raise RuntimeError('Service not ready')
@@ -36,5 +36,5 @@ def main():
    if old[name] is None:(root/name).unlink(missing_ok=True)
    else:(root/name).write_bytes(old[name])
   subprocess.run(['docker','restart','afita-meals'],stdout=subprocess.DEVNULL);raise
- print('ГОТОВО: исправлен учёт лимитов. Неудачные попытки возвращены; общий бюджет учитывает реальные запросы к ИИ.')
+ print('ГОТОВО: проверена версия staged-recipes-20261030-3. Исправлены проверка ингредиентов и повторное исправление рецептов.')
 if __name__=='__main__':main()
