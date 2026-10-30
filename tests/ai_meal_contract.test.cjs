@@ -29,3 +29,10 @@ console.log('AI contract: independent arithmetic, constraints, hidden ingredient
 module.exports={body,profile,req};
 
 assert.doesNotThrow(()=>C.meal({slot:'snack',family:'other',title:'Овощная нарезка',time:5,steps:'Нарежьте сырой огурец и морковь, подайте свежими.',seasonings:[],parts:[{food:'Огурец',grams:100},{food:'Морковь',grams:100}]},'snack',req,FOOD_DB),'сырой must not imply unlisted cheese');
+// A prohibition is not an added ingredient. A positive addition later in the step still is.
+const noOil={slot:'breakfast',family:'pancakes',title:'Овсяные оладьи с бананом',time:15,steps:'Измельчите хлопья и смешайте с яйцом и бананом. Выпекайте на антипригарной сковороде без масла и молока.',seasonings:[],parts:[{food:'Овсяные хлопья сухие',grams:40},{food:'Яйцо куриное',grams:50},{food:'Банан',grams:100}]};
+assert.doesNotThrow(()=>C.meal(noOil,'breakfast',req,FOOD_DB));
+assert.throws(()=>C.meal({...noOil,steps:noOil.steps+' Затем добавьте масло.'},'breakfast',req,FOOD_DB),/неучтённый ингредиент: масло/);
+assert.throws(()=>C.meal({...noOil,steps:'Смешайте хлопья с молоком и яйцом. Выпекайте на сковороде.'},'breakfast',req,FOOD_DB),/неучтённый ингредиент: молоко/);
+const several=copy();several.days[0].meals[0].parts[0].food='Неизвестный продукт';several.days[1].meals[0].parts[0].food='Другой неизвестный продукт';
+assert.throws(()=>C.normalize(several,req,FOOD_DB),e=>e.message.includes('День 1')&&e.message.includes('День 2'),'report all affected meals for a single focused repair');

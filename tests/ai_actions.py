@@ -7,7 +7,7 @@ fixture=json.loads(Path('tests/fixtures/ai-menu.json').read_text())['body']
 fixture['days'][0]['meals'][0]['steps']='1. '+fixture['days'][0]['meals'][0]['steps']+'\n0.5 минуты дайте блюду постоять перед подачей.\n3. Подайте сразу после приготовления.'
 Path('qa-output').mkdir(exist_ok=True)
 with sync_playwright() as p:
- b=p.chromium.launch();page=b.new_page();calls=[];errors=[];state={'bad':False}
+ b=p.chromium.launch();page=b.new_page();calls=[];errors=[];state={'bad':False,'reject':False}
  page.on('pageerror',lambda e:errors.append(str(e)))
  def api(route):
   r=route.request
@@ -18,6 +18,8 @@ with sync_playwright() as p:
   data=r.post_data_json;calls.append(data)
   assert 'weight' not in data and 'height' not in data and 'age' not in data
   assert data['targets']['k']==1800
+  if state['reject']:
+   route.fulfill(status=502,json={'code':'validation_failed','error':'Меню не прошло проверку','reason':'В приготовлении есть неучтённый ингредиент: масло.'},headers={'Access-Control-Allow-Origin':'*'});return
   if state['bad']:body={'days':[]}
   elif data['action']=='replace':
    meal=copy.deepcopy(fixture['days'][data['day']]['meals'][data['index']]);meal['title']='Контрольная замена одного блюда';body={'meals':[meal]}
@@ -55,6 +57,10 @@ with sync_playwright() as p:
  state['bad']=True
  page.locator('#week-settings > summary').click();page.get_by_role('button',name='Составить мой рацион',exact=True).click()
  expect(page.locator('#week-error')).not_to_be_empty()
+ expect(page.locator('.week-meal h3').first).to_have_text('Контрольная замена одного блюда')
+ state['bad']=False;state['reject']=True
+ page.get_by_role('button',name='Составить мой рацион',exact=True).click()
+ expect(page.locator('#week-diagnostic')).to_contain_text('неучтённый ингредиент: масло')
  expect(page.locator('.week-meal h3').first).to_have_text('Контрольная замена одного блюда')
  for width in (320,390,768,1280):
   page.set_viewport_size({'width':width,'height':844})
