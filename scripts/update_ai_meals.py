@@ -15,6 +15,9 @@ def main():
   url=f'https://raw.githubusercontent.com/alexcomun85-star/Alena/{a.commit}/server/meal-plan/{name}'
   with urllib.request.urlopen(url,timeout=30) as r:new[name]=r.read(100000)
  if b'minItems:7,maxItems:7' not in new['handler.js'] or b"code:'interrupted'" not in new['handler.js'] or b'warnings.push' not in new['contract.js']:raise SystemExit('Expected fixes missing')
+ m=re.search(rb"revision:'([a-z0-9-]+)'",new['handler.js'])
+ if not m:raise SystemExit('Revision missing; nothing changed')
+ expected=m.group(1).decode()
  if new==old:print('Обновление уже установлено');return
  stamp=str(int(time.time()))
  for name in names:
@@ -26,7 +29,7 @@ def main():
   for attempt in range(30):
    try:
     with urllib.request.urlopen('http://127.0.0.1:18081/api/meal-plan/status',timeout=2) as r:status=json.load(r);ready=status.get('ready')
-    if ready and status.get('revision')=='staged-recipes-20261030-3':break
+    if ready and status.get('revision')==expected:break
    except OSError:pass
    time.sleep(.5)
   else:raise RuntimeError('Service not ready')
@@ -36,5 +39,5 @@ def main():
    if old[name] is None:(root/name).unlink(missing_ok=True)
    else:(root/name).write_bytes(old[name])
   subprocess.run(['docker','restart','afita-meals'],stdout=subprocess.DEVNULL);raise
- print('ГОТОВО: проверена версия staged-recipes-20261030-3. Исправлены проверка ингредиентов и повторное исправление рецептов.')
+ print('ГОТОВО: проверена версия '+expected+'. Исправлены проверка ингредиентов и повторное исправление рецептов.')
 if __name__=='__main__':main()

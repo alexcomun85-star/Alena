@@ -38,7 +38,7 @@ async function buildMenu(req,fetcher,env){
   const result=await modelCall(req,fetcher,env,patchSchema(items,mealSchema),{stage:'repair',request:req,correction:reason,recipes:items.map(e=>({id:e.day+':'+e.index,meal:e.meal,error:e.error||reason})),foodNutritionPer100g:nutrition,instruction:'Исправь или замени только указанные блюда. Другие блюда изменить нельзя. Для ошибки приготовления сохрани состав и исправь текст.'},'afita_repairs');
   if(!Array.isArray(result.repairs)||result.repairs.length!==items.length)throw failure('Неполный ответ исправления блюд.');
   const wanted=new Map(items.map(e=>[e.day+':'+e.index,e])),seen=new Set();
-  for(const patch of result.repairs){if(!wanted.has(patch.id)||seen.has(patch.id))throw failure('Неверный адрес исправления.');seen.add(patch.id);const e=wanted.get(patch.id);C.meal(patch.meal,C.slots[e.index],req,AI_FOODS);put(body,req,e,patch.meal);}
+  for(const patch of result.repairs){if(!wanted.has(patch.id)||seen.has(patch.id))throw failure('Неверный адрес исправления.');seen.add(patch.id);const e=wanted.get(patch.id);try{C.meal(patch.meal,C.slots[e.index],req,AI_FOODS)}catch(err){throw failure(err.message)}put(body,req,e,patch.meal);}
  }
  let issues=collect(body,req);const titleKey=t=>String(t).toLocaleLowerCase('ru').replace(/ё/g,'е');const used=new Set(req.avoidTitles.map(titleKey));for(const e of entries(body,req)){const key=titleKey(e.meal.title);if(used.has(key)&&!issues.some(x=>x.day===e.day&&x.index===e.index))issues.push({...e,error:'Повтор названия: '+e.meal.title});used.add(key);}if(issues.length)await repair(issues,issues.map(e=>e.error).join('\n'));
  try{const original=body;body=balanceMenu(body,req,AI_FOODS);portionsAdjusted=body!==original;C.normalize(body,req,AI_FOODS);}catch(err){
@@ -46,18 +46,24 @@ async function buildMenu(req,fetcher,env){
   const days=new Set([...err.message.matchAll(/День (\d+)/g)].map(m=>Number(m[1])-1));
   const items=entries(body,req).filter(e=>days.has(e.day));
   if(!items.length)throw failure(err.message);await repair(items,err.message);
-  const original=body;body=balanceMenu(body,req,AI_FOODS);portionsAdjusted ||= body!==original;C.normalize(body,req,AI_FOODS);
+  try{const original=body;body=balanceMenu(body,req,AI_FOODS);portionsAdjusted ||= body!==original;C.normalize(body,req,AI_FOODS);}catch(err2){throw failure(err2.message)}
  }
  const meals=entries(body,req),cookingSchema={type:'object',additionalProperties:false,properties:{recipes:{type:'array',minItems:meals.length,maxItems:meals.length,items:{type:'object',additionalProperties:false,properties:{id:{type:'string',enum:meals.map(e=>e.day+':'+e.index)},steps:{type:'string'}},required:['id','steps']}}},required:['recipes']};
  const cooking=await modelCall(req,fetcher,env,cookingSchema,{stage:'cooking',recipes:meals.map(e=>({id:e.day+':'+e.index,...e.meal})),instruction:'Состав и граммовки уже проверены и неизменяемы. Напиши только приготовление по этому составу, без новых ингредиентов. Используй количества из состава. Соблюдай технологию, время и температуры. Вода и указанные приправы разрешены.'},'afita_cooking');
  const wanted=new Map(meals.map(e=>[e.day+':'+e.index,e])),seen=new Set();
  if(!Array.isArray(cooking.recipes)||cooking.recipes.length!==meals.length)throw failure('Неполные инструкции приготовления.');
  for(const recipe of cooking.recipes){if(!wanted.has(recipe.id)||seen.has(recipe.id))throw failure('Неверный адрес инструкции.');seen.add(recipe.id);wanted.get(recipe.id).meal.steps=recipe.steps;}
- issues=collect(body,req);if(issues.length){const before=new Map(issues.map(e=>[e.day+':'+e.index,JSON.stringify({...e.meal,steps:undefined})]));await repair(issues,issues.map(e=>e.error).join('\n'));for(const e of issues){const current=entries(body,req).find(x=>x.day===e.day&&x.index===e.index);if(JSON.stringify({...current.meal,steps:undefined})!==before.get(e.day+':'+e.index))throw failure('Исправление инструкции изменило проверенное блюдо.');}}
+ // Cooking text is repaired as text only: verified composition and grams are never resent, so they cannot drift.
+ issues=collect(body,req);if(issues.length){
+  const ids=issues.map(e=>e.day+':'+e.index),fix=await modelCall(req,fetcher,env,{type:'object',additionalProperties:false,properties:{recipes:{type:'array',minItems:ids.length,maxItems:ids.length,items:{type:'object',additionalProperties:false,properties:{id:{type:'string',enum:ids},steps:{type:'string'}},required:['id','steps']}}},required:['recipes']},{stage:'cooking_repair',recipes:issues.map(e=>({id:e.day+':'+e.index,...e.meal,error:e.error})),instruction:'Перепиши только приготовление для указанных блюд, исправив ошибку из поля error. Состав и граммовки неизменяемы: используй только их, без новых ингредиентов. Вода и указанные приправы разрешены.'},'afita_cooking_repair');
+  const seenFix=new Set();if(!Array.isArray(fix.recipes)||fix.recipes.length!==ids.length)throw failure('Неполное исправление приготовления.');
+  for(const recipe of fix.recipes){if(!ids.includes(recipe.id)||seenFix.has(recipe.id))throw failure('Неверный адрес инструкции.');seenFix.add(recipe.id);const [d,i]=recipe.id.split(':').map(Number);entries(body,req).find(x=>x.day===d&&x.index===i).meal.steps=recipe.steps;}
+  const left=collect(body,req);if(left.length)throw failure(left.map(e=>e.error).join('\n'));
+ }
  try{C.normalize(body,req,AI_FOODS)}catch(err){throw failure(err.message)}
  return {body,portionsAdjusted};
 }
-export function aiStatus(env){return reply({revision:'staged-recipes-20261030-3',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
+export function aiStatus(env){return reply({revision:'cooking-text-repair-20261031-1',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
 export async function aiRoute(request,env,{fetcher=fetch,now=Date.now}={}){
  if(!configured(env))return reply({code:'not_configured',error:'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'},503);
  const time=now(),ip=request.headers.get('CF-Connecting-IP')||request.headers.get('oai-authenticated-user-id');if(!ip)return reply({code:'identity_unavailable',error:'Не удалось проверить лимит запросов. Попробуйте позже.'},503);const epoch=Math.floor(time/86400000),owner=await digest(env.AI_BUDGET_SALT+':'+epoch+':'+ip);
@@ -79,6 +85,7 @@ export async function aiRoute(request,env,{fetcher=fetch,now=Date.now}={}){
   await db.batch([db.prepare('DELETE FROM ai_requests WHERE id IN (SELECT id FROM ai_requests WHERE expires < ? LIMIT 100)').bind(time),db.prepare('DELETE FROM ai_budget WHERE bucket IN (SELECT bucket FROM ai_budget WHERE expires < ? LIMIT 100)').bind(time)]).catch(()=>{});
   return reply(result);
  }catch(e){
+  console.error('Afita generation failed:',e.name==='TimeoutError'?'timeout':e.message,e.reason?String(e.reason).slice(0,500):'');
   if(created){const refunded=await db.prepare('UPDATE ai_requests SET status = ? WHERE id = ? AND owner = ? AND status = ? RETURNING id').bind('failed_refunded',req.requestId,owner,'pending').first().catch(()=>null);if(refunded)await release(db,userKey).catch(()=>{});}
   else{if(userReserved)await release(db,userKey).catch(()=>{});if(globalReserved)await release(db,globalKey).catch(()=>{});}
   return reply({reason:e.reason||null,code:e.message==='validation_failed'?'validation_failed':'generation_failed',error:e.message==='validation_failed'?'Не удалось проверить рацион. Сохранённое меню не изменено.':'Генерация временно недоступна. Сохранённое меню не изменено.'},502)}

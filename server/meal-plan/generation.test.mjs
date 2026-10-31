@@ -73,17 +73,18 @@ env=await environment();let cookingCalls=0;let wrongCooking=true;
 const cookRepair=async(url,init)=>{
  cookingCalls++;const input=JSON.parse(JSON.parse(init.body).input[1].content);
  if(input.stage==='cooking')return answer({recipes:input.recipes.map((e,i)=>({id:e.id,steps:body.days[Number(e.id.split(':')[0])].meals[Number(e.id.split(':')[1])].steps+(i===0?' Добавьте майонез.':'')}))});
- if(input.stage==='repair'){
-  assert.equal(input.recipes.length,1);assert.equal(input.recipes[0].id,'0:0');
-  const meal=structuredClone(input.recipes[0].meal);meal.steps=body.days[0].meals[0].steps;if(!wrongCooking)meal.parts[0].grams+=5;
-  return answer({repairs:[{id:'0:0',meal}]});
+ if(input.stage==='cooking_repair'){
+  // Only cooking text is requested; the schema has no place for parts or grams.
+  const schema=JSON.parse(init.body).text.format.schema.properties.recipes.items;assert.deepEqual(Object.keys(schema.properties),['id','steps']);
+  assert.equal(input.recipes.length,1);assert.equal(input.recipes[0].id,'0:0');assert.match(input.recipes[0].error,/.+/);
+  return answer({recipes:[{id:'0:0',steps:body.days[0].meals[0].steps+(wrongCooking?'':' Добавьте майонез.')}]});
  }
  return provider(url,init);
 };
 response=await aiRoute(request(),env,{fetcher:cookRepair});assert.equal(response.status,200);assert.equal(cookingCalls,3);
 const cooked=(await response.json()).body;assert.deepEqual(cooked.days[1],body.days[1]);
 response=await aiRoute(request(),env,{fetcher:cookRepair});assert.equal(response.status,200);assert.equal(cookingCalls,3,'cached final recipe never pays for cooking again');
-wrongCooking=false;env=await environment();response=await aiRoute(request(),env,{fetcher:cookRepair});assert.equal(response.status,502,'cooking repair cannot modify verified weights');assert.match((await response.json()).reason,/проверенное блюдо/);
+wrongCooking=false;env=await environment();response=await aiRoute(request(),env,{fetcher:cookRepair});assert.equal(response.status,502,'unfixed cooking text is rejected');const failed=await response.json();assert.equal(failed.code,'validation_failed','a rejected recipe is not reported as a temporary outage');assert.match(failed.reason,/.+/);
 
 // A repair cannot address another meal or return duplicate IDs.
 env=await environment();response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
