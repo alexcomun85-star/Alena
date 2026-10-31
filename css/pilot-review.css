@@ -153,3 +153,79 @@ body.pilot-v2 .plan:not(.primary) .slot,body.pilot-v2 .plan:not(.primary) .price
 body.pilot-v2 .quiz .opts label{background:var(--band)}
 @media(max-width:480px){body.pilot-v2 .plan .fit{grid-template-columns:1fr}}
 @media(min-width:1024px){body.pilot-v2 .coaching-demo .w{max-width:1140px}}
+
+/* ===================== v4: своя компоновка для телефона =====================
+   Телефон: окна почти во всю ширину, без вложенных рамок, однотипные карточки — в ленту со свайпом.
+   Планшет: две колонки. ПК: сетки (правила выше). */
+@media(max-width:719px){
+  /* окна шире: 8 px от края экрана вместо 20 */
+  body.pilot-v2 main>section:not(.hero):not(.final)>.w{margin-inline:-12px;padding:30px 18px 26px;border-radius:28px}
+  body.pilot-v2 main>#zachem>.w{margin-inline:-12px}
+  body.pilot-v2 main section h2{font-size:clamp(28px,8.2vw,40px)}
+
+  /* меньше вложенности: внутренние рамки снимаем */
+  body.pilot-v2 .prog,body.pilot-v2 .limits,body.pilot-v2 .quiz{background:transparent;border:0;padding:0;box-shadow:none}
+  body.pilot-v2 .prog{margin-top:18px;padding-top:18px;border-top:1px solid var(--win-edge);border-radius:0}
+  body.pilot-v2 .limits{gap:14px}
+
+  /* лента со свайпом: общий вид */
+  body.pilot-v2 .swipe{display:flex!important;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-inline:-18px;padding:4px 18px 6px;scroll-padding-inline:18px}
+  body.pilot-v2 .swipe::-webkit-scrollbar{display:none}
+  body.pilot-v2 .swipe>*{scroll-snap-align:start;flex:0 0 82%;min-width:0}
+  body.pilot-v2 .swipe-hint{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+  body.pilot-v2 .swipe-hint::after{content:"";width:28px;height:2px;border-radius:2px;background:var(--amber)}
+
+  /* «Узнали себя?» — карточки в ленте */
+  body.pilot-v2.editorial-refine #who .who{margin-top:20px}
+  body.pilot-v2.editorial-refine #who .who article{background:var(--band);border:0;border-radius:22px;padding:44px 18px 20px}
+  body.pilot-v2.editorial-refine #who .who article::before{top:18px;left:18px}
+  body.pilot-v2.editorial-refine #who .who h3{font-size:19px;margin-bottom:10px}
+
+  /* инструменты — три плашки в ленте, внутри компактный список */
+  body.pilot-v2 #tools .tools-row{margin-top:18px}
+  body.pilot-v2 #tools .tools-row>.tool-group{flex-basis:86%;padding:18px 14px 14px}
+  body.pilot-v2 #tools .tool-group .cat-grid{grid-template-columns:1fr;gap:6px}
+  body.pilot-v2 #tools .tool-group .cat{padding:11px 13px;gap:2px}
+  body.pilot-v2 #tools .tool-group .cat b{font-size:14.5px}
+  body.pilot-v2 #tools .tool-group .cat span{font-size:12.5px}
+
+  /* цены: карточки плотнее */
+  body.pilot-v2 .plans{gap:10px}
+  body.pilot-v2 .plan{padding:22px 16px 18px;gap:16px;border-radius:24px}
+  body.pilot-v2 .plan .price b{font-size:36px}
+  body.pilot-v2 .plan ul{gap:8px}
+  body.pilot-v2 .plan li{font-size:15px}
+  body.pilot-v2 .plan .slots{gap:6px}
+  body.pilot-v2 .plan .slot{grid-template-columns:52px 1fr;padding:8px 12px 8px 8px}
+  body.pilot-v2 .plan .day{width:52px;height:52px}
+  body.pilot-v2 .plan .pricepair{flex-wrap:nowrap}
+  body.pilot-v2 .plan .pricepair span{flex:1;text-align:center;padding:9px 8px;font-size:14px}
+
+  /* «По блину»: блины поменьше, текст шире */
+  body.pilot-v2 .brand-journey .step{grid-template-columns:60px 1fr;gap:14px}
+  body.pilot-v2 .brand-journey .step .pl,body.pilot-v2 .brand-journey .step .pl svg{width:60px;height:60px}
+  body.pilot-v2 .brand-journey .step b{font-size:17px}
+
+  /* телефон с перепиской — без лишних полей */
+  body.pilot-v2 .phone{max-width:320px}
+  body.pilot-v2 .pilot-demo .w{gap:26px}
+
+  /* об Алёне: фото и цифра рядом */
+  body.pilot-v2 .about{gap:16px}
+  body.pilot-v2 .portrait{max-width:100%;aspect-ratio:4/3;border-radius:22px}
+}
+@media(min-width:720px) and (max-width:1023px){
+  body.pilot-v2 .tools-row{grid-template-columns:1fr 1fr}
+  body.pilot-v2 .tools-row>.tool-group:last-child{grid-column:1/-1}
+  body.pilot-v2 .plans{grid-template-columns:1fr 1fr;align-items:start}
+}
+.swipe-hint{display:none}
+@media(max-width:719px){body.pilot-v2 .swipe-hint.m-only{display:flex}}
+@media(max-width:719px){body.pilot-v2 .about{grid-template-columns:minmax(0,1fr)!important}body.pilot-v2 .portrait{width:100%;justify-self:stretch}}
+@media(max-width:719px){
+  body.pilot-v2 main>#zachem>.w{margin-inline:-12px!important;max-width:none}
+  body.pilot-v2 #zachem .eat-teaser{border-radius:28px}
+  body.pilot-v2 .portrait{aspect-ratio:4/3!important;height:auto!important;max-height:300px;box-shadow:none}
+  body.pilot-v2 .portrait img{height:100%;object-position:50% 25%}
+}
+@media(max-width:719px){body.pilot-v2 #zachem .eat-teaser{margin-inline:-18px;width:auto}}

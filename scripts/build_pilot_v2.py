@@ -58,5 +58,15 @@ if(!c||!('IntersectionObserver' in window)||matchMedia('(prefers-reduced-motion:
 new IntersectionObserver(function(e,o){if(e[0].isIntersecting){c.classList.add('chat-anim');o.disconnect()}},{threshold:.35}).observe(c)})();</script>
 </body>""")
 
+# --- лента со свайпом на телефоне: класс swipe + подсказка
+h = h.replace('<div class="who">', '<div class="who swipe">', 1)
+h = h.replace('<div class="tools-row">', '<div class="tools-row swipe">', 1)
+i = h.index('</div>', h.index('<div class="who swipe">'))
+# подсказку ставим после ленты «для кого»: ищем конец блока по закрывающему тегу статьи
+j = h.index('</article>\n      </div>', h.index('<div class="who swipe">')) + len('</article>\n      </div>')
+h = h[:j] + '\n      <p class="swipe-hint m-only">Листайте</p>' + h[j:]
+k = h.index('<div class="row-btns"><a class="btn btn-line" href="servisy.html">')
+h = h[:k] + '<p class="swipe-hint m-only">Листайте</p>\n      ' + h[k:]
+
 p.write_text(h, encoding="utf-8")
 print("v2 ok", len(h))
