@@ -62,14 +62,20 @@ const failure=reason=>Object.assign(Error('validation_failed'),{reason});
 async function buildMenu(req,fetcher,env){
  env={...env,deadline:Date.now()+170000};
  const full=schema(req),mealSchema=req.action==='week'?full.properties.days.items.properties.meals.items:full.properties.meals.items;
- const composition=structuredClone(full),draftMeal=req.action==='week'?composition.properties.days.items.properties.meals.items:composition.properties.meals.items;
+ // Week composition is an object day1…day7, not an array of exactly seven. With an array the model
+ // regularly "finished" after day 6 and, unable to close it under the strict schema, looped on whitespace.
+ const dayKeys=['day1','day2','day3','day4','day5','day6','day7'];
+ let composition,draftMeal;
+ if(req.action==='week'){const dayObj=structuredClone(full.properties.days.items);draftMeal=dayObj.properties.meals.items;composition={type:'object',additionalProperties:false,properties:Object.fromEntries(dayKeys.map(k=>[k,dayObj])),required:dayKeys};}
+ else{composition=structuredClone(full);draftMeal=composition.properties.meals.items;}
  delete draftMeal.properties.steps;draftMeal.required=draftMeal.required.filter(k=>k!=='steps');
  const nutrition=C.foodList(AI_FOODS).map(r=>({food:r[0],k:r[1],p:r[2],f:r[3],c:r[4]}));
- const compose=()=>modelCall(req,fetcher,env,composition,{stage:'composition',request:req,foodNutritionPer100g:nutrition,instruction:'Сначала составь блюда и ингредиенты. Инструкции приготовления будут созданы отдельно по проверенному составу.'},'afita_composition');
+ const compose=()=>modelCall(req,fetcher,env,composition,{stage:'composition',request:req,foodNutritionPer100g:nutrition,instruction:(req.action==='week'?'Заполни все семь дней: day1, day2, day3, day4, day5, day6, day7 — в каждом четыре приёма пищи. ':'')+'Сначала составь блюда и ингредиенты. Инструкции приготовления будут созданы отдельно по проверенному составу.'},'afita_composition');
  // Up to two retries after a loop, cut-off or broken JSON, while 60 s remain for the rest of the menu.
  let body;for(let attempt=1;;attempt++){try{body=await compose();break;}catch(e){
   const retryable=['incomplete','invalid_output','whitespace_loop'].includes(e.message)||e.name==='TimeoutError'||e instanceof SyntaxError;
   if(!retryable||attempt>2||env.deadline-Date.now()<60000)throw e;console.error('Afita composition retry:',e.name==='TimeoutError'?'timeout':e.message+(e.chars?' after '+e.chars+' chars':'')+(e.context?' | before: '+JSON.stringify(e.context):''));}}
+ if(req.action==='week'&&!Array.isArray(body?.days)&&body&&dayKeys.every(k=>body[k]))body={days:dayKeys.map(k=>body[k])};
  const placeholder='Приготовление будет составлено по проверенному составу.';
  for(const e of entries(body,req)){e.meal.steps=placeholder;tidy(e.meal);}
  let compositionRepairs=0,portionsAdjusted=false;const oilAdded=[],touched=new Set();
@@ -101,7 +107,7 @@ async function buildMenu(req,fetcher,env){
    const items=entries(body,req).filter(e=>days.has(e.day));
    if(!items.length||round>2)throw failure(message);
    await repair(items,explainDays(message,req.targets),compositionRepairs+1);
-   const after=compositionIssues();if(after.length)throw failure(after.map(e=>e.error).join('\n'));
+   let after=compositionIssues();if(after.length){await repair(after,after.map(e=>e.error).join('\n'),compositionRepairs+1);after=compositionIssues();if(after.length)throw failure(after.map(e=>e.error).join('\n'));}
    try{const original=body;body=balanceMenu(body,req,AI_FOODS);portionsAdjusted ||= body!==original;C.normalize(body,req,AI_FOODS);break;}catch(err2){message=err2.message;}
   }
  }
@@ -129,7 +135,7 @@ async function buildMenu(req,fetcher,env){
  try{C.normalize(body,req,AI_FOODS)}catch(err){throw failure(err.message)}
  return {body,portionsAdjusted,oilAdded};
 }
-export function aiStatus(env){return reply({revision:'loop-context-20261031-8',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
+export function aiStatus(env){return reply({revision:'seven-day-fields-20261031-9',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
 export async function aiRoute(request,env,{fetcher=fetch,now=Date.now}={}){
  if(!configured(env))return reply({code:'not_configured',error:'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'},503);
  const time=now(),ip=request.headers.get('CF-Connecting-IP')||request.headers.get('oai-authenticated-user-id');if(!ip)return reply({code:'identity_unavailable',error:'Не удалось проверить лимит запросов. Попробуйте позже.'},503);const epoch=Math.floor(time/86400000),owner=await digest(env.AI_BUDGET_SALT+':'+epoch+':'+ip);

@@ -15,7 +15,7 @@ let calls=0;
 const provider=async(url,init)=>{calls++;assert.equal(url,'https://api.openai.com/v1/responses');const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);assert.equal(p.store,false);assert.equal(p.text.format.strict,true);assert.ok(!init.body.includes('unit-test-placeholder'));
  if(input.stage==='cooking')return answer({recipes:input.recipes.map(e=>({id:e.id,steps:body.days[Number(e.id.split(':')[0])].meals[Number(e.id.split(':')[1])].steps}))});
  assert.equal(input.stage,'composition');assert.equal(input.request.weight,undefined);assert.equal(input.request.age,undefined);
- const m=p.text.format.schema.properties.days?.items.properties.meals.items||p.text.format.schema.properties.meals.items;assert.equal(m.properties.steps,undefined,'composition does not generate cooking text');
+ const m=p.text.format.schema.properties.day7?.properties.meals.items||p.text.format.schema.properties.meals.items;assert.ok(!p.text.format.schema.properties.days,'week composition uses day1…day7 fields');assert.equal(m.properties.steps,undefined,'composition does not generate cooking text');
  return answer(input.request.action==='replace'?{meals:[body.days[input.request.day].meals[input.request.index]]}:body);
 };
 let env=await environment();assert.equal((await aiStatus({}).json()).ready,false);
@@ -156,7 +156,7 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
  let seen=0,rounds=0;const env=await environment();const egg=body.days.flatMap((d,day)=>d.meals.map((m,index)=>({day,index,m}))).find(e=>e.m.parts.some(x=>x.food==='Яйцо куриное'));
  const r=await aiRoute(request(),env,{fetcher:async(url,init)=>{
   const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);
-  if(input.stage==='composition'){seen++;const g=p.text.format.schema.properties.days.items.properties.meals.items.properties.parts.items.properties.grams;assert.equal(g.type,'integer','grams cannot be an endless decimal');
+  if(input.stage==='composition'){seen++;const g=p.text.format.schema.properties.day1.properties.meals.items.properties.parts.items.properties.grams;assert.equal(g.type,'integer','grams cannot be an endless decimal');
    const odd=structuredClone(body);odd.days[egg.day].meals[egg.index].parts.find(x=>x.food==='Яйцо куриное').grams=60;odd.days[0].meals[1].parts[0].food='Unknown';return answer(odd);}
   if(input.stage==='repair'){rounds++;const meal=structuredClone(body.days[0].meals[1]);if(rounds===1)meal.parts[0].food='Unknown';return answer({repairs:[{id:'0:1',meal}]});}
   return provider(url,init);
@@ -188,6 +188,16 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
  const r=await aiRoute(request(),env,{fetcher:async(url,init)=>{const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);models[input.stage]=p.model;return provider(url,init);}});
  assert.equal(r.status,200);assert.equal(models.composition,'gpt-4.1');assert.equal(models.cooking,'gpt-4.1-mini');
  console.log('Composition model: configurable for composition only OK');
+}
+
+// The model answers the week as day1…day7 fields; the server turns them into seven ordered days.
+{
+ const env=await environment();const r=await aiRoute(request(),env,{fetcher:async(url,init)=>{const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);
+  if(input.stage==='composition'){const sc=p.text.format.schema;assert.deepEqual(sc.required,['day1','day2','day3','day4','day5','day6','day7']);assert.match(input.instruction,/day7/);
+   return answer(Object.fromEntries(body.days.map((d,i)=>['day'+(i+1),d])));}
+  return provider(url,init);}});
+ assert.equal(r.status,200);const out=(await r.json()).body;assert.equal(out.days.length,7);assert.equal(out.days[6].meals[0].title,body.days[6].meals[0].title);
+ console.log('Seven day fields: day1…day7 required, converted to ordered days OK');
 }
 
 // A repair cannot address another meal or return duplicate IDs.
