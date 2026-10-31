@@ -27,6 +27,8 @@ jobs:
     container: mcr.microsoft.com/playwright/python:v1.64.1-noble
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
@@ -76,6 +78,7 @@ jobs:
           retry python tests/audit_regression.py
           retry python tests/technical_regression.py
           retry python tests/mobile_feedback.py
+          python tests/mobile_services.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
