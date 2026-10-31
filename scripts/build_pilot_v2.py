@@ -42,7 +42,7 @@ must('<div class="creds" id="creds">',
      '<div class="about-stat"><b>105</b><span>кг в становой тяге<br>3-е место WRPF, Санкт-Петербург</span></div>\n          <div class="creds" id="creds">')
 
 # --- переписка в телефоне: сообщения приходят по одному, лента уезжает вверх
-must('</body>', '<script src="js/pilot-phone.js?v=1" defer></script>\n</body>')
+must('</body>', '<script src="js/pilot-phone.js?v=2" defer></script>\n</body>')
 
 # --- лента со свайпом на телефоне: класс swipe + подсказка
 h = h.replace('<div class="who">', '<div class="who pswipe">', 1)

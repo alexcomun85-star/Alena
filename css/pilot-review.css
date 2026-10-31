@@ -383,3 +383,21 @@ body.pilot-v2 .pilot-science a{color:var(--amber);text-underline-offset:3px}
 body.pilot-v2 main>section.final{padding-top:0!important;margin-top:var(--gap-win)!important}
 body.pilot-v2 .final-invite h2 em{color:inherit}
 body.pilot-v2 .final-invite h2 br{display:none}
+
+/* телефон: плавность — без анимации высоты, только transform/opacity (управляет js/pilot-phone.js) */
+.cw-track>.shown,.cw-track>.typing{animation:none!important}
+.cw-track{will-change:transform;backface-visibility:hidden}
+.cw-track>.msg,.cw-track>.msg-day{will-change:transform,opacity}
+
+/* окна разделов разделены явно: зазор больше, край и верхний блик заметнее */
+body.pilot-v2{--gap-win:20px;--win-edge:rgba(238,244,241,.13)}
+@media(min-width:1024px){body.pilot-v2{--gap-win:28px}}
+body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w,
+body.pilot-v2 #zachem .eat-teaser{box-shadow:inset 0 1px 0 rgba(238,244,241,.10),0 18px 40px -22px rgba(0,0,0,.85)}
+body.pilot-v2 #zachem .eat-teaser{border:1px solid var(--win-edge)}
+body.pilot-v2 main>section#who{padding-top:12px!important}
+/* карточки в ленте «Кому подойдёт» — шире зазор */
+@media(max-width:599px){body.pilot-v2 .pswipe{gap:12px}}
+/* карточки внутри окна: свой край, чтобы соседние не сливались */
+body.pilot-v2.editorial-refine #who .who article,body.pilot-v2 #tools .tool-group{border:1px solid var(--win-edge)!important}
+@media(max-width:599px){body.pilot-v2 .pswipe{gap:14px}body.pilot-v2 .pswipe>*{flex-basis:80%}}
