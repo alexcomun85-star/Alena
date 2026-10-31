@@ -6,6 +6,7 @@ from playwright.sync_api import sync_playwright
 BASE=os.environ.get('BASE','http://localhost:8766/')
 BASELINE='18eeb8321ca7d50e444d7d04b1b9886353fc7460'
 OUT=Path('qa-output');OUT.mkdir(exist_ok=True)
+current=Path('index.html').read_text()
 old=subprocess.check_output(['git','-c','safe.directory='+str(Path.cwd()),'show',BASELINE+':index.html'],text=True)
 rows=[];geometry={}
 with sync_playwright() as pw:
@@ -18,7 +19,7 @@ with sync_playwright() as pw:
     u=urlsplit(r.request.url)
     if 'assistant.alenafit.com' in u.netloc:assistant.append(r.request.url)
     if u.netloc!=urlsplit(BASE).netloc:r.abort()
-    elif phase=='before' and u.path in ['/','/index.html']:r.fulfill(status=200,body=old,content_type='text/html; charset=utf-8')
+    elif u.path in ['/','/index.html']:r.fulfill(status=200,body=old if phase=='before' else current,content_type='text/html; charset=utf-8')
     else:r.continue_()
    ctx.route('**/*',route)
    p=ctx.new_page()
@@ -51,7 +52,7 @@ with sync_playwright() as pw:
    def local(r):
     u=urlsplit(r.request.url)
     if u.netloc!=urlsplit(BASE).netloc:r.abort()
-    elif phase=='before' and u.path in ['/','/index.html']:r.fulfill(status=200,body=old,content_type='text/html; charset=utf-8')
+    elif u.path in ['/','/index.html']:r.fulfill(status=200,body=old if phase=='before' else current,content_type='text/html; charset=utf-8')
     else:r.continue_()
    ctx.route('**/*',local);p=ctx.new_page();cdp=ctx.new_cdp_session(p)
    cdp.send('Network.enable');cdp.send('Network.emulateNetworkConditions',{'offline':False,'latency':150,'downloadThroughput':200000,'uploadThroughput':96000});cdp.send('Emulation.setCPUThrottlingRate',{'rate':4})
@@ -60,5 +61,5 @@ with sync_playwright() as pw:
    rows.append({'phase':phase,'run':run+1,'lab':p.evaluate('({...window.__metrics,domReady:performance.getEntriesByType("navigation")[0].domContentLoadedEventEnd})')});ctx.close()
  browser.close()
 summary={phase:{'medianLcpMs':statistics.median(r['lab']['lcp'] for r in rows if r.get('lab') and r['phase']==phase),'maxCls':max(r['lab']['cls'] for r in rows if r.get('lab') and r['phase']==phase)} for phase in ['before','after']}
-(OUT/'mobile-services-comparison.json').write_text(json.dumps({'baseline':BASELINE,'environment':'Chromium local HTTP, simulated mobile 4x CPU and 1.6 Mbps/150 ms, 3 cold contexts per phase; not PSI or field CWV. External hosts blocked.','summary':summary,'samples':rows},ensure_ascii=False,indent=2))
+(OUT/'mobile-services-comparison.json').write_text(json.dumps({'baseline':BASELINE,'environment':'Chromium local assets; both HTML variants fulfilled identically, simulated mobile 4x CPU and 1.6 Mbps/150 ms, 3 cold contexts per phase; not PSI or field CWV. External hosts blocked.','summary':summary,'samples':rows},ensure_ascii=False,indent=2))
 print('PASS: identical main-page geometry at 390/768/1200 px and DPR 1/2; responsive images decoded; service links/overflow; no assistant requests. LAB:',json.dumps(summary))
