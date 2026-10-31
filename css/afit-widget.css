@@ -79,12 +79,12 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch{visibility:hidden;poi
 @media(prefers-reduced-motion:no-preference){
  .afit-window:not([hidden]){animation:afitaOpen 380ms cubic-bezier(.16,1,.3,1) both;transform-origin:bottom right}
  .afit-window.is-closing{animation:afitaClose 180ms ease-in both;pointer-events:none}
- .afit-window:not([hidden]) .afit-tabs button{animation:afitaTab 320ms ease-out 100ms backwards}
+ .afit-window:not([hidden]) .afit-tabs button{animation:none}
  .afit-window:not([hidden]) .afit-tabs button+button{animation-delay:160ms}
- .afit-window iframe.afita-view-enter{animation:afitaTab 240ms ease-out both}
+ .afit-window iframe{animation:none!important}
  .afit-tabs button,.afit-close{transition:background-color 180ms,color 180ms,box-shadow 180ms}
- @keyframes afitaOpen{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
- @keyframes afitaClose{to{opacity:0;transform:translateY(12px) scale(.98)}}
+ @keyframes afitaOpen{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+ @keyframes afitaClose{to{opacity:0;transform:translateY(8px)}}
  @keyframes afitaTab{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 }
 @media(max-width:600px){.afit-window{border-radius:20px}.afit-window header{min-height:60px}.afit-tabs button{min-height:44px}}

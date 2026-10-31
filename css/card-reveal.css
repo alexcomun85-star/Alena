@@ -3,7 +3,7 @@
   .unified-motion .motion-pending { opacity:0; }
   .unified-motion .motion-pending:focus-within { opacity:1; }
   .unified-motion .motion-enter {
-    animation: contentArrival 760ms cubic-bezier(.2,.65,.25,1) var(--motion-delay,0ms) backwards !important;
+    animation: contentArrival 600ms cubic-bezier(.2,.65,.25,1) var(--motion-delay,0ms) backwards !important;
   }
   /* Legacy section animation must not replay the same cards. */
   .unified-motion .editorial-refine #who.refine-in .who article:not(.motion-enter) { animation:none }
@@ -12,12 +12,12 @@
   main summary { transition:color 160ms ease, background-color 160ms ease }
 }
 @keyframes contentArrival {
-  from { opacity:0; transform:translateY(30px) scale(.985) }
+  from { opacity:0; transform:translateY(24px) }
   to { opacity:1; transform:translateY(0) }
 }
 @keyframes detailArrival { from {opacity:.5} to {opacity:1} }
 @media (max-width:600px) and (prefers-reduced-motion:no-preference) {
-  .unified-motion .motion-enter { animation-duration:650ms !important }
+  .unified-motion .motion-enter { animation-duration:540ms !important }
 }
 @media (prefers-reduced-motion:reduce) {
   .motion-pending, .motion-enter, main details[open] > :not(summary) { animation:none !important; transform:none !important; opacity:1 !important }

@@ -13,11 +13,11 @@
 h1,h2{font-family:'Unbounded','Golos Text',sans-serif;letter-spacing:-.04em}h1{font-size:23px}h2{font-size:17px}
 .primary{background:#f0a92b;border-color:#f0a92b;color:#14251c}.primary:hover{background:#f5bb50}
 .tools-header{background:#142e27;color:#e8f0eb;border-bottom-color:var(--line)}.tools-header button{color:#afc4b9}
-.tools-nav{background:#0d1e1af0;backdrop-filter:blur(12px)}.tools-nav [aria-current=page]{color:#f0a92b}
+.tools-nav{background:#0d1e1af0;backdrop-filter:none}.tools-nav [aria-current=page]{color:#f0a92b}
 .eyebrow,.group-title{color:#f0a92b}.task-card{border-radius:16px}.recipe{border-radius:16px}
 button,input,select,textarea{transition:border-color 180ms,background-color 180ms,box-shadow 180ms}input:focus,textarea:focus,select:focus{border-color:#f0a92b}
 @media(hover:hover){button:not(:disabled):hover{border-color:#f0a92b80}.task-card:hover,.starter:hover{background:#203c31}}
-@media(prefers-reduced-motion:no-preference){#work>*{animation:afitaContent 360ms cubic-bezier(.2,.65,.25,1) backwards}#work>:nth-child(2){animation-delay:50ms}#work>:nth-child(3){animation-delay:100ms}.task-card{animation:afitaContent 420ms ease-out backwards}.task-card:nth-child(2){animation-delay:60ms}.task-card:nth-child(3){animation-delay:120ms}.task-card:nth-child(4){animation-delay:180ms}@keyframes afitaContent{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}}
+@media(prefers-reduced-motion:no-preference){#work>h1,#work>h2,#work>p,#work>.eyebrow{animation:afitaContent 360ms cubic-bezier(.2,.65,.25,1) backwards}#work>:nth-child(2){animation-delay:50ms}#work>:nth-child(3){animation-delay:100ms}.task-card{animation:afitaContent 420ms ease-out backwards}.task-card:nth-child(2){animation-delay:60ms}.task-card:nth-child(3){animation-delay:120ms}.task-card:nth-child(4){animation-delay:180ms}@keyframes afitaContent{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 @media print{:root,body{background:white;color:#183d31}.recipe,.week-day{background:white;color:#183d31}button{display:none}}
 .task-card:first-child{background:#f0a92b;color:#14251c;border-color:#f0a92b}.task-card:first-child small{color:#243e2e;opacity:1}

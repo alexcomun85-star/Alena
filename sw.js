@@ -2,7 +2,7 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-release-20261031-v55-afita';
+const VERSION = 'alenafit-release-20261031-v56-smooth';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
   "./js/nutrition-targets.js?v=20261030simple1",
@@ -13,7 +13,7 @@ const CORE = [
   "./js/online-data.js?v=20261030online1",
   "./js/recipe-engine.js?v=20261029pantry2",
   "./assistant-tools.html",
-  "./css/assistant-tools.css?v=20261031harmony1",
+  "./css/assistant-tools.css?v=20261031smooth1",
   "./js/assistant-tools.js?v=20261030repair1",
   "./img/alena-invitation.webp",
   "./",
@@ -47,18 +47,18 @@ const CORE = [
   "./vozvrat.html",
   "./zal.html",
   "./css/brand-pilot.css?v=1",
-  "./css/card-reveal.css?v=20261031visible2",
+  "./css/card-reveal.css?v=20261031smooth1",
   "./css/design-pilot.css?v=20261029a",
   "./css/editorial-refine.css?v=1",
   "./css/final-invite.css?v=20261028d",
   "./css/fonts.css?v=20261028b",
   "./css/gym-images.css?v=20261028j",
   "./css/home-motion.css?v=20261028b",
-  "./css/afit-widget.css?v=20261031harmony1",
-  "./js/afit-widget.js?v=20261031harmony1",
+  "./css/afit-widget.css?v=20261031smooth1",
+  "./js/afit-widget.js?v=20261031smooth1",
   "./css/site.css?v=20261029m",
   "./js/brand-pilot.js?v=1",
-  "./js/card-reveal.js?v=20261031visible2",
+  "./js/card-reveal.js?v=20261031smooth1",
   "./js/cycle-diary.js?v=20261028d",
   "./js/cycle.js?v=20261028b",
   "./js/design-pilot.js?v=20261029a",

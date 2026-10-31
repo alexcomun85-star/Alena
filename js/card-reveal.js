@@ -3,7 +3,7 @@
   'use strict';
   const main = document.querySelector('main');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  if (!main || reduced.matches || !('IntersectionObserver' in window)) return;
+  if (!main || location.pathname.endsWith('/assistant-tools.html') || reduced.matches || !('IntersectionObserver' in window)) return;
   const selector = [
     'h1', 'h2', 'p', '.tag', 'article', 'figure', 'form', 'fieldset', 'details',
     '.test', '.step', '.cat', '.demo-card', '.stats', '.limits', '.creds',
@@ -29,7 +29,7 @@
       el.classList.remove('motion-pending');
       // Never interrupt a person typing or using a control inside a card.
       if (el.contains(document.activeElement)) return;
-      el.style.setProperty('--motion-delay', `${Math.min(index, 3) * 70}ms`);
+      el.style.setProperty('--motion-delay', `${Math.max(0, Math.min([...el.parentElement.children].filter(sibling => pending.has(sibling) || sibling.dataset.revealPlayed === 'true').indexOf(el), 3)) * 60}ms`);
       el.classList.add('motion-enter');
       active.add(el);
       const clean = () => {
@@ -41,7 +41,7 @@
       // Also clean up if an existing component rule cancels the animation.
       setTimeout(clean, 1500);
     });
-  }, {threshold: 0, rootMargin: '0px 0px -80px 0px'});
+  }, {threshold: 0, rootMargin: '0px 0px 24px 0px'});
   function collect(root) {
     if (stopped) return;
     const candidates = [...(root.matches?.(selector) ? [root] : []), ...root.querySelectorAll(selector)];
@@ -51,11 +51,12 @@
       const parent = el.parentElement?.closest(selector);
       if (parent && main.contains(parent) && !parent.closest(excluded)) return;
       registered.add(el);
-      // Only offscreen cards wait invisibly; initial content and controls stay readable.
-      if (el.matches('.task-nav > a,article,.cat,.hub-card,.hand,.myth,.tool,.step,.demo-card,.eat-teaser') &&
-          el.getBoundingClientRect().top >= (window.visualViewport?.height || innerHeight)) {
-        el.classList.add('motion-pending');
+      // Visible content must never disappear to start its entry animation.
+      if (el.getBoundingClientRect().top < (window.visualViewport?.height || innerHeight) + 24) {
+        el.dataset.revealPlayed = 'true';
+        return;
       }
+      el.classList.add('motion-pending');
       pending.add(el);
       observer.observe(el);
     });
