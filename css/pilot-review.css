@@ -356,3 +356,6 @@ body.pilot-v2 .phone .msg.vid{display:flex;align-items:center;gap:9px;padding-ri
 body.pilot-v2 .brand-journey .step .pl{width:44px!important;height:44px!important;border-radius:50%;border:1.5px solid var(--amber);color:var(--amber);font:700 17px/1 var(--display);display:grid;place-items:center}
 body.pilot-v2 .brand-journey .step{grid-template-columns:44px 1fr!important;align-items:start}
 body.pilot-v2 .brand-journey .step:last-child .pl{background:var(--amber);color:var(--amber-ink)}
+
+/* регалии на первом экране — обычная строка текста, не «таблетки» */
+body.pilot-v2 .hero .trust-line{display:block;font-size:14px;line-height:1.5;color:var(--muted);max-width:44ch}
