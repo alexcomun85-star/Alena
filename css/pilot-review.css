@@ -41,7 +41,7 @@
 @media(min-width:1024px){.pf-cols{grid-template-columns:repeat(5,minmax(0,1fr))}.pf-top{grid-template-columns:auto 1fr auto;align-items:center}}
 
 /* ===================== v2: дизайн-слой =====================
-   Идея: штанга и блины. Тёмный зал + одна светлая «меловая» полоса для цен.
+   Идея: штанга и блины. Одна тёмно-зелёная гамма; разделы — отдельные окна-панели.
    Смелость в одном месте — первый экран с фото на всю ширину; остальное тише. */
 body.pilot-v2{--chalk:#e6eee8;--chalk-2:#f5f8f6;--chalk-ink:#132823;--chalk-muted:#4a6158;--chalk-line:#c3d3c9;--amber-deep:#9a5f00}
 
@@ -106,31 +106,10 @@ body.pilot-v2 .demo-label{font-size:12px;line-height:1.45;color:var(--muted);bor
 }
 @media(min-width:1024px){body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 360px;column-gap:72px;align-items:center}}
 
-/* --- цены: светлая «меловая» полоса --- */
-body.pilot-v2 #plans{background:var(--chalk);color:var(--chalk-ink);padding-block:64px 72px;margin-top:64px}
-body.pilot-v2 #plans .tag{color:var(--amber-deep)}
-body.pilot-v2 #plans h2{color:var(--chalk-ink)}
-body.pilot-v2 #plans h2 em{color:var(--amber-deep)}
-body.pilot-v2 #plans .plan.primary{box-shadow:0 30px 60px -30px rgba(13,30,26,.55)}
-body.pilot-v2 #plans .plan:not(.primary){background:var(--chalk-2);border:1px solid var(--chalk-line);color:var(--chalk-ink)}
-body.pilot-v2 #plans .plan:not(.primary) .small,body.pilot-v2 #plans .plan:not(.primary) .cal-body,body.pilot-v2 #plans .plan:not(.primary) .cal-list span{color:var(--chalk-muted)}
-body.pilot-v2 #plans .plan:not(.primary) .maplink,body.pilot-v2 #plans .plan:not(.primary) .cal summary,body.pilot-v2 #plans .plan:not(.primary) .cal-list a,body.pilot-v2 #plans .plan:not(.primary) .pricepair b{color:var(--amber-deep)}
-body.pilot-v2 #plans .plan:not(.primary) .chip{background:var(--chalk-ink);color:var(--chalk-2)}
-body.pilot-v2 #plans .plan:not(.primary) .slot{background:#fff;border:1px solid var(--chalk-line);color:var(--chalk-ink)}
-body.pilot-v2 #plans .plan:not(.primary) .slot span{color:var(--chalk-muted)}
-body.pilot-v2 #plans .plan:not(.primary) .day{background:var(--chalk-ink)}
-body.pilot-v2 #plans .plan:not(.primary) .day b{color:#fff}
-body.pilot-v2 #plans .plan:not(.primary) .pricepair span{background:#fff;border:1px solid var(--chalk-line);color:var(--chalk-ink)}
-body.pilot-v2 #plans .plan:not(.primary) .btn-line{color:var(--chalk-ink);box-shadow:inset 0 0 0 1.5px var(--chalk-ink);background:transparent}
-body.pilot-v2 #plans .plan:not(.primary) .cal{border-color:var(--chalk-line);background:#fff}
-body.pilot-v2 #plans .plan:not(.primary) .tbtn{color:var(--chalk-ink)}
-
 /* --- об Алёне: цифра 105 --- */
 body.pilot-v2 .about-stat{display:flex;align-items:flex-end;gap:14px;padding:6px 0 4px}
 body.pilot-v2 .about-stat b{font:800 clamp(72px,22vw,128px)/.82 var(--display);color:var(--amber);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
 body.pilot-v2 .about-stat span{font-size:14px;line-height:1.4;color:var(--muted);padding-bottom:4px}
-body.pilot-v2 #plans .plan.primary{color:var(--ink)}
-body.pilot-v2 #plans .plan.primary .fit div{color:var(--ink)}
 body.pilot-v2 .brand-journey .step .pl{position:relative}
 body.pilot-v2 .brand-journey .step .pl small{position:absolute;bottom:-6px;left:0;right:0;text-align:center;font-size:10.5px;letter-spacing:.08em;color:var(--muted)}
 body.pilot-v2 .brand-journey .step .pl svg text{font-family:var(--display)}
@@ -144,3 +123,33 @@ body.pilot-v2 .brand-journey .step .pl svg{width:64px;height:64px;max-width:none
 body.pilot-v2 .brand-journey .step{grid-template-columns:76px 1fr}
 body.pilot-v2 .brand-journey .step .pl{width:76px;height:76px}
 body.pilot-v2 .brand-journey .step .pl svg{width:76px;height:76px}
+
+/* ===================== v3: разделы-окна в одной гамме ===================== */
+body.pilot-v2{--win:#18332d;--win-edge:rgba(238,244,241,.07);--win-hi:rgba(238,244,241,.045)}
+body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem){padding-block:14px 0}
+body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{
+  background:linear-gradient(180deg,var(--win-hi),transparent 140px),var(--win);
+  border:1px solid var(--win-edge);border-radius:32px;padding:36px 22px 32px;
+  box-shadow:0 1px 0 var(--win-hi) inset,0 24px 48px -32px rgba(0,0,0,.55)}
+body.pilot-v2 main>#zachem{padding-block:14px 0}
+body.pilot-v2 main>section.manifest>.w{overflow:hidden;position:relative}
+body.pilot-v2 .pilot-science .w{border-style:solid}
+body.pilot-v2 main>.final{margin-top:14px}
+/* внутренние карточки — на тон светлее окна */
+body.pilot-v2 .plan:not(.primary),body.pilot-v2 .quiz,body.pilot-v2 .prog,body.pilot-v2 .limits{background:#1f4038;border-color:transparent}
+body.pilot-v2 #plans .plan.primary{background:var(--band)}
+body.pilot-v2 #tools .tool-group{background:var(--band)}
+body.pilot-v2 .brand-journey .step,body.pilot-v2 .faq details,body.pilot-v2 .creds div{border-color:var(--win-edge)}
+/* первый экран тоже окно, фото внутри него */
+body.pilot-v2.design-pilot .hero .w>.hero-photo{border-radius:0 0 32px 32px}
+@media(min-width:1024px){
+  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem){padding-block:20px 0}
+  body.pilot-v2 main>#zachem{padding-block:20px 0}
+  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{padding:72px 64px 64px;border-radius:40px}
+  body.pilot-v2.design-pilot .hero .w>.hero-photo{border-radius:40px}
+  body.pilot-v2 main>.final{margin-top:20px}
+}
+body.pilot-v2 .plan:not(.primary) .slot,body.pilot-v2 .plan:not(.primary) .pricepair span,body.pilot-v2 .plan:not(.primary) .chip,body.pilot-v2 .plan:not(.primary) .cal{background:var(--band)}
+body.pilot-v2 .quiz .opts label{background:var(--band)}
+@media(max-width:480px){body.pilot-v2 .plan .fit{grid-template-columns:1fr}}
+@media(min-width:1024px){body.pilot-v2 .coaching-demo .w{max-width:1140px}}
