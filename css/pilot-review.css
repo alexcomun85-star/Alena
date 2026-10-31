@@ -317,12 +317,42 @@ body.pilot-v2.design-pilot .hero-over h1{hyphens:manual;-webkit-hyphens:manual;o
 @media(min-width:1024px){body.pilot-v2.design-pilot .hero-photo>img{object-position:50% 4%}}
 @media(min-width:600px) and (max-width:1023px){body.pilot-v2.design-pilot .hero-photo>img{object-position:50% 8%}}
 
-/* ---------- телефон с перепиской: возвращён, пропорции по содержимому ---------- */
-body.pilot-v2 .phone{position:relative;justify-self:center;width:min(300px,84vw);padding:10px;border-radius:46px;background:#08120f;box-shadow:0 0 0 1.5px #2f4f47,0 36px 70px -24px rgba(0,0,0,.65)}
-body.pilot-v2 .phone::before{content:"";position:absolute;top:18px;left:50%;width:84px;height:22px;margin-left:-42px;border-radius:12px;background:#08120f;z-index:2}
-body.pilot-v2 .phone .chatwin{border:0;border-radius:36px}
-body.pilot-v2 .phone .cw-top{padding:46px 14px 10px}
-body.pilot-v2 .phone .cw-chat{padding:12px 10px 16px}
-body.pilot-v2 .phone .msg{font-size:13.5px;max-width:88%}
-@media(min-width:600px) and (max-width:1023px){body.pilot-v2 .phone{width:280px}body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 280px}}
-@media(min-width:1024px){body.pilot-v2 .phone{width:330px}body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 330px}}
+/* ---------- телефон с перепиской: реальные пропорции, сообщения приходят по одному ---------- */
+body.pilot-v2 .phone{--pw:min(280px,76vw);position:relative;justify-self:center;width:var(--pw);aspect-ratio:9/19.5;padding:9px;border-radius:calc(var(--pw)*.16);background:#08120f;box-shadow:0 0 0 1.5px #2f4f47,0 36px 70px -24px rgba(0,0,0,.65)}
+body.pilot-v2 .phone::before{content:"";position:absolute;top:17px;left:50%;width:30%;height:22px;transform:translateX(-50%);border-radius:12px;background:#08120f;z-index:3}
+.ph-screen{height:100%;display:flex;flex-direction:column;border-radius:calc(var(--pw)*.13);overflow:hidden;background:#0f231e}
+.ph-status{display:flex;justify-content:space-between;align-items:center;padding:13px 22px 0 26px;height:40px;font:600 12px var(--body);color:var(--ink)}
+.ph-status i{width:22px;height:10px;border-radius:3px;border:1.5px solid currentColor;opacity:.8}
+body.pilot-v2 .phone .cw-top{padding:8px 12px 10px;flex:none}
+body.pilot-v2 .phone .cw-av{background:var(--amber);color:var(--amber-ink);width:34px;height:34px}
+body.pilot-v2 .phone .cw-top small{transition:color .2s}
+.cw-chat{position:relative;flex:1;min-height:0;overflow:hidden;padding:0}
+.cw-track{position:absolute;left:0;right:0;bottom:0;display:grid;gap:7px;padding:10px 10px 12px}
+.ph-input{flex:none;display:flex;align-items:center;gap:8px;margin:0 10px 14px;padding:9px 9px 9px 14px;border-radius:20px;background:#162f29;font-size:13px;color:var(--muted)}
+.ph-input span{flex:1}
+.ph-input i{width:26px;height:26px;border-radius:50%;background:var(--amber)}
+body.pilot-v2 .phone .msg{font-size:13px;max-width:84%;padding:8px 11px 18px;border-radius:16px}
+body.pilot-v2 .phone .msg time{font-size:10px}
+body.pilot-v2 .phone .msg.out{justify-self:end;background:#2c6e5f;color:var(--ink);border-radius:16px 16px 5px 16px}
+body.pilot-v2 .phone .msg.in{justify-self:start;background:var(--amber);color:var(--amber-ink);border-radius:16px 16px 16px 5px}
+body.pilot-v2 .phone .msg.vid{display:flex;align-items:center;gap:9px;padding-right:44px}
+.msg-day{justify-self:center;margin:4px 0 2px;padding:3px 10px;border-radius:10px;background:rgba(238,244,241,.08);font-size:11px;color:var(--muted)}
+.msg.typing{display:flex;gap:4px;padding:12px 13px!important}
+.msg.typing i{width:6px;height:6px;border-radius:50%;background:var(--amber-ink);opacity:.4;animation:tdot 1s infinite}
+.msg.typing i:nth-child(2){animation-delay:.15s}.msg.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tdot{50%{opacity:1;transform:translateY(-2px)}}
+/* появление: блок «растёт» снизу, поэтому старые сообщения плавно уезжают вверх */
+.cw-track>.pending{display:none}
+.cw-track>.shown,.cw-track>.typing{animation:msgGrow .45s cubic-bezier(.2,.8,.3,1) both;transform-origin:bottom}
+@keyframes msgGrow{from{opacity:0;max-height:0;transform:translateY(10px) scale(.96);margin-bottom:-7px}to{opacity:1;max-height:260px}}
+.cw-chat.fade .cw-track{opacity:0;transition:opacity .5s}
+@media(prefers-reduced-motion:reduce){.cw-track>*{animation:none!important}}
+
+@media(min-width:600px) and (max-width:1023px){body.pilot-v2 .phone{--pw:250px}body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 250px}}
+@media(min-width:1024px){body.pilot-v2 .phone{--pw:290px}body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 290px}}
+@media(min-width:600px) and (max-height:700px){body.pilot-v2 .phone{--pw:230px}}
+
+/* ---------- шаги: номер в кружке ---------- */
+body.pilot-v2 .brand-journey .step .pl{width:44px!important;height:44px!important;border-radius:50%;border:1.5px solid var(--amber);color:var(--amber);font:700 17px/1 var(--display);display:grid;place-items:center}
+body.pilot-v2 .brand-journey .step{grid-template-columns:44px 1fr!important;align-items:start}
+body.pilot-v2 .brand-journey .step:last-child .pl{background:var(--amber);color:var(--amber-ink)}

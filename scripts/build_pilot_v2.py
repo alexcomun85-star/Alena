@@ -24,23 +24,12 @@ h = h[:m.start()] + h[m.end():]
 i = h.index('</figure>', h.index('<figure class="hero-photo">')) + len('</figure>')
 h = h[:i] + '\n      ' + over.strip() + h[i:]
 
-# --- «По блину за раз»: блины с маркировкой веса, растут от шага к шагу
-def plate(kg, r, last=False):
-    fill = '#f0a92b' if last else '#2c6e5f'
-    ink = '#132823' if last else '#eef4f1'
-    fs = 11 if len(kg) > 2 else 13
-    return ('<span class="pl"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">'
-            f'<circle cx="32" cy="32" r="{r}" fill="{fill}"/>'
-            f'<circle cx="32" cy="32" r="{r-3.5}" fill="none" stroke="{ink}" stroke-opacity=".35" stroke-width="1.2"/>'
-            f'<text x="32" y="{32 + fs*0.15:.1f}" text-anchor="middle" font-size="{fs}" font-weight="800" fill="{ink}">{kg}</text>'
-            f'<text x="32" y="{32 + fs*0.15 + 10:.1f}" text-anchor="middle" font-size="7.5" font-weight="600" fill="{ink}" fill-opacity=".7">КГ</text></svg></span>')
-
-plates = [plate('1,25', 23), plate('2,5', 26), plate('5', 29), plate('10', 32, True)]
+# --- шаги «Как начинаем работу»: номер шага в кружке (это реальная последовательность)
 old = re.findall(r'<span class="pl"><i style="[^"]*"></i></span>', h)
 if len(old) != 4:
     raise SystemExit("ожидалось 4 шага, найдено %d" % len(old))
-for o, n in zip(old, plates):
-    h = h.replace(o, n, 1)
+for n, o in enumerate(old, 1):
+    h = h.replace(o, f'<span class="pl" aria-hidden="true">{n}</span>', 1)
 
 # --- пример поддержки: телефон с перепиской
 DEMO = (root / "scripts" / "pilot_demo.html").read_text(encoding="utf-8")
@@ -52,11 +41,8 @@ if not n:
 must('<div class="creds" id="creds">',
      '<div class="about-stat"><b>105</b><span>кг в становой тяге<br>3-е место WRPF, Санкт-Петербург</span></div>\n          <div class="creds" id="creds">')
 
-# --- появление сообщений в телефоне при прокрутке (без JS — всё видно сразу)
-must('</body>', """<script>(function(){var c=document.querySelector('[data-chat]');
-if(!c||!('IntersectionObserver' in window)||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-new IntersectionObserver(function(e,o){if(e[0].isIntersecting){c.classList.add('chat-anim');o.disconnect()}},{threshold:.35}).observe(c)})();</script>
-</body>""")
+# --- переписка в телефоне: сообщения приходят по одному, лента уезжает вверх
+must('</body>', '<script src="js/pilot-phone.js?v=1" defer></script>\n</body>')
 
 # --- лента со свайпом на телефоне: класс swipe + подсказка
 h = h.replace('<div class="who">', '<div class="who pswipe">', 1)
