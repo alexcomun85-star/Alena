@@ -203,6 +203,15 @@ def t_afit(browser):
     check('Афит: чат не загружается заранее', None, p.locator('#afit-window iframe[title="Чат с Афитой"]').get_attribute('src'))
     for width,height in [(320,740),(390,844),(768,900),(1200,900)]:
         p.set_viewport_size({'width':width,'height':height})
+        launcher=p.locator('.afit-launch')
+        launch_box=launcher.bounding_box()
+        if width<1024:
+            check('Афита: компактная кнопка '+str(width), True, 44<=launch_box['width']<=50 and 44<=launch_box['height']<=50)
+            check('Афита: доступное имя '+str(width), True, p.get_by_role('button',name='Афита',exact=False).count()>0)
+            dock=p.locator('.dock')
+            if dock.is_visible():
+                check('Афита: выше нижнего меню '+str(width), True, launch_box['y']+launch_box['height']<=dock.bounding_box()['y'])
+            p.screenshot(path=str(OUT / f'afit-compact-{width}.png'))
         p.click('.afit-launch')
         check('Афит: открыт '+str(width), True, p.is_visible('#afit-window'))
         check('Афит: фирменный знак '+str(width), True, p.locator('.afit-window .afit-symbol img').evaluate('(e)=>e.complete && e.naturalWidth>0'))

@@ -33,3 +33,11 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch{visibility:hidden;poi
 
 /* Compact tool shell: leave the viewport to the task. */
 .afit-window{width:min(430px,calc(100% - 20px));background:#f5f3ed}.afit-window header{padding:8px 12px}.afit-window header .afit-symbol{width:30px;height:30px;padding:5px}.afit-window .afit-access{font-size:10px;line-height:1.35;padding:5px 12px;background:#edeedf}.afit-tabs{padding:5px 12px;gap:4px;background:#edeedf}.afit-tabs button{min-height:34px;font-size:12px;padding:4px 10px;border:0;border-radius:7px}.afit-tabs button[aria-pressed=true]{background:#173e2f;color:#fff}.afit-window .afit-fallback{font-size:10px;margin:0;padding:5px 12px}.afit-window:has(.afit-tabs button:last-child[aria-pressed=true]) .afit-fallback{display:none}@media(max-width:600px){.afit-window{border-radius:14px;right:10px}.afit-window header{min-height:48px}.afit-close{min-height:36px;min-width:40px}}
+
+/* Mobile launcher: one quiet, touch-friendly brand icon above the dock. */
+@media(max-width:1023px){
+  .afit-launch{right:max(12px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));width:48px;height:48px;box-sizing:border-box;padding:0;gap:0;justify-content:center;border-radius:50%;animation:none;box-shadow:0 3px 12px rgba(4,20,15,.2)}
+  .afit-launch .afit-symbol{width:44px;height:44px;box-sizing:border-box;padding:8px;background:transparent;border:0;animation:none}
+  .afit-launch>span:not(.afit-symbol){position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0}
+  .afit-launch:hover,.afit-launch:active{transform:none}
+}
