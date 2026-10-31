@@ -17,10 +17,20 @@ seasonings — максимум четыре разрешённых припра
 Порция завтрака до 650 г, основных блюд до 750 г, перекуса до 450 г. Это потолки, не целевая масса; делай порции обычными. Не превращай одно блюдо в гигантскую тарелку. Четыре приёма пищи: breakfast,lunch,snack,dinner. Примерные доли энергии 25/35/15/25, не жесткая медицинская норма. За день от 400 г овощей, фруктов и ягод, картофель, сухофрукты, бобовые и горошек сюда не входят. Меняй овощи, гарниры и способы приготовления. Названия не повторяются; не маскируй одинаковое блюдо новыми названиями. Семья завтрака (family) не чаще двух раз на неделю. Остальные family=other. Основные КБЖУ каждого дня близки к целям, но сохраняй съедобную рецептуру. При 1800 ккал обычно нужны полноценные порции гарнира, а не только белок с салатом. Не завышай мясо и творог ради белка; учитывай целевые углеводы. Расчётный модуль может умеренно скорректировать граммовки. В шагах не дублируй точные граммовки и число яиц: используй количества из состава. Никогда не возвращай свои числа калорий: проверяющий модуль вычислит их из состава.
 Работай по stage и заданной JSON-схеме. composition: составь блюда и полный состав без steps. cooking: напиши только шаги по переданным проверенным продуктам, не меняй состав. repair: верни только repairs для перечисленных id, исправляя конкретные ошибки. Если ошибка только в приготовлении, состав, название, время и приправы неизменяемы. Для week в composition нужны 7 дней по 4 блюда; для replace только одно блюдо. Не повторяй avoidTitles. Все названия блюд за неделю разные: одно блюдо не встречается дважды даже в разные дни.`;}
 function entries(body,req){return req.action==='week'?(body.days||[]).flatMap((d,day)=>(d.meals||[]).map((meal,index)=>({day,index,meal}))):(body.meals||[]).map(meal=>({day:req.day,index:req.index,meal}));}
-// A drink named in the title must be counted: milk, kefir or ryazhenka in the title need the product in parts.
-const drinkFoods=[[/молок/i,/^Молоко/,'молоко'],[/кефир/i,/^Кефир/,'кефир'],[/ряженк/i,/^Ряженка/,'ряженка']];
-function drinkIssue(meal){const t=String(meal?.title||'');for(const [word,food,label] of drinkFoods)if(word.test(t)&&!(meal.parts||[]).some(x=>food.test(x.food)))return 'В названии напиток с продуктом вне состава: '+label+' («'+t+'»). Добавь его в parts или убери из названия.';return null;}
-function collect(body,req){const issues=[];for(const e of entries(body,req)){try{C.meal(e.meal,C.slots[e.index],req,AI_FOODS);const d=drinkIssue(e.meal);if(d)throw Error(d);}catch(err){issues.push({...e,error:err.message});}}return issues;}
+// The title must describe the real composition (live PDF: "Макароны с сосисками" with salmon,
+// "форель" with salmon). Main products named in the title must be in parts; products absent
+// from the food base cannot appear in a title at all.
+const titleFoods=[[/кур(иц|ин)|цыпл/i,/^Курин/,'курица'],[/индейк/i,/^Индейка/,'индейка'],[/говяд|говяж/i,/^Говядина/,'говядина'],[/свин/i,/^Свинина/,'свинина'],
+ [/сёмг|семг|лосос/i,/^Сёмга/,'сёмга'],[/треск/i,/^Треска/,'треска'],[/минтай/i,/^Минтай/,'минтай'],[/тун(ец|ц)/i,/^Тунец/,'тунец'],[/кревет/i,/^Креветки/,'креветки'],
+ [/творог|творож|сырник/i,/^Творог/,'творог'],[/омлет|яичниц|(?<![а-яё])яйц/i,/^Яйцо/,'яйца'],[/гречк|гречнев/i,/^Гречка/,'гречка'],[/(?<![а-яё])рис(?![а-яё])|рисов/i,/^Рис/,'рис'],
+ [/булгур/i,/^Булгур/,'булгур'],[/пшён|пшен/i,/^Пшено/,'пшено'],[/перлов/i,/^Перловка/,'перловка'],[/овсян/i,/^Овся/,'овсянка'],[/макарон|спагетти|пенне/i,/^Макароны/,'макароны'],
+ [/картоф/i,/^Картофель/,'картофель'],[/молок/i,/^Молоко/,'молоко'],[/кефир/i,/^Кефир/,'кефир'],[/ряженк/i,/^Ряженка/,'ряженка']];
+const notInBase=/сосиск|колбас|ветчин|бекон|форел|скумбри|судак|горбуш|сельд|(?<![а-яё])хек|кальмар|миди[ий]|тушёнк|тушенк/i;
+function titleIssue(meal){const t=String(meal?.title||''),parts=meal?.parts||[];
+ const odd=t.match(notInBase);if(odd)return 'В названии продукт, которого нет в составе и базе: «'+odd[0]+'» («'+t+'»). Назови блюдо по фактическому составу.';
+ for(const [word,food,label] of titleFoods)if(word.test(t)&&!parts.some(x=>food.test(x.food)))return 'Название не соответствует составу: в названии '+label+', а в составе его нет («'+t+'»). Назови блюдо по фактическому составу.';
+ return null;}
+function collect(body,req){const issues=[];for(const e of entries(body,req)){try{C.meal(e.meal,C.slots[e.index],req,AI_FOODS);const d=titleIssue(e.meal);if(d)throw Error(d);}catch(err){issues.push({...e,error:err.message});}}return issues;}
 function put(body,req,e,meal){if(req.action==='week')body.days[e.day].meals[e.index]=meal;else body.meals[0]=meal;}
 function patchSchema(items,mealSchema){return {type:'object',additionalProperties:false,properties:{repairs:{type:'array',minItems:items.length,maxItems:items.length,items:{type:'object',additionalProperties:false,properties:{id:{type:'string',enum:items.map(e=>e.day+':'+e.index)},meal:mealSchema},required:['id','meal']}}},required:['repairs']};}
 // Week composition is the longest answer: observed 17–22 s normally and over 55 s at peak load.
@@ -52,7 +62,7 @@ async function modelCall(req,fetcher,env,outputSchema,input,name){const model=(n
  if(!text||text.length>100000)throw Error('invalid_output');return JSON.parse(text);}
 const tracked=[['масло',/^Масло/],['сахар',/^Сахар/],['мёд',/^Мёд/],['молоко',/^Молоко/],['сливки',/^Молоко|^Сметана/],['сыр',/^Сыр/],['сметана',/^Сметана/],['йогурт',/^Йогурт/],['майонез',/^Майонез/],['яйцо',/^Яйцо/]];
 const doNotMention=meal=>tracked.filter(([,food])=>!(meal.parts||[]).some(x=>food.test(x.food))).map(([w])=>w);
-const cookingRules='Каждое блюдо содержит doNotMention — продукты, которых нет в составе. Не пиши эти слова ни в какой форме, даже с «без» или «по желанию». Если масла нет: жарь на сухой антипригарной сковороде, запекай на пергаменте, хлеб подсушивай в тостере или на сухой сковороде, яйца готовь на сухой антипригарной сковороде под крышкой или варёными.';
+const cookingRules='Мясо, рыба, крупы и макароны в составе указаны в готовом виде (запечённая, варёная): граммовка — вес готовой порции. Готовишь с нуля — не пиши граммовку из состава для сырого продукта: «обжарьте сырую грудку…, затем отвесьте 120 г готовой». Продукт уже готовый — только разогрей, не жарь его как сырой. Каждое блюдо содержит doNotMention — продукты, которых нет в составе. Не пиши эти слова ни в какой форме, даже с «без» или «по желанию». Если масла нет: жарь на сухой антипригарной сковороде, запекай на пергаменте, хлеб подсушивай в тостере или на сухой сковороде, яйца готовь на сухой антипригарной сковороде под крышкой или варёными.';
 const macroNames={k:['калории','ккал'],p:['белок','г'],f:['жиры','г'],c:['углеводы','г']};
 const fatFoods='Масло оливковое, Масло подсолнечное, Грецкие орехи, Миндаль, Семечки подсолнечника, Сыр моцарелла, Сметана 15%';
 function explainDays(message,t){return message.split('\n').map(line=>{const m=line.match(/^День (\d+): фактически (\{.*\})$/);if(!m)return line;let fact;try{fact=JSON.parse(m[2])}catch{return line}
@@ -138,7 +148,7 @@ async function buildMenu(req,fetcher,env){
  try{C.normalize(body,req,AI_FOODS)}catch(err){throw failure(err.message)}
  return {body,portionsAdjusted,oilAdded};
 }
-export function aiStatus(env){return reply({revision:'drinks-20261031-10',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
+export function aiStatus(env){return reply({revision:'title-check-20261031-11',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
 export async function aiRoute(request,env,{fetcher=fetch,now=Date.now}={}){
  if(!configured(env))return reply({code:'not_configured',error:'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'},503);
  const time=now(),ip=request.headers.get('CF-Connecting-IP')||request.headers.get('oai-authenticated-user-id');if(!ip)return reply({code:'identity_unavailable',error:'Не удалось проверить лимит запросов. Попробуйте позже.'},503);const epoch=Math.floor(time/86400000),owner=await digest(env.AI_BUDGET_SALT+':'+epoch+':'+ip);

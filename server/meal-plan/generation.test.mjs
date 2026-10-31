@@ -205,10 +205,20 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
  let rounds=0;const env=await environment();const r=await aiRoute(request(),env,{fetcher:async(url,init)=>{const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);
   if(input.stage==='composition'){assert.match(p.input[0].content,/Напитки без крайностей/);assert.match(p.input[0].content,/Не предлагай соки, сладкие и газированные/);
    const b=structuredClone(body);const m=b.days[0].meals[2];m.parts=m.parts.filter(x=>!/^Кефир/.test(x.food));m.title=m.title+' + кефир';return answer(b);}
-  if(input.stage==='repair'){rounds++;assert.match(input.recipes[0].error,/вне состава: кефир/);const meal=structuredClone(input.recipes[0].meal);meal.title=body.days[0].meals[2].title;return answer({repairs:[{id:input.recipes[0].id,meal}]});}
+  if(input.stage==='repair'){rounds++;assert.match(input.recipes[0].error,/в названии кефир/);const meal=structuredClone(input.recipes[0].meal);meal.title=body.days[0].meals[2].title;return answer({repairs:[{id:input.recipes[0].id,meal}]});}
   return provider(url,init);}});
  assert.equal(r.status,200);assert.equal(rounds,1,'uncounted drink in the title is sent for repair');
  console.log('Drinks: moderate guidance, uncounted drink in a title is repaired OK');
+}
+
+// Title must match composition: a product absent from the base or from parts is sent for repair.
+{
+ let errs=[];const env=await environment();const r=await aiRoute(request(),env,{fetcher:async(url,init)=>{const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);
+  if(input.stage==='composition'){const b=structuredClone(body);b.days[0].meals[3].title='Макароны с сосисками и томатным соусом';b.days[5].meals[1].title='Гречка с запечённой форелью';return answer(b);}
+  if(input.stage==='repair'){input.recipes.forEach(e=>errs.push(e.error));return answer({repairs:input.recipes.map(e=>{const [d,i]=e.id.split(':').map(Number);return {id:e.id,meal:body.days[d].meals[i]}})});}
+  return provider(url,init);}});
+ assert.equal(r.status,200);assert.ok(errs.some(e=>/«сосиск/.test(e)));assert.ok(errs.some(e=>/«форел/.test(e)));
+ console.log('Title check: products absent from composition or base are repaired OK');
 }
 
 // A repair cannot address another meal or return duplicate IDs.
