@@ -49,13 +49,27 @@ jobs:
           clean=$(printf '%s' "$AFITA_DEPLOY" | tr -d ' \r\n\t')
           diag "Секрет для сверки: длина ${#clean}, контроль $(printf '%s' "$clean" | sha256sum | cut -c1-8)"
           install -d -m 700 ~/.ssh
-          if ! printf '%s' "$clean" | base64 -d > /tmp/blob 2>/dev/null; then
-            diag "Строка не декодируется как base64: скопирована не целиком или с лишними символами"; exit 1; fi
-          HOST=$(sed -n 's/^HOST=//p' /tmp/blob); PORT=$(sed -n 's/^PORT=//p' /tmp/blob)
-          sed -n 's/^KNOWN=//p' /tmp/blob > ~/.ssh/known_hosts
-          sed -n '/BEGIN OPENSSH PRIVATE KEY/,/END OPENSSH PRIVATE KEY/p' /tmp/blob > ~/.ssh/afita; chmod 600 ~/.ssh/afita; rm /tmp/blob
-          diag "Адрес: $([ -n "$HOST" ] && echo есть || echo НЕТ), порт: ${PORT:-НЕТ}, ключ сервера: $([ -s ~/.ssh/known_hosts ] && echo есть || echo НЕТ), ключ доступа: $(grep -q 'END OPENSSH PRIVATE KEY' ~/.ssh/afita && echo целый || echo НЕПОЛНЫЙ)"
-          [ -n "$HOST" ] && [ -n "$PORT" ] && [ -s ~/.ssh/known_hosts ] && grep -q 'END OPENSSH PRIVATE KEY' ~/.ssh/afita || { diag "Секрет неполный — повторите копирование"; exit 1; }
+          python3 -c 'import cryptography' 2>/dev/null || python3 -m pip install -q --break-system-packages cryptography >/dev/null 2>&1 || python3 -m pip install -q cryptography >/dev/null
+          # Формат AF1|seed|адрес|порт|ключ сервера — полный ключ восстанавливается из 32-байтного seed.
+          if ! python3 - "$clean" <<'PY' >> access.txt 2>&1
+          import sys,os,base64
+          from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+          from cryptography.hazmat.primitives import serialization as S
+          parts=sys.argv[1].split('|')
+          if len(parts)!=5 or parts[0]!='AF1':sys.exit(f'Ожидалось 5 частей формата AF1, получено {len(parts)}')
+          _,seed,host,port,hostkey=parts
+          raw=base64.urlsafe_b64decode(seed+'='*(-len(seed)%4))
+          if len(raw)!=32:sys.exit(f'Ключ доступа неполный: {len(raw)} байт из 32')
+          if not port.isdigit() or not host or len(hostkey)<60:sys.exit('Адрес, порт или ключ сервера неполные')
+          home=os.path.expanduser('~/.ssh')
+          open(home+'/afita','w').write(Ed25519PrivateKey.from_private_bytes(raw).private_bytes(S.Encoding.PEM,S.PrivateFormat.OpenSSH,S.NoEncryption()).decode())
+          os.chmod(home+'/afita',0o600)
+          open(home+'/known_hosts','w').write((host if port=='22' else f'[{host}]:{port}')+' ssh-ed25519 '+hostkey+'\n')
+          open('/tmp/afita_target','w').write(host+' '+port+'\n')
+          print('Секрет разобран: адрес, порт, ключ сервера и ключ доступа на месте')
+          PY
+          then tail -1 access.txt; exit 1; fi
+          read -r HOST PORT < /tmp/afita_target; rm /tmp/afita_target
           printf 'Host afita\n HostName %s\n Port %s\n User root\n IdentityFile ~/.ssh/afita\n IdentitiesOnly yes\n StrictHostKeyChecking yes\n ConnectTimeout 20\n ServerAliveInterval 20\n' "$HOST" "$PORT" > ~/.ssh/config
           if ssh afita status > /dev/null 2>ssh_err.txt; then diag "Подключение: успешно"; else
             diag "Подключение не удалось: $(grep -oE 'Permission denied|Connection timed out|Connection refused|Host key verification failed|No route to host' ssh_err.txt | head -1)"; exit 1; fi
