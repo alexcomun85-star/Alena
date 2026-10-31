@@ -41,241 +41,278 @@
 @media(min-width:1024px){.pf-cols{grid-template-columns:repeat(5,minmax(0,1fr))}.pf-top{grid-template-columns:auto 1fr auto;align-items:center}}
 
 /* ===================== v2: дизайн-слой =====================
-   Идея: штанга и блины. Одна тёмно-зелёная гамма; разделы — отдельные окна-панели.
-   Смелость в одном месте — первый экран с фото на всю ширину; остальное тише. */
-body.pilot-v2{--chalk:#e6eee8;--chalk-2:#f5f8f6;--chalk-ink:#132823;--chalk-muted:#4a6158;--chalk-line:#c3d3c9;--amber-deep:#9a5f00}
 
-/* общий ритм заголовков */
-body.pilot-v2 main section h2{font-size:clamp(30px,8.6vw,54px);line-height:1.04;letter-spacing:-.03em}
+/* =====================================================================
+   ДИЗАЙН-СЛОЙ ПИЛОТА (v6). Переписан целиком: три сценария вместо латок.
+   Палитра и шрифты — фирменные (тёмно-зелёный, янтарь, Unbounded + Golos).
+   Смелость в одном месте — фото с приседом на первом экране. Остальное тихо.
+
+   S  < 600 px   iPhone, внешний экран Fold, узкие Android.
+                 Одна колонка. Окна почти до края. Без «рамки в рамке».
+                 Однотипные карточки — лентой со свайпом.
+   M  600–1023   Раскрытый Fold (почти квадрат, низкий экран), iPad.
+                 Поток сверху вниз; внутри окна — только сбалансированные пары
+                 (две колонки ставим лишь там, где у колонок близкая высота).
+   L  ≥ 1024     ПК. Колонки и сетки.
+   ===================================================================== */
+
+body.pilot-v2{
+  --win:#18332d;              /* окно раздела: на тон светлее фона */
+  --win-2:#1f4038;            /* карточка внутри окна */
+  --win-edge:rgba(238,244,241,.08);
+  --win-hi:rgba(238,244,241,.045);
+  --gap-win:12px;             /* зазор между окнами */
+  --r-win:28px;
+}
+
+/* ---------- общая типографика ---------- */
+body.pilot-v2 main section h2{font-size:clamp(28px,7.4vw,52px);line-height:1.05;letter-spacing:-.03em;text-wrap:balance}
 body.pilot-v2 main .tag{display:inline-flex;align-items:center;gap:10px;font-size:11.5px}
 body.pilot-v2 main .tag::before{content:"";width:22px;height:2px;background:currentColor}
 
-/* --- первый экран --- */
+/* ---------- окна разделов ---------- */
+body.pilot-v2 main>section:not(.hero):not(.final){padding-block:var(--gap-win) 0}
+body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{
+  background:linear-gradient(180deg,var(--win-hi),transparent 160px),var(--win);
+  border:1px solid var(--win-edge);border-radius:var(--r-win);
+  padding:32px 20px 28px;
+  box-shadow:0 24px 48px -36px rgba(0,0,0,.6)}
+body.pilot-v2 main>section.manifest>.w{overflow:hidden;position:relative}
+body.pilot-v2 main>.final{margin-top:var(--gap-win)}
+body.pilot-v2 .brand-journey .step,body.pilot-v2 .faq details,body.pilot-v2 .creds div{border-color:var(--win-edge)}
+body.pilot-v2 .pilot-science .w{border-style:solid!important}
+
+/* внутренние карточки — на тон светлее окна, без собственной рамки */
+body.pilot-v2 .plan:not(.primary),body.pilot-v2 .limits,body.pilot-v2 .prog{background:var(--win-2);border-color:transparent}
+body.pilot-v2 #plans .plan.primary{background:var(--band)}
+body.pilot-v2 .plan:not(.primary) .slot,body.pilot-v2 .plan:not(.primary) .pricepair span,body.pilot-v2 .plan:not(.primary) .chip,body.pilot-v2 .plan:not(.primary) .cal,body.pilot-v2 .quiz .opts label{background:var(--band)}
+body.pilot-v2 .quiz{background:transparent;border:0;padding:0;box-shadow:none}
+body.pilot-v2 #tools .tool-group{background:var(--band)}
+
+/* ---------- первый экран: общая часть ---------- */
 body.pilot-v2 .hero{padding-top:0}
-body.pilot-v2.design-pilot .hero .w>.hero-photo{position:relative;margin:0 -20px;width:calc(100% + 40px);max-width:none;border-radius:0 0 28px 28px;aspect-ratio:auto}
-body.pilot-v2.design-pilot .hero-photo>img{aspect-ratio:4/5;max-height:620px;width:100%;height:auto;object-fit:cover;object-position:42% 18%}
-body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 30%,rgba(13,30,26,.55) 58%,rgba(13,30,26,.96) 92%)!important}
-body.pilot-v2 .hero-over{position:absolute;left:20px;right:20px;bottom:22px;z-index:3;display:grid;gap:12px}
-body.pilot-v2.design-pilot .hero-over h1{margin:0;font-size:clamp(36px,10.4vw,64px);line-height:1;letter-spacing:-.04em;text-shadow:0 2px 24px rgba(0,0,0,.35)}
-body.pilot-v2 .hero .sub{margin-top:22px}
-@media(min-width:1024px){
-  body.pilot-v2 .hero{padding-block:24px 72px}
-  body.pilot-v2.design-pilot .hero .w{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:56px;align-items:start}
-  body.pilot-v2.design-pilot .hero .w>*{grid-column:2}
-  body.pilot-v2.design-pilot .hero .w>.hero-photo{grid-column:1/-1;grid-row:auto;margin:0 0 36px;width:100%;border-radius:32px;aspect-ratio:auto}
-  body.pilot-v2.design-pilot .hero-photo>img{aspect-ratio:21/9;max-height:none;object-position:50% 22%}
-  body.pilot-v2 .hero-over{left:48px;right:auto;bottom:44px;max-width:15ch}
-  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(52px,5.4vw,84px)}
-  body.pilot-v2.design-pilot .hero .w>.sub{grid-column:1;grid-row:2;margin-top:0;font-size:20px}
-  body.pilot-v2.design-pilot .hero .w>.cta{grid-column:1;grid-row:3}
-  body.pilot-v2.design-pilot .hero .w>.cta-hint{grid-column:1;grid-row:4}
-  body.pilot-v2.design-pilot .hero .w>.reassure{grid-column:1;grid-row:5}
-  body.pilot-v2.design-pilot .hero .w>.trust-line{grid-column:2;grid-row:2;margin-top:0}
-  body.pilot-v2.design-pilot .hero .w>.proof{grid-column:2;grid-row:3/span 3;grid-template-columns:1fr 1fr;margin-top:0}
-}
+body.pilot-v2.design-pilot .hero .w>.hero-photo{position:relative;margin:0;width:100%;max-width:none;aspect-ratio:auto;overflow:hidden}
+body.pilot-v2.design-pilot .hero-photo>img{display:block;width:100%;object-fit:cover}
+body.pilot-v2 .hero-over{position:relative;z-index:3;display:grid;gap:12px}
+body.pilot-v2.design-pilot .hero-over h1{margin:0;letter-spacing:-.04em;line-height:1.02;text-shadow:none}
+body.pilot-v2.design-pilot .hero-over h1>span{display:inline}
+body.pilot-v2 .hero .sub{margin-top:18px}
+body.pilot-v2 .cta-hint{font-size:14px;color:var(--ink);margin-top:12px}
+body.pilot-v2 .trust-line{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 
-/* --- «По блину за раз» --- */
-body.pilot-v2 .brand-journey .step{grid-template-columns:64px 1fr;gap:18px;padding:18px 0}
+/* ---------- «По блину за раз» ---------- */
+body.pilot-v2 .brand-journey .step{grid-template-columns:64px 1fr;gap:16px;padding:16px 0;align-items:center}
 body.pilot-v2 .brand-journey .step::before{display:none}
-body.pilot-v2 .brand-journey .step .pl{display:grid;place-items:center;width:64px;height:64px}
-body.pilot-v2 .brand-journey .step .pl svg text{font-family:var(--body)}
-body.pilot-v2 .brand-journey .step b{font:700 18px/1.25 var(--display)}
+body.pilot-v2 .brand-journey .step .pl{display:grid;place-items:center;width:64px;height:64px;position:relative}
+body.pilot-v2 .brand-journey .step .pl svg{width:64px;height:64px;max-width:none}
+body.pilot-v2 .brand-journey .step .pl svg text{font-family:var(--display)}
+body.pilot-v2 .brand-journey .step b{font:700 17px/1.25 var(--display)}
 
-/* --- телефон с перепиской --- */
-body.pilot-v2 .pilot-demo .w{display:grid;gap:36px;border-top:0;padding-top:0}
+/* ---------- переписка: окно чата вместо макета телефона ---------- */
+body.pilot-v2 .pilot-demo .w{display:grid;gap:24px}
 body.pilot-v2 .demo-copy{display:grid;gap:14px;justify-items:start;min-width:0}
-body.pilot-v2 .demo-copy .lede{margin:0;max-width:44ch}
-body.pilot-v2 .demo-label{font-size:12px;line-height:1.45;color:var(--muted);border-left:2px solid var(--amber);padding-left:12px;max-width:46ch}
-.phone{width:100%;max-width:340px;justify-self:center;background:#08120f;border-radius:44px;padding:11px;box-shadow:0 0 0 1.5px #2f4f47,0 40px 80px -20px rgba(0,0,0,.6);position:relative}
-.phone::before{content:"";position:absolute;top:19px;left:50%;width:92px;height:24px;margin-left:-46px;border-radius:14px;background:#08120f;z-index:2}
-.ph-screen{border-radius:34px;overflow:hidden;background:#0f231e}
-.ph-top{display:flex;gap:11px;align-items:center;padding:52px 16px 12px;background:#162f29;border-bottom:1px solid var(--line)}
-.ph-top b{display:block;font-size:15px}
-.ph-top small{display:block;font-size:11.5px;color:var(--muted)}
-.ph-av{flex:none;width:36px;height:36px;border-radius:50%;background:#3b5a52;color:var(--ink);display:grid;place-items:center;font:700 14px var(--body);filter:blur(.4px)}
-.ph-chat{display:grid;gap:8px;padding:16px 12px 22px;min-height:360px;align-content:start;background:radial-gradient(circle at 20% 10%,rgba(44,110,95,.18),transparent 55%)}
-.msg{margin:0;max-width:84%;padding:9px 12px 19px;border-radius:18px;font-size:14.5px;line-height:1.4;position:relative;min-width:0}
+body.pilot-v2 .demo-copy .lede{margin:0;max-width:46ch}
+body.pilot-v2 .demo-label{font-size:12px;line-height:1.45;color:var(--muted);border-left:2px solid var(--amber);padding-left:12px;max-width:48ch;margin:0}
+.chatwin{min-width:0;border-radius:22px;overflow:hidden;background:#0f231e;border:1px solid var(--win-edge)}
+.cw-top{display:flex;gap:11px;align-items:center;padding:12px 16px;background:#162f29;border-bottom:1px solid var(--win-edge)}
+.cw-top b{display:block;font-size:15px}
+.cw-top small{display:block;font-size:12px;color:var(--muted)}
+.cw-av{flex:none;width:36px;height:36px;border-radius:50%;background:#3b5a52;color:var(--ink);display:grid;place-items:center;font:700 14px var(--body)}
+.cw-chat{display:grid;gap:8px;padding:16px 14px 18px;align-content:start}
+.msg{margin:0;max-width:min(86%,420px);padding:9px 12px 19px;border-radius:18px;font-size:14.5px;line-height:1.4;position:relative;min-width:0}
 .msg time{position:absolute;right:10px;bottom:4px;font-size:10.5px;opacity:.6}
 .msg.in{justify-self:start;background:#21433b;border-bottom-left-radius:5px}
 .msg.out{justify-self:end;background:var(--amber);color:var(--amber-ink);border-bottom-right-radius:5px}
-.msg.vid{display:flex;align-items:center;gap:10px;padding-right:44px}
+.msg.vid{display:flex;align-items:center;gap:10px;padding-right:46px}
 .msg.vid span{font-weight:600;font-size:13.5px}
 @media (prefers-reduced-motion:no-preference){
-  .chat-anim .msg{animation:msgIn .55s cubic-bezier(.2,.8,.3,1) backwards;animation-delay:calc(var(--i)*.55s + .1s)}
-  @keyframes msgIn{from{opacity:0;transform:translateY(12px) scale(.96)}}
+  .chat-anim .msg{animation:msgIn .5s cubic-bezier(.2,.8,.3,1) backwards;animation-delay:calc(var(--i)*.5s + .1s)}
+  @keyframes msgIn{from{opacity:0;transform:translateY(10px)}}
 }
-@media(min-width:1024px){body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 360px;column-gap:72px;align-items:center}}
 
-/* --- об Алёне: цифра 105 --- */
-body.pilot-v2 .about-stat{display:flex;align-items:flex-end;gap:14px;padding:6px 0 4px}
-body.pilot-v2 .about-stat b{font:800 clamp(72px,22vw,128px)/.82 var(--display);color:var(--amber);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
-body.pilot-v2 .about-stat span{font-size:14px;line-height:1.4;color:var(--muted);padding-bottom:4px}
-body.pilot-v2 .brand-journey .step .pl{position:relative}
-body.pilot-v2 .brand-journey .step .pl small{position:absolute;bottom:-6px;left:0;right:0;text-align:center;font-size:10.5px;letter-spacing:.08em;color:var(--muted)}
-body.pilot-v2 .brand-journey .step .pl svg text{font-family:var(--display)}
-body.pilot-v2 .hero-over h1{hyphens:manual;-webkit-hyphens:manual}
-body.pilot-v2 .brand-journey .step .pl svg{width:64px;height:64px;max-width:none}
-@media(min-width:1024px){
-  body.pilot-v2 .hero-over{right:48px;max-width:none}
-  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(44px,4.6vw,72px);max-width:17ch}
-  body.pilot-v2.design-pilot .hero-over h1>span{display:inline}
-}
-body.pilot-v2 .brand-journey .step{grid-template-columns:76px 1fr}
-body.pilot-v2 .brand-journey .step .pl{width:76px;height:76px}
-body.pilot-v2 .brand-journey .step .pl svg{width:76px;height:76px}
+/* ---------- об Алёне ---------- */
+body.pilot-v2 .about-stat{display:flex;align-items:center;gap:16px;padding:4px 0}
+body.pilot-v2 .about-stat b{flex:none;font:800 clamp(64px,17vw,112px)/.85 var(--display);color:var(--amber);letter-spacing:-.05em}
+body.pilot-v2 .about-stat span{flex:1;min-width:0;font-size:14px;line-height:1.4;color:var(--muted)}
+body.pilot-v2 .creds div{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:3px}
+body.pilot-v2 .creds span{white-space:normal;text-align:left}
 
-/* ===================== v3: разделы-окна в одной гамме ===================== */
-body.pilot-v2{--win:#18332d;--win-edge:rgba(238,244,241,.07);--win-hi:rgba(238,244,241,.045)}
-body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem){padding-block:14px 0}
-body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{
-  background:linear-gradient(180deg,var(--win-hi),transparent 140px),var(--win);
-  border:1px solid var(--win-edge);border-radius:32px;padding:36px 22px 32px;
-  box-shadow:0 1px 0 var(--win-hi) inset,0 24px 48px -32px rgba(0,0,0,.55)}
-body.pilot-v2 main>#zachem{padding-block:14px 0}
-body.pilot-v2 main>section.manifest>.w{overflow:hidden;position:relative}
-body.pilot-v2 .pilot-science .w{border-style:solid}
-body.pilot-v2 main>.final{margin-top:14px}
-/* внутренние карточки — на тон светлее окна */
-body.pilot-v2 .plan:not(.primary),body.pilot-v2 .quiz,body.pilot-v2 .prog,body.pilot-v2 .limits{background:#1f4038;border-color:transparent}
-body.pilot-v2 #plans .plan.primary{background:var(--band)}
-body.pilot-v2 #tools .tool-group{background:var(--band)}
-body.pilot-v2 .brand-journey .step,body.pilot-v2 .faq details,body.pilot-v2 .creds div{border-color:var(--win-edge)}
-/* первый экран тоже окно, фото внутри него */
-body.pilot-v2.design-pilot .hero .w>.hero-photo{border-radius:0 0 32px 32px}
-@media(min-width:1024px){
-  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem){padding-block:20px 0}
-  body.pilot-v2 main>#zachem{padding-block:20px 0}
-  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{padding:72px 64px 64px;border-radius:40px}
-  body.pilot-v2.design-pilot .hero .w>.hero-photo{border-radius:40px}
-  body.pilot-v2 main>.final{margin-top:20px}
-}
-body.pilot-v2 .plan:not(.primary) .slot,body.pilot-v2 .plan:not(.primary) .pricepair span,body.pilot-v2 .plan:not(.primary) .chip,body.pilot-v2 .plan:not(.primary) .cal{background:var(--band)}
-body.pilot-v2 .quiz .opts label{background:var(--band)}
-@media(max-width:480px){body.pilot-v2 .plan .fit{grid-template-columns:1fr}}
-@media(min-width:1024px){body.pilot-v2 .coaching-demo .w{max-width:1140px}}
+/* ---------- лента со свайпом (только S) ---------- */
+.swipe-hint{display:none}
 
-/* ===================== v4: своя компоновка для телефона =====================
-   Телефон: окна почти во всю ширину, без вложенных рамок, однотипные карточки — в ленту со свайпом.
-   Планшет: две колонки. ПК: сетки (правила выше). */
-@media(max-width:559px){
-  /* окна шире: 8 px от края экрана вместо 20 */
-  body.pilot-v2 main>section:not(.hero):not(.final)>.w{margin-inline:-12px;padding:30px 18px 26px;border-radius:28px}
-  body.pilot-v2 main>#zachem>.w{margin-inline:-12px}
-  body.pilot-v2 main section h2{font-size:clamp(28px,8.2vw,40px)}
+/* =====================================================================
+   S  < 600 px
+   ===================================================================== */
+@media(max-width:599px){
+  body.pilot-v2{--gap-win:10px;--r-win:26px}
+  body.pilot-v2 main>section:not(.hero):not(.final)>.w{margin-inline:-12px}
+  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{padding:28px 18px 24px}
 
-  /* меньше вложенности: внутренние рамки снимаем */
-  body.pilot-v2 .prog,body.pilot-v2 .limits,body.pilot-v2 .quiz{background:transparent;border:0;padding:0;box-shadow:none}
-  body.pilot-v2 .prog{margin-top:18px;padding-top:18px;border-top:1px solid var(--win-edge);border-radius:0}
-  body.pilot-v2 .limits{gap:14px}
+  /* первый экран: фото открыто, заголовок под лицом на тёмной кромке */
+  body.pilot-v2.design-pilot .hero .w>.hero-photo{margin-inline:-20px;width:calc(100% + 40px);border-radius:0 0 26px 26px}
+  body.pilot-v2.design-pilot .hero-photo>img{height:min(54svh,520px);max-height:none;aspect-ratio:auto;object-position:44% 14%}
+  body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 55%,rgba(13,30,26,.75) 82%,var(--band) 100%)!important}
+  body.pilot-v2 .hero-over{margin-top:-64px}
+  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(29px,8.4vw,38px)}
+  body.pilot-v2.design-pilot .hero .w>.proof{grid-template-columns:1fr 1fr}
 
-  /* лента со свайпом: общий вид */
+  /* без «рамки в рамке» */
+  body.pilot-v2 .prog,body.pilot-v2 .limits{background:transparent;padding:0;border-radius:0;box-shadow:none}
+  body.pilot-v2 .prog{margin-top:16px;padding-top:16px;border-top:1px solid var(--win-edge)}
+
+  /* ленты со свайпом */
   body.pilot-v2 .pswipe{display:flex!important;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-inline:-18px;padding:4px 18px 6px;scroll-padding-inline:18px}
   body.pilot-v2 .pswipe::-webkit-scrollbar{display:none}
-  body.pilot-v2 .pswipe>*{scroll-snap-align:start;flex:0 0 82%;min-width:0}
-  body.pilot-v2 .pswipe-hint{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--muted)}
-  body.pilot-v2 .pswipe-hint::after{content:"";width:28px;height:2px;border-radius:2px;background:var(--amber)}
+  body.pilot-v2 .pswipe>*{scroll-snap-align:start;flex:0 0 84%;min-width:0}
+  body.pilot-v2 .swipe-hint.m-only{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+  body.pilot-v2 .swipe-hint.m-only::after{content:"";width:28px;height:2px;border-radius:2px;background:var(--amber)}
 
-  /* «Узнали себя?» — карточки в ленте */
   body.pilot-v2.editorial-refine #who .who{margin-top:20px}
-  body.pilot-v2.editorial-refine #who .who article{background:var(--band);border:0;border-radius:22px;padding:44px 18px 20px}
+  body.pilot-v2.editorial-refine #who .who article{background:var(--band);border:0;border-radius:20px;padding:44px 18px 20px}
   body.pilot-v2.editorial-refine #who .who article::before{top:18px;left:18px}
   body.pilot-v2.editorial-refine #who .who h3{font-size:19px;margin-bottom:10px}
 
-  /* инструменты — три плашки в ленте, внутри компактный список */
   body.pilot-v2 #tools .tools-row{margin-top:18px}
-  body.pilot-v2 #tools .tools-row>.tool-group{flex-basis:86%;padding:18px 14px 14px}
+  body.pilot-v2 #tools .tools-row>.tool-group{flex-basis:86%;padding:18px 14px 14px;margin:0}
   body.pilot-v2 #tools .tool-group .cat-grid{grid-template-columns:1fr;gap:6px}
   body.pilot-v2 #tools .tool-group .cat{padding:11px 13px;gap:2px}
-  body.pilot-v2 #tools .tool-group .cat b{font-size:14.5px}
-  body.pilot-v2 #tools .tool-group .cat span{font-size:12.5px}
 
-  /* цены: карточки плотнее */
+  /* цены плотнее */
   body.pilot-v2 .plans{gap:10px}
-  body.pilot-v2 .plan{padding:22px 16px 18px;gap:16px;border-radius:24px}
-  body.pilot-v2 .plan .price b{font-size:36px}
-  body.pilot-v2 .plan ul{gap:8px}
-  body.pilot-v2 .plan li{font-size:15px}
-  body.pilot-v2 .plan .slots{gap:6px}
-  body.pilot-v2 .plan .slot{grid-template-columns:52px 1fr;padding:8px 12px 8px 8px}
-  body.pilot-v2 .plan .day{width:52px;height:52px}
-  body.pilot-v2 .plan .pricepair{flex-wrap:nowrap}
-  body.pilot-v2 .plan .pricepair span{flex:1;text-align:center;padding:9px 8px;font-size:14px}
-
-  /* «По блину»: блины поменьше, текст шире */
-  body.pilot-v2 .brand-journey .step{grid-template-columns:60px 1fr;gap:14px}
-  body.pilot-v2 .brand-journey .step .pl,body.pilot-v2 .brand-journey .step .pl svg{width:60px;height:60px}
-  body.pilot-v2 .brand-journey .step b{font-size:17px}
-
-  /* телефон с перепиской — без лишних полей */
-  body.pilot-v2 .phone{max-width:320px}
-  body.pilot-v2 .pilot-demo .w{gap:26px}
-
-  /* об Алёне: фото и цифра рядом */
-  body.pilot-v2 .about{gap:16px}
-  body.pilot-v2 .portrait{max-width:100%;aspect-ratio:4/3;border-radius:22px}
-}
-@media(min-width:560px) and (max-width:1023px){
-  body.pilot-v2 .tools-row{grid-template-columns:1fr 1fr}
-  body.pilot-v2 .tools-row>.tool-group:last-child{grid-column:1/-1}
-  body.pilot-v2 .plans{grid-template-columns:1fr 1fr;align-items:start}
-}
-.swipe-hint{display:none}
-@media(max-width:559px){body.pilot-v2 .pswipe-hint.m-only{display:flex}}
-@media(max-width:559px){body.pilot-v2 .about{grid-template-columns:minmax(0,1fr)!important}body.pilot-v2 .portrait{width:100%;justify-self:stretch}}
-@media(max-width:559px){
-  body.pilot-v2 main>#zachem>.w{margin-inline:-12px!important;max-width:none}
-  body.pilot-v2 #zachem .eat-teaser{border-radius:28px}
-  body.pilot-v2 .portrait{aspect-ratio:4/3!important;height:auto!important;max-height:300px;box-shadow:none}
-  body.pilot-v2 .portrait img{height:100%;object-position:50% 25%}
-}
-@media(max-width:559px){body.pilot-v2 #zachem .eat-teaser{margin-inline:-18px;width:auto}}
-
-/* ===================== v5: первый экран без перекрытия фото; узкий / раскладной / широкий ===================== */
-/* узкий (iPhone, внешний экран Fold): фото открыто, заголовок под лицом на тёмной кромке снимка */
-body.pilot-v2 .hero-over{position:relative;left:auto;right:auto;bottom:auto;z-index:3;margin-top:-76px;max-width:none}
-body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(30px,9vw,44px);line-height:1.04}
-body.pilot-v2.design-pilot .hero-photo>img{aspect-ratio:4/5;max-height:560px;object-position:44% 16%}
-body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 58%,rgba(13,30,26,.7) 82%,var(--band) 100%)!important}
-
-/* от 560 px (раскрытый Fold, планшет, ПК): фото слева, текст справа */
-@media(min-width:560px){
-  body.pilot-v2 .hero{padding-block:20px 48px}
-  body.pilot-v2.design-pilot .hero .w{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);column-gap:clamp(20px,4vw,64px);row-gap:0;align-items:start}
-  body.pilot-v2.design-pilot .hero .w>*{grid-column:2;grid-row:auto}
-  body.pilot-v2.design-pilot .hero .w>.hero-photo{grid-column:1;grid-row:1/span 7;margin:0;width:100%;border-radius:28px;align-self:start}
-  body.pilot-v2.design-pilot .hero-photo>img{aspect-ratio:4/5;max-height:none;object-position:44% 20%}
-  body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 70%,rgba(13,30,26,.35) 100%)!important}
-  body.pilot-v2 .hero-over{margin-top:0;grid-row:1}
-  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(30px,5vw,66px);text-shadow:none}
-  body.pilot-v2.design-pilot .hero .w>.sub{grid-column:2;grid-row:2;margin-top:16px;font-size:clamp(15px,1.6vw,19px)}
-  body.pilot-v2.design-pilot .hero .w>.cta{grid-column:2;grid-row:3;margin-top:20px}
-  body.pilot-v2.design-pilot .hero .w>.cta-hint{grid-column:2;grid-row:4}
-  body.pilot-v2.design-pilot .hero .w>.reassure{grid-column:2;grid-row:5}
-  body.pilot-v2.design-pilot .hero .w>.trust-line{grid-column:2;grid-row:6;margin-top:16px}
-  body.pilot-v2.design-pilot .hero .w>.proof{grid-column:2;grid-row:7;grid-template-columns:1fr 1fr;margin-top:16px}
-}
-@media(min-width:1024px){body.pilot-v2.design-pilot .hero-photo>img{aspect-ratio:4/5;max-height:720px}}
-
-/* раскрытый Fold и планшет (560–1023): две колонки вместо лент */
-@media(min-width:560px) and (max-width:1023px){
-  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{padding:40px 28px 34px}
-  body.pilot-v2.editorial-refine #who .who{grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
-  body.pilot-v2.editorial-refine #who .who article{background:var(--band);border:0;border-radius:22px;padding:44px 18px 20px}
-  body.pilot-v2.editorial-refine #who .who article::before{top:18px;left:18px}
-  body.pilot-v2.editorial-refine #who .who h3{font-size:18px}
-  body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 280px;column-gap:28px;align-items:center}
-  body.pilot-v2 .phone{max-width:280px}
-  body.pilot-v2 .msg{font-size:13.5px}
-  body.pilot-v2 .about{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)!important;align-items:start;gap:24px}
-  body.pilot-v2 .portrait{max-width:100%;width:100%}
-  body.pilot-v2 #tools .tool-group .cat-grid{grid-template-columns:1fr}
-  body.pilot-v2 .plan{padding:24px 18px}
-}
-@media(max-width:559px){body.pilot-v2.design-pilot .hero-photo>img{max-height:min(560px,50vh);max-height:min(560px,50svh);aspect-ratio:auto;height:min(560px,50vh);height:min(560px,50svh)}}
-/* раскрытый Fold / планшет: заголовки по ширине колонки, цены одна под другой до 820 px */
-@media(min-width:560px) and (max-width:1023px){
-  body.pilot-v2 main section h2{font-size:clamp(30px,6.2vw,48px)}
-  body.pilot-v2 .pilot-demo h2{font-size:clamp(28px,4.6vw,40px)}
+  body.pilot-v2 .plan{padding:22px 16px 18px;border-radius:22px}
   body.pilot-v2 .plan .fit{grid-template-columns:1fr}
+  body.pilot-v2 .plan .pricepair{flex-wrap:nowrap}
+  body.pilot-v2 .plan .pricepair span{flex:1;text-align:center}
+
+  /* об Алёне: портрет горизонтальный, не вытянутый */
+  body.pilot-v2 .about{grid-template-columns:minmax(0,1fr)!important;gap:16px}
+  body.pilot-v2 .portrait{width:100%;max-width:100%!important;height:auto!important;aspect-ratio:4/3!important;max-height:300px}
+  body.pilot-v2 .portrait img{height:100%;object-position:50% 22%}
+
+  /* «Зачем тренер»: по краям окон */
+  body.pilot-v2 #zachem .eat-teaser{border-radius:var(--r-win)}
 }
-@media(min-width:560px) and (max-width:819px){body.pilot-v2 .plans{grid-template-columns:1fr!important}}
+
+/* =====================================================================
+   M  600–1023 px  (раскрытый Fold, iPad)
+   ===================================================================== */
+@media(min-width:600px) and (max-width:1023px){
+  body.pilot-v2{--gap-win:14px;--r-win:30px}
+  body.pilot-v2 .g>.w{max-width:880px}
+  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{padding:40px 32px 34px}
+  body.pilot-v2 main section h2{font-size:clamp(34px,5.6vw,48px)}
+
+  /* первый экран: фото-баннер сверху, заголовок во всю ширину, ниже две ровные колонки */
+  body.pilot-v2 .hero{padding-block:16px 40px}
+  body.pilot-v2.design-pilot .hero .w{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;row-gap:0;align-items:start}
+  body.pilot-v2.design-pilot .hero .w>*{grid-column:1/-1;grid-row:auto}
+  body.pilot-v2.design-pilot .hero .w>.hero-photo{grid-column:1/-1;border-radius:var(--r-win)}
+  body.pilot-v2.design-pilot .hero-photo>img{height:min(46svh,420px);aspect-ratio:auto;max-height:none;object-position:50% 18%}
+  body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 70%,rgba(13,30,26,.35) 100%)!important}
+  body.pilot-v2 .hero-over{margin-top:24px}
+  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(36px,6.2vw,54px);max-width:18ch}
+  body.pilot-v2.design-pilot .hero .w>.sub{grid-column:1;grid-row:3;font-size:16px}
+  body.pilot-v2.design-pilot .hero .w>.cta{grid-column:1;grid-row:4;margin-top:18px;flex-wrap:wrap}
+  body.pilot-v2.design-pilot .hero .w>.cta-hint{grid-column:1;grid-row:5}
+  body.pilot-v2.design-pilot .hero .w>.reassure{grid-column:1;grid-row:6}
+  body.pilot-v2.design-pilot .hero .w>.trust-line{grid-column:2;grid-row:3;margin-top:18px}
+  body.pilot-v2.design-pilot .hero .w>.proof{grid-column:2;grid-row:4/span 3;grid-template-columns:1fr 1fr;margin-top:12px;align-self:start}
+
+  /* для кого: сетка 2×2 */
+  body.pilot-v2.editorial-refine #who .who{grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+  body.pilot-v2.editorial-refine #who .who article{background:var(--band);border:0;border-radius:20px;padding:44px 20px 22px}
+  body.pilot-v2.editorial-refine #who .who article::before{top:18px;left:20px}
+  body.pilot-v2.editorial-refine #who .who h3{font-size:18px}
+
+  /* как работаем: шаги 2×2, график ниже на всю ширину */
+  body.pilot-v2 .brand-journey .steps{display:grid;grid-template-columns:1fr 1fr;column-gap:24px}
+  body.pilot-v2 .brand-journey .step{grid-template-columns:56px 1fr;align-items:start}
+  body.pilot-v2 .brand-journey .step .pl,body.pilot-v2 .brand-journey .step .pl svg{width:56px;height:56px}
+  body.pilot-v2 .prog{margin-top:20px}
+
+  /* переписка: текст и окно чата рядом, окно не выше текста */
+  body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);column-gap:24px;align-items:center}
+  body.pilot-v2 .msg{font-size:13.5px}
+
+  /* цены: одна карточка под другой, внутри — в две колонки */
+  body.pilot-v2 .plans{grid-template-columns:1fr!important;gap:12px}
+  body.pilot-v2 #plans .plan.primary{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);column-gap:24px;align-items:start}
+  body.pilot-v2 #plans .plan.primary>.plan-head,body.pilot-v2 #plans .plan.primary>ul{grid-column:1}
+  body.pilot-v2 #plans .plan.primary>.fit,body.pilot-v2 #plans .plan.primary>.small,body.pilot-v2 #plans .plan.primary>.btn{grid-column:2}
+  body.pilot-v2 #plans .plan.primary>.plan-head{grid-row:1}
+  body.pilot-v2 #plans .plan.primary>ul{grid-row:2/span 2}
+  body.pilot-v2 #plans .plan.primary>.fit{grid-row:1;grid-template-columns:1fr;align-self:start}
+  body.pilot-v2 #plans .plan.primary>.small{grid-row:2;align-self:start}
+  body.pilot-v2 #plans .plan.primary>.btn{grid-row:3;align-self:end}
+  body.pilot-v2 #groups .slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  body.pilot-v2 #groups .slot{grid-template-columns:1fr;justify-items:start;padding:12px}
+
+  /* об Алёне: портрет + вступление рядом (одной высоты), цифра и дипломы ниже */
+  body.pilot-v2 .about{grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr)!important;gap:24px 28px;align-items:center}
+  body.pilot-v2 .portrait{width:100%;max-width:none!important;height:auto!important;aspect-ratio:4/5!important}
+  body.pilot-v2 .portrait img{height:100%;object-position:50% 20%}
+  body.pilot-v2 .about-text{display:contents}
+  body.pilot-v2 .about-text>p:first-child{grid-column:2;grid-row:1;align-self:center}
+  body.pilot-v2 .about-text>p.muted{grid-column:1/-1}
+  body.pilot-v2 .about-stat{grid-column:1/-1}
+  body.pilot-v2 .creds{grid-column:1/-1;grid-template-columns:1fr 1fr;column-gap:24px}
+  body.pilot-v2 .creds div:last-child{border-bottom:0}
+
+  /* «Зачем тренер»: фото слева, текст справа */
+  body.pilot-v2 #zachem .eat-photo{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);align-items:center;border-radius:var(--r-win)}
+  body.pilot-v2 #zachem .eat-photo img{height:100%!important;min-height:280px}
+  body.pilot-v2 #zachem .eat-photo>div{margin-top:0;padding:28px 28px 28px 8px}
+
+  /* инструменты: три группы одна под другой, внутри 2×2 */
+  body.pilot-v2 #tools .tools-row{grid-template-columns:1fr!important}
+  body.pilot-v2 #tools .tools-row>.tool-group:last-child{grid-column:auto}
+  body.pilot-v2 #tools .tool-group .cat-grid{grid-template-columns:1fr 1fr}
+
+  /* финал: фото и текст рядом, одной высоты */
+  body.pilot-v2 .invite-card{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);align-items:stretch}
+  body.pilot-v2 .invite-portrait{aspect-ratio:auto;height:100%;min-height:440px}
+  body.pilot-v2 .invite-portrait img{width:100%;height:100%;object-fit:cover;object-position:88% 20%}
+  body.pilot-v2 .invite-copy{width:auto;padding:32px 28px 26px}
+  body.pilot-v2 .final-invite h2{font-size:clamp(32px,5vw,44px)}
+
+  /* подвал: три колонки */
+  body.pilot-v2 .pf-cols{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+/* =====================================================================
+   L  ≥ 1024 px  (ПК)
+   ===================================================================== */
+@media(min-width:1024px){
+  body.pilot-v2{--gap-win:18px;--r-win:40px}
+  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{padding:68px 64px 60px}
+
+  body.pilot-v2 .hero{padding-block:20px 64px}
+  body.pilot-v2.design-pilot .hero .w{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:56px;row-gap:0;align-items:start}
+  body.pilot-v2.design-pilot .hero .w>*{grid-column:1/-1;grid-row:auto}
+  body.pilot-v2.design-pilot .hero .w>.hero-photo{border-radius:var(--r-win)}
+  body.pilot-v2.design-pilot .hero-photo>img{height:min(56vh,520px);aspect-ratio:auto;max-height:none;object-position:50% 22%}
+  body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 70%,rgba(13,30,26,.3) 100%)!important}
+  body.pilot-v2 .hero-over{margin-top:36px}
+  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(48px,4.8vw,72px);max-width:20ch}
+  body.pilot-v2.design-pilot .hero .w>.sub{grid-column:1;grid-row:3;font-size:19px}
+  body.pilot-v2.design-pilot .hero .w>.cta{grid-column:1;grid-row:4;margin-top:22px}
+  body.pilot-v2.design-pilot .hero .w>.cta-hint{grid-column:1;grid-row:5}
+  body.pilot-v2.design-pilot .hero .w>.reassure{grid-column:1;grid-row:6}
+  body.pilot-v2.design-pilot .hero .w>.trust-line{grid-column:2;grid-row:3;margin-top:22px}
+  body.pilot-v2.design-pilot .hero .w>.proof{grid-column:2;grid-row:4/span 3;grid-template-columns:1fr 1fr;margin-top:14px;align-self:start}
+
+  body.pilot-v2 .brand-journey .step{grid-template-columns:72px 1fr}
+  body.pilot-v2 .brand-journey .step .pl,body.pilot-v2 .brand-journey .step .pl svg{width:72px;height:72px}
+
+  body.pilot-v2 .coaching-demo .w{max-width:1140px}
+  body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 440px;column-gap:72px;align-items:center}
+
+  body.pilot-v2 .tools-row{grid-template-columns:repeat(3,minmax(0,1fr))}
+  body.pilot-v2 #tools .tool-group .cat-grid{grid-template-columns:1fr}
+  body.pilot-v2 .creds{grid-template-columns:1fr 1fr;column-gap:28px}
+}
+
+/* правки после проверки */
+body.pilot-v2.design-pilot .hero-over h1{hyphens:manual;-webkit-hyphens:manual;overflow-wrap:normal}
+@media(min-width:1024px){body.pilot-v2.design-pilot .hero-photo>img{object-position:50% 4%}}
+@media(min-width:600px) and (max-width:1023px){body.pilot-v2.design-pilot .hero-photo>img{object-position:50% 8%}}
