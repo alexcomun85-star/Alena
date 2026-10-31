@@ -157,7 +157,7 @@ body.pilot-v2 .quiz .opts label{background:var(--band)}
 /* ===================== v4: своя компоновка для телефона =====================
    Телефон: окна почти во всю ширину, без вложенных рамок, однотипные карточки — в ленту со свайпом.
    Планшет: две колонки. ПК: сетки (правила выше). */
-@media(max-width:719px){
+@media(max-width:559px){
   /* окна шире: 8 px от края экрана вместо 20 */
   body.pilot-v2 main>section:not(.hero):not(.final)>.w{margin-inline:-12px;padding:30px 18px 26px;border-radius:28px}
   body.pilot-v2 main>#zachem>.w{margin-inline:-12px}
@@ -169,11 +169,11 @@ body.pilot-v2 .quiz .opts label{background:var(--band)}
   body.pilot-v2 .limits{gap:14px}
 
   /* лента со свайпом: общий вид */
-  body.pilot-v2 .swipe{display:flex!important;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-inline:-18px;padding:4px 18px 6px;scroll-padding-inline:18px}
-  body.pilot-v2 .swipe::-webkit-scrollbar{display:none}
-  body.pilot-v2 .swipe>*{scroll-snap-align:start;flex:0 0 82%;min-width:0}
-  body.pilot-v2 .swipe-hint{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--muted)}
-  body.pilot-v2 .swipe-hint::after{content:"";width:28px;height:2px;border-radius:2px;background:var(--amber)}
+  body.pilot-v2 .pswipe{display:flex!important;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-inline:-18px;padding:4px 18px 6px;scroll-padding-inline:18px}
+  body.pilot-v2 .pswipe::-webkit-scrollbar{display:none}
+  body.pilot-v2 .pswipe>*{scroll-snap-align:start;flex:0 0 82%;min-width:0}
+  body.pilot-v2 .pswipe-hint{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+  body.pilot-v2 .pswipe-hint::after{content:"";width:28px;height:2px;border-radius:2px;background:var(--amber)}
 
   /* «Узнали себя?» — карточки в ленте */
   body.pilot-v2.editorial-refine #who .who{margin-top:20px}
@@ -214,18 +214,68 @@ body.pilot-v2 .quiz .opts label{background:var(--band)}
   body.pilot-v2 .about{gap:16px}
   body.pilot-v2 .portrait{max-width:100%;aspect-ratio:4/3;border-radius:22px}
 }
-@media(min-width:720px) and (max-width:1023px){
+@media(min-width:560px) and (max-width:1023px){
   body.pilot-v2 .tools-row{grid-template-columns:1fr 1fr}
   body.pilot-v2 .tools-row>.tool-group:last-child{grid-column:1/-1}
   body.pilot-v2 .plans{grid-template-columns:1fr 1fr;align-items:start}
 }
 .swipe-hint{display:none}
-@media(max-width:719px){body.pilot-v2 .swipe-hint.m-only{display:flex}}
-@media(max-width:719px){body.pilot-v2 .about{grid-template-columns:minmax(0,1fr)!important}body.pilot-v2 .portrait{width:100%;justify-self:stretch}}
-@media(max-width:719px){
+@media(max-width:559px){body.pilot-v2 .pswipe-hint.m-only{display:flex}}
+@media(max-width:559px){body.pilot-v2 .about{grid-template-columns:minmax(0,1fr)!important}body.pilot-v2 .portrait{width:100%;justify-self:stretch}}
+@media(max-width:559px){
   body.pilot-v2 main>#zachem>.w{margin-inline:-12px!important;max-width:none}
   body.pilot-v2 #zachem .eat-teaser{border-radius:28px}
   body.pilot-v2 .portrait{aspect-ratio:4/3!important;height:auto!important;max-height:300px;box-shadow:none}
   body.pilot-v2 .portrait img{height:100%;object-position:50% 25%}
 }
-@media(max-width:719px){body.pilot-v2 #zachem .eat-teaser{margin-inline:-18px;width:auto}}
+@media(max-width:559px){body.pilot-v2 #zachem .eat-teaser{margin-inline:-18px;width:auto}}
+
+/* ===================== v5: первый экран без перекрытия фото; узкий / раскладной / широкий ===================== */
+/* узкий (iPhone, внешний экран Fold): фото открыто, заголовок под лицом на тёмной кромке снимка */
+body.pilot-v2 .hero-over{position:relative;left:auto;right:auto;bottom:auto;z-index:3;margin-top:-76px;max-width:none}
+body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(30px,9vw,44px);line-height:1.04}
+body.pilot-v2.design-pilot .hero-photo>img{aspect-ratio:4/5;max-height:560px;object-position:44% 16%}
+body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 58%,rgba(13,30,26,.7) 82%,var(--band) 100%)!important}
+
+/* от 560 px (раскрытый Fold, планшет, ПК): фото слева, текст справа */
+@media(min-width:560px){
+  body.pilot-v2 .hero{padding-block:20px 48px}
+  body.pilot-v2.design-pilot .hero .w{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);column-gap:clamp(20px,4vw,64px);row-gap:0;align-items:start}
+  body.pilot-v2.design-pilot .hero .w>*{grid-column:2;grid-row:auto}
+  body.pilot-v2.design-pilot .hero .w>.hero-photo{grid-column:1;grid-row:1/span 7;margin:0;width:100%;border-radius:28px;align-self:start}
+  body.pilot-v2.design-pilot .hero-photo>img{aspect-ratio:4/5;max-height:none;object-position:44% 20%}
+  body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 70%,rgba(13,30,26,.35) 100%)!important}
+  body.pilot-v2 .hero-over{margin-top:0;grid-row:1}
+  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(30px,5vw,66px);text-shadow:none}
+  body.pilot-v2.design-pilot .hero .w>.sub{grid-column:2;grid-row:2;margin-top:16px;font-size:clamp(15px,1.6vw,19px)}
+  body.pilot-v2.design-pilot .hero .w>.cta{grid-column:2;grid-row:3;margin-top:20px}
+  body.pilot-v2.design-pilot .hero .w>.cta-hint{grid-column:2;grid-row:4}
+  body.pilot-v2.design-pilot .hero .w>.reassure{grid-column:2;grid-row:5}
+  body.pilot-v2.design-pilot .hero .w>.trust-line{grid-column:2;grid-row:6;margin-top:16px}
+  body.pilot-v2.design-pilot .hero .w>.proof{grid-column:2;grid-row:7;grid-template-columns:1fr 1fr;margin-top:16px}
+}
+@media(min-width:1024px){body.pilot-v2.design-pilot .hero-photo>img{aspect-ratio:4/5;max-height:720px}}
+
+/* раскрытый Fold и планшет (560–1023): две колонки вместо лент */
+@media(min-width:560px) and (max-width:1023px){
+  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{padding:40px 28px 34px}
+  body.pilot-v2.editorial-refine #who .who{grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+  body.pilot-v2.editorial-refine #who .who article{background:var(--band);border:0;border-radius:22px;padding:44px 18px 20px}
+  body.pilot-v2.editorial-refine #who .who article::before{top:18px;left:18px}
+  body.pilot-v2.editorial-refine #who .who h3{font-size:18px}
+  body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 280px;column-gap:28px;align-items:center}
+  body.pilot-v2 .phone{max-width:280px}
+  body.pilot-v2 .msg{font-size:13.5px}
+  body.pilot-v2 .about{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)!important;align-items:start;gap:24px}
+  body.pilot-v2 .portrait{max-width:100%;width:100%}
+  body.pilot-v2 #tools .tool-group .cat-grid{grid-template-columns:1fr}
+  body.pilot-v2 .plan{padding:24px 18px}
+}
+@media(max-width:559px){body.pilot-v2.design-pilot .hero-photo>img{max-height:min(560px,50vh);max-height:min(560px,50svh);aspect-ratio:auto;height:min(560px,50vh);height:min(560px,50svh)}}
+/* раскрытый Fold / планшет: заголовки по ширине колонки, цены одна под другой до 820 px */
+@media(min-width:560px) and (max-width:1023px){
+  body.pilot-v2 main section h2{font-size:clamp(30px,6.2vw,48px)}
+  body.pilot-v2 .pilot-demo h2{font-size:clamp(28px,4.6vw,40px)}
+  body.pilot-v2 .plan .fit{grid-template-columns:1fr}
+}
+@media(min-width:560px) and (max-width:819px){body.pilot-v2 .plans{grid-template-columns:1fr!important}}

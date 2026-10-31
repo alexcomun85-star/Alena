@@ -21,8 +21,8 @@ h = h[:m.start()] + h[m.end():]
 m = re.search(r'\s*<span class="tag">Онлайн и мини-группы в СПб</span>\s*<h1>.*?</h1>', h, re.S)
 over = '<div class="hero-over">' + m.group(0).strip() + '</div>\n      '
 h = h[:m.start()] + h[m.end():]
-i = h.index('</figure>', h.index('<figure class="hero-photo">'))
-h = h[:i] + over + h[i:]
+i = h.index('</figure>', h.index('<figure class="hero-photo">')) + len('</figure>')
+h = h[:i] + '\n      ' + over.strip() + h[i:]
 
 # --- «По блину за раз»: блины с маркировкой веса, растут от шага к шагу
 def plate(kg, r, last=False):
@@ -59,11 +59,11 @@ new IntersectionObserver(function(e,o){if(e[0].isIntersecting){c.classList.add('
 </body>""")
 
 # --- лента со свайпом на телефоне: класс swipe + подсказка
-h = h.replace('<div class="who">', '<div class="who swipe">', 1)
-h = h.replace('<div class="tools-row">', '<div class="tools-row swipe">', 1)
-i = h.index('</div>', h.index('<div class="who swipe">'))
+h = h.replace('<div class="who">', '<div class="who pswipe">', 1)
+h = h.replace('<div class="tools-row">', '<div class="tools-row pswipe">', 1)
+i = h.index('</div>', h.index('<div class="who pswipe">'))
 # подсказку ставим после ленты «для кого»: ищем конец блока по закрывающему тегу статьи
-j = h.index('</article>\n      </div>', h.index('<div class="who swipe">')) + len('</article>\n      </div>')
+j = h.index('</article>\n      </div>', h.index('<div class="who pswipe">')) + len('</article>\n      </div>')
 h = h[:j] + '\n      <p class="swipe-hint m-only">Листайте</p>' + h[j:]
 k = h.index('<div class="row-btns"><a class="btn btn-line" href="servisy.html">')
 h = h[:k] + '<p class="swipe-hint m-only">Листайте</p>\n      ' + h[k:]
