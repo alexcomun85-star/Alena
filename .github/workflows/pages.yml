@@ -57,6 +57,7 @@ jobs:
           # Браузерные проверки на общих серверах GitHub иногда сбиваются по времени — упавший набор повторяем один раз.
           retry() { "$@" || { echo "::warning::Повтор после сбоя: $*"; "$@"; }; }
           python tests/seo_check.py
+          python tests/mobile_services.py
           node tests/food_storage.test.cjs
           node tests/nav_resize.test.cjs
           node tests/cycle_diary.test.cjs
@@ -78,7 +79,6 @@ jobs:
           retry python tests/audit_regression.py
           retry python tests/technical_regression.py
           retry python tests/mobile_feedback.py
-          python tests/mobile_services.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

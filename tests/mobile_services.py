@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 BASE=os.environ.get('BASE','http://localhost:8766/')
 BASELINE='18eeb8321ca7d50e444d7d04b1b9886353fc7460'
 OUT=Path('qa-output');OUT.mkdir(exist_ok=True)
-old=subprocess.check_output(['git','show',BASELINE+':index.html'],text=True)
+old=subprocess.check_output(['git','-c','safe.directory='+str(Path.cwd()),'show',BASELINE+':index.html'],text=True)
 rows=[];geometry={}
 with sync_playwright() as pw:
  browser=pw.chromium.launch(executable_path=os.environ.get('ALENAFIT_CHROMIUM'))
