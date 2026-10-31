@@ -1,0 +1,41 @@
+/* Пилот главной по замечаниям 31.10.2026. Только pilot.html. Анимации не переопределяются. */
+.pilot-flag{position:relative;z-index:31;background:var(--amber);color:var(--amber-ink);font:600 13px/1.3 var(--body);text-align:center;padding:8px 16px}
+.pilot-flag a{color:inherit}
+
+/* первый экран: подсказка к кнопке и строка доверия */
+.cta-hint{font-size:14px;color:var(--ink);margin-top:12px}
+.trust-line{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.trust-line span{font-size:13px;line-height:1.3;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+
+/* «Зачем тренер»: кнопка внутри карточки */
+.eat-teaser .pilot-btn{margin-top:14px;pointer-events:none}
+
+/* инструменты: три отдельные плашки */
+#tools .task-nav{display:none!important}
+#tools .tool-group{background:var(--band);border:1px solid var(--line);border-top:3px solid var(--amber);border-radius:var(--r-lg);padding:20px 16px 18px;margin-top:16px}
+#tools .tool-group>h3{display:flex;align-items:center;gap:12px;font-size:19px}
+#tools .tg-ico{flex:none;width:40px;height:40px;padding:8px;border-radius:12px;background:var(--surface-2);color:var(--amber)}
+#tools .tool-group .cat{background:var(--surface-2);border-color:transparent;min-height:0}
+#tools .tool-group .cat:hover{border-color:var(--amber)}
+.tools-row{display:grid;gap:16px;margin-top:16px}
+#tools .tools-row>.tool-group{margin-top:0}
+@media(min-width:1024px){.tools-row{grid-template-columns:repeat(3,minmax(0,1fr))}#tools .tool-group .cat-grid{grid-template-columns:1fr}}
+
+/* наука одной строкой */
+.pilot-science .w{border:1px dashed var(--line);border-radius:var(--r-lg);padding:20px;display:grid;gap:12px}
+.pilot-science p{color:var(--muted)}
+.pilot-science p b{color:var(--ink)}
+
+/* подвал как меню */
+.pilot-foot .w{display:grid;gap:24px;padding-top:28px;font-size:14px}
+.pf-top{display:grid;gap:12px;justify-items:start}
+.pf-top p{color:var(--muted)}
+.pf-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px 18px}
+.pf-cols div{display:grid;gap:8px;align-content:start;min-width:0}
+.pf-cols b{color:var(--ink);font:700 14px/1.3 var(--display);margin-bottom:2px}
+.pf-cols a{color:var(--muted);text-decoration:none;font-size:14px}
+.pf-cols a:hover{color:var(--amber)}
+.pf-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:14px;font-size:12px}
+.pf-bottom a{color:var(--amber)}
+@media(max-width:360px){.pf-cols{grid-template-columns:1fr}}
+@media(min-width:1024px){.pf-cols{grid-template-columns:repeat(5,minmax(0,1fr))}.pf-top{grid-template-columns:auto 1fr auto;align-items:center}}
