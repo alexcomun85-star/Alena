@@ -316,3 +316,13 @@ body.pilot-v2 .creds span{white-space:normal;text-align:left}
 body.pilot-v2.design-pilot .hero-over h1{hyphens:manual;-webkit-hyphens:manual;overflow-wrap:normal}
 @media(min-width:1024px){body.pilot-v2.design-pilot .hero-photo>img{object-position:50% 4%}}
 @media(min-width:600px) and (max-width:1023px){body.pilot-v2.design-pilot .hero-photo>img{object-position:50% 8%}}
+
+/* ---------- телефон с перепиской: возвращён, пропорции по содержимому ---------- */
+body.pilot-v2 .phone{position:relative;justify-self:center;width:min(300px,84vw);padding:10px;border-radius:46px;background:#08120f;box-shadow:0 0 0 1.5px #2f4f47,0 36px 70px -24px rgba(0,0,0,.65)}
+body.pilot-v2 .phone::before{content:"";position:absolute;top:18px;left:50%;width:84px;height:22px;margin-left:-42px;border-radius:12px;background:#08120f;z-index:2}
+body.pilot-v2 .phone .chatwin{border:0;border-radius:36px}
+body.pilot-v2 .phone .cw-top{padding:46px 14px 10px}
+body.pilot-v2 .phone .cw-chat{padding:12px 10px 16px}
+body.pilot-v2 .phone .msg{font-size:13.5px;max-width:88%}
+@media(min-width:600px) and (max-width:1023px){body.pilot-v2 .phone{width:280px}body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 280px}}
+@media(min-width:1024px){body.pilot-v2 .phone{width:330px}body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 330px}}
