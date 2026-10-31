@@ -15,7 +15,7 @@ function instruction(){return `Ты составляешь разнообраз�
 Опирайся на таблицу FoodSafety.gov Safe Minimum Internal Temperatures: целый кусок говядины/свинины — не ниже 63 °C внутри и отдых 3 минуты; фарш из этого мяса — 71 °C; птица — 74 °C; рыба — 63 °C или непрозрачная мякоть, легко разделяющаяся вилкой; повторный разогрев готовой еды — 74 °C. Это внутренняя температура по пищевому термометру, а не режим духовки. Не оценивай безопасность мяса только по цвету. Для яиц — плотные белок и желток; для яичных блюд 71 °C. Указывай применимое правило в нужном шаге, без общей длинной памятки в каждом рецепте.
 seasonings — максимум четыре разрешённых приправы по вкусу в малом количестве; не помещай туда калорийные продукты. Их следовые КБЖУ отдельно не оцениваются. Соль умеренно. Нет обязательного сахара и обязательных соусов.
 Порция завтрака до 650 г, основных блюд до 750 г, перекуса до 450 г. Это потолки, не целевая масса; делай порции обычными. Не превращай одно блюдо в гигантскую тарелку. Четыре приёма пищи: breakfast,lunch,snack,dinner. Примерные доли энергии 25/35/15/25, не жесткая медицинская норма. За день от 400 г овощей, фруктов и ягод, картофель, сухофрукты, бобовые и горошек сюда не входят. Меняй овощи, гарниры и способы приготовления. Названия не повторяются; не маскируй одинаковое блюдо новыми названиями. Семья завтрака (family) не чаще двух раз на неделю. Остальные family=other. Основные КБЖУ каждого дня близки к целям, но сохраняй съедобную рецептуру. При 1800 ккал обычно нужны полноценные порции гарнира, а не только белок с салатом. Не завышай мясо и творог ради белка; учитывай целевые углеводы. Расчётный модуль может умеренно скорректировать граммовки. В шагах не дублируй точные граммовки и число яиц: используй количества из состава. Никогда не возвращай свои числа калорий: проверяющий модуль вычислит их из состава.
-Работай по stage и заданной JSON-схеме. composition: составь блюда и полный состав без steps. cooking: напиши только шаги по переданным проверенным продуктам, не меняй состав. repair: верни только repairs для перечисленных id, исправляя конкретные ошибки. Если ошибка только в приготовлении, состав, название, время и приправы неизменяемы. Для week в composition нужны 7 дней по 4 блюда; для replace только одно блюдо. Не повторяй avoidTitles.`;}
+Работай по stage и заданной JSON-схеме. composition: составь блюда и полный состав без steps. cooking: напиши только шаги по переданным проверенным продуктам, не меняй состав. repair: верни только repairs для перечисленных id, исправляя конкретные ошибки. Если ошибка только в приготовлении, состав, название, время и приправы неизменяемы. Для week в composition нужны 7 дней по 4 блюда; для replace только одно блюдо. Не повторяй avoidTitles. Все названия блюд за неделю разные: одно блюдо не встречается дважды даже в разные дни.`;}
 function entries(body,req){return req.action==='week'?(body.days||[]).flatMap((d,day)=>(d.meals||[]).map((meal,index)=>({day,index,meal}))):(body.meals||[]).map(meal=>({day:req.day,index:req.index,meal}));}
 function collect(body,req){const issues=[];for(const e of entries(body,req)){try{C.meal(e.meal,C.slots[e.index],req,AI_FOODS)}catch(err){issues.push({...e,error:err.message});}}return issues;}
 function put(body,req,e,meal){if(req.action==='week')body.days[e.day].meals[e.index]=meal;else body.meals[0]=meal;}
@@ -35,20 +35,32 @@ async function buildMenu(req,fetcher,env){
  let body=await modelCall(req,fetcher,env,composition,{stage:'composition',request:req,foodNutritionPer100g:nutrition,instruction:'Сначала составь блюда и ингредиенты. Инструкции приготовления будут созданы отдельно по проверенному составу.'},'afita_composition');
  const placeholder='Приготовление будет составлено по проверенному составу.';
  for(const e of entries(body,req))e.meal.steps=placeholder;
- let repaired=false,portionsAdjusted=false;const oilAdded=[];
- async function repair(items,reason){
-  if(repaired)throw failure(reason);repaired=true;
-  const result=await modelCall(req,fetcher,env,patchSchema(items,mealSchema),{stage:'repair',request:req,correction:reason,recipes:items.map(e=>({id:e.day+':'+e.index,meal:e.meal,error:e.error||reason})),foodNutritionPer100g:nutrition,instruction:'Исправь или замени только указанные блюда. Другие блюда изменить нельзя. Для ошибки приготовления сохрани состав и исправь текст.'},'afita_repairs');
+ let compositionRepairs=0,portionsAdjusted=false;const oilAdded=[],touched=new Set();
+ // Composition repairs are bounded: two rounds for dish/title issues plus one for day totals.
+ async function repair(items,reason,limit=2){
+  if(compositionRepairs>=limit)throw failure(reason);compositionRepairs++;
+  // The model must see the titles it may not reuse, otherwise a replacement can collide with another day.
+  const ids=new Set(items.map(e=>e.day+':'+e.index)),takenTitles=[...new Set([...req.avoidTitles,...entries(body,req).filter(e=>!ids.has(e.day+':'+e.index)).map(e=>e.meal.title)])];
+  const result=await modelCall(req,fetcher,env,patchSchema(items,mealSchema),{stage:'repair',request:req,correction:reason,takenTitles,recipes:items.map(e=>({id:e.day+':'+e.index,meal:e.meal,error:e.error||reason})),foodNutritionPer100g:nutrition,instruction:'Исправь или замени только указанные блюда. Другие блюда изменить нельзя. Названия исправленных блюд не должны совпадать с takenTitles и между собой — придумай другое блюдо, а не переименование того же. Для ошибки приготовления сохрани состав и исправь текст.'},'afita_repairs');
   if(!Array.isArray(result.repairs)||result.repairs.length!==items.length)throw failure('Неполный ответ исправления блюд.');
   const wanted=new Map(items.map(e=>[e.day+':'+e.index,e])),seen=new Set();
-  for(const patch of result.repairs){if(!wanted.has(patch.id)||seen.has(patch.id))throw failure('Неверный адрес исправления.');seen.add(patch.id);const e=wanted.get(patch.id);try{C.meal(patch.meal,C.slots[e.index],req,AI_FOODS)}catch(err){throw failure(err.message)}put(body,req,e,patch.meal);}
+  for(const patch of result.repairs){if(!wanted.has(patch.id)||seen.has(patch.id))throw failure('Неверный адрес исправления.');seen.add(patch.id);const e=wanted.get(patch.id);touched.add(patch.id);try{C.meal(patch.meal,C.slots[e.index],req,AI_FOODS)}catch(err){throw failure(err.message)}put(body,req,e,patch.meal);}
  }
- let issues=collect(body,req);const titleKey=t=>String(t).toLocaleLowerCase('ru').replace(/ё/g,'е');const used=new Set(req.avoidTitles.map(titleKey));for(const e of entries(body,req)){const key=titleKey(e.meal.title);if(used.has(key)&&!issues.some(x=>x.day===e.day&&x.index===e.index))issues.push({...e,error:'Повтор названия: '+e.meal.title});used.add(key);}if(issues.length)await repair(issues,issues.map(e=>e.error).join('\n'));
+ const titleKey=t=>String(t).toLocaleLowerCase('ru').replace(/ё/g,'е');
+ // On a repeat, the dish that a repair just produced is the one sent back; the verified original stays.
+ function compositionIssues(){const issues=collect(body,req),avoid=new Set(req.avoidTitles.map(titleKey)),groups=new Map();
+  for(const e of entries(body,req)){const key=titleKey(e.meal.title);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(e);}
+  for(const [key,list] of groups){if(list.length<2&&!avoid.has(key))continue;const keep=avoid.has(key)?null:(list.find(e=>!touched.has(e.day+':'+e.index))||list[0]);
+   for(const e of list)if(e!==keep&&!issues.some(x=>x.day===e.day&&x.index===e.index))issues.push({...e,error:'Повтор названия: '+e.meal.title});}
+  return issues;}
+ let issues=compositionIssues();
+ while(issues.length){await repair(issues,issues.map(e=>e.error).join('\n'));issues=compositionIssues();}
  try{const original=body;body=balanceMenu(body,req,AI_FOODS);portionsAdjusted=body!==original;C.normalize(body,req,AI_FOODS);}catch(err){
   // Day-level nutrition errors repair that day's four dishes; valid days remain untouched.
   const days=new Set([...err.message.matchAll(/День (\d+)/g)].map(m=>Number(m[1])-1));
   const items=entries(body,req).filter(e=>days.has(e.day));
-  if(!items.length)throw failure(err.message);await repair(items,err.message);
+  if(!items.length)throw failure(err.message);await repair(items,err.message,compositionRepairs+1);
+  const after=compositionIssues();if(after.length)throw failure(after.map(e=>e.error).join('\n'));
   try{const original=body;body=balanceMenu(body,req,AI_FOODS);portionsAdjusted ||= body!==original;C.normalize(body,req,AI_FOODS);}catch(err2){throw failure(err2.message)}
  }
  const meals=entries(body,req),cookingSchema={type:'object',additionalProperties:false,properties:{recipes:{type:'array',minItems:meals.length,maxItems:meals.length,items:{type:'object',additionalProperties:false,properties:{id:{type:'string',enum:meals.map(e=>e.day+':'+e.index)},steps:{type:'string'}},required:['id','steps']}}},required:['recipes']};
@@ -75,7 +87,7 @@ async function buildMenu(req,fetcher,env){
  try{C.normalize(body,req,AI_FOODS)}catch(err){throw failure(err.message)}
  return {body,portionsAdjusted,oilAdded};
 }
-export function aiStatus(env){return reply({revision:'cooking-text-repair-20261031-2',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
+export function aiStatus(env){return reply({revision:'unique-titles-20261031-3',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
 export async function aiRoute(request,env,{fetcher=fetch,now=Date.now}={}){
  if(!configured(env))return reply({code:'not_configured',error:'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'},503);
  const time=now(),ip=request.headers.get('CF-Connecting-IP')||request.headers.get('oai-authenticated-user-id');if(!ip)return reply({code:'identity_unavailable',error:'Не удалось проверить лимит запросов. Попробуйте позже.'},503);const epoch=Math.floor(time/86400000),owner=await digest(env.AI_BUDGET_SALT+':'+epoch+':'+ip);

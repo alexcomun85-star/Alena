@@ -109,6 +109,25 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
  console.log('Cooking oil: forbidden words named, two text-only rounds, oil fallback '+(response.status===200?'counted (5 g)':'rejected by day totals')+' OK');
 }
 
+// A replacement dish named like a dish from another day: the model sees taken titles,
+// gets one more targeted round, and a persistent repeat is rejected before any cooking call.
+{
+ const other=body.days[3].meals[0].title;
+ const run=async(fixOnRound)=>{let stages=[],round=0;const env=await environment();const response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
+  const input=JSON.parse(JSON.parse(init.body).input[1].content);stages.push(input.stage);
+  if(input.stage==='composition'){const bad=structuredClone(body);bad.days[0].meals[0].parts[0].food='Unknown';return answer(bad);}
+  if(input.stage==='repair'){round++;assert.equal(input.recipes.length,1);assert.equal(input.recipes[0].id,'0:0');assert.ok(input.takenTitles.includes(other),'taken titles are shown to the model');assert.ok(!input.takenTitles.includes(body.days[0].meals[0].title),'own title is not blocked');
+   const meal=structuredClone(body.days[0].meals[0]);if(round!==fixOnRound)meal.title=other;return answer({repairs:[{id:'0:0',meal}]});}
+  return provider(url,init);
+ }});return {response,stages};};
+ let {response,stages}=await run(2);
+ assert.equal(response.status,200,'second round removes the repeated title');assert.deepEqual(stages.slice(0,3),['composition','repair','repair']);
+ ({response,stages}=await run(0));
+ assert.equal(response.status,502);const out=await response.json();assert.equal(out.code,'validation_failed');assert.match(out.reason,/Повтор названия/);
+ assert.deepEqual(stages,['composition','repair','repair'],'bounded repairs, no cooking for a rejected week');
+ console.log('Unique titles: taken titles shown, second targeted round, persistent repeat rejected before cooking OK');
+}
+
 // A repair cannot address another meal or return duplicate IDs.
 env=await environment();response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
  const input=JSON.parse(JSON.parse(init.body).input[1].content);
