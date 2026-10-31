@@ -39,3 +39,108 @@
 .pf-bottom a{color:var(--amber)}
 @media(max-width:360px){.pf-cols{grid-template-columns:1fr}}
 @media(min-width:1024px){.pf-cols{grid-template-columns:repeat(5,minmax(0,1fr))}.pf-top{grid-template-columns:auto 1fr auto;align-items:center}}
+
+/* ===================== v2: дизайн-слой =====================
+   Идея: штанга и блины. Тёмный зал + одна светлая «меловая» полоса для цен.
+   Смелость в одном месте — первый экран с фото на всю ширину; остальное тише. */
+body.pilot-v2{--chalk:#e6eee8;--chalk-2:#f5f8f6;--chalk-ink:#132823;--chalk-muted:#4a6158;--chalk-line:#c3d3c9;--amber-deep:#9a5f00}
+
+/* общий ритм заголовков */
+body.pilot-v2 main section h2{font-size:clamp(30px,8.6vw,54px);line-height:1.04;letter-spacing:-.03em}
+body.pilot-v2 main .tag{display:inline-flex;align-items:center;gap:10px;font-size:11.5px}
+body.pilot-v2 main .tag::before{content:"";width:22px;height:2px;background:currentColor}
+
+/* --- первый экран --- */
+body.pilot-v2 .hero{padding-top:0}
+body.pilot-v2.design-pilot .hero .w>.hero-photo{position:relative;margin:0 -20px;width:calc(100% + 40px);max-width:none;border-radius:0 0 28px 28px;aspect-ratio:auto}
+body.pilot-v2.design-pilot .hero-photo>img{aspect-ratio:4/5;max-height:620px;width:100%;height:auto;object-fit:cover;object-position:42% 18%}
+body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 30%,rgba(13,30,26,.55) 58%,rgba(13,30,26,.96) 92%)!important}
+body.pilot-v2 .hero-over{position:absolute;left:20px;right:20px;bottom:22px;z-index:3;display:grid;gap:12px}
+body.pilot-v2.design-pilot .hero-over h1{margin:0;font-size:clamp(36px,10.4vw,64px);line-height:1;letter-spacing:-.04em;text-shadow:0 2px 24px rgba(0,0,0,.35)}
+body.pilot-v2 .hero .sub{margin-top:22px}
+@media(min-width:1024px){
+  body.pilot-v2 .hero{padding-block:24px 72px}
+  body.pilot-v2.design-pilot .hero .w{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:56px;align-items:start}
+  body.pilot-v2.design-pilot .hero .w>*{grid-column:2}
+  body.pilot-v2.design-pilot .hero .w>.hero-photo{grid-column:1/-1;grid-row:auto;margin:0 0 36px;width:100%;border-radius:32px;aspect-ratio:auto}
+  body.pilot-v2.design-pilot .hero-photo>img{aspect-ratio:21/9;max-height:none;object-position:50% 22%}
+  body.pilot-v2 .hero-over{left:48px;right:auto;bottom:44px;max-width:15ch}
+  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(52px,5.4vw,84px)}
+  body.pilot-v2.design-pilot .hero .w>.sub{grid-column:1;grid-row:2;margin-top:0;font-size:20px}
+  body.pilot-v2.design-pilot .hero .w>.cta{grid-column:1;grid-row:3}
+  body.pilot-v2.design-pilot .hero .w>.cta-hint{grid-column:1;grid-row:4}
+  body.pilot-v2.design-pilot .hero .w>.reassure{grid-column:1;grid-row:5}
+  body.pilot-v2.design-pilot .hero .w>.trust-line{grid-column:2;grid-row:2;margin-top:0}
+  body.pilot-v2.design-pilot .hero .w>.proof{grid-column:2;grid-row:3/span 3;grid-template-columns:1fr 1fr;margin-top:0}
+}
+
+/* --- «По блину за раз» --- */
+body.pilot-v2 .brand-journey .step{grid-template-columns:64px 1fr;gap:18px;padding:18px 0}
+body.pilot-v2 .brand-journey .step::before{display:none}
+body.pilot-v2 .brand-journey .step .pl{display:grid;place-items:center;width:64px;height:64px}
+body.pilot-v2 .brand-journey .step .pl svg text{font-family:var(--body)}
+body.pilot-v2 .brand-journey .step b{font:700 18px/1.25 var(--display)}
+
+/* --- телефон с перепиской --- */
+body.pilot-v2 .pilot-demo .w{display:grid;gap:36px;border-top:0;padding-top:0}
+body.pilot-v2 .demo-copy{display:grid;gap:14px;justify-items:start;min-width:0}
+body.pilot-v2 .demo-copy .lede{margin:0;max-width:44ch}
+body.pilot-v2 .demo-label{font-size:12px;line-height:1.45;color:var(--muted);border-left:2px solid var(--amber);padding-left:12px;max-width:46ch}
+.phone{width:100%;max-width:340px;justify-self:center;background:#08120f;border-radius:44px;padding:11px;box-shadow:0 0 0 1.5px #2f4f47,0 40px 80px -20px rgba(0,0,0,.6);position:relative}
+.phone::before{content:"";position:absolute;top:19px;left:50%;width:92px;height:24px;margin-left:-46px;border-radius:14px;background:#08120f;z-index:2}
+.ph-screen{border-radius:34px;overflow:hidden;background:#0f231e}
+.ph-top{display:flex;gap:11px;align-items:center;padding:52px 16px 12px;background:#162f29;border-bottom:1px solid var(--line)}
+.ph-top b{display:block;font-size:15px}
+.ph-top small{display:block;font-size:11.5px;color:var(--muted)}
+.ph-av{flex:none;width:36px;height:36px;border-radius:50%;background:#3b5a52;color:var(--ink);display:grid;place-items:center;font:700 14px var(--body);filter:blur(.4px)}
+.ph-chat{display:grid;gap:8px;padding:16px 12px 22px;min-height:360px;align-content:start;background:radial-gradient(circle at 20% 10%,rgba(44,110,95,.18),transparent 55%)}
+.msg{margin:0;max-width:84%;padding:9px 12px 19px;border-radius:18px;font-size:14.5px;line-height:1.4;position:relative;min-width:0}
+.msg time{position:absolute;right:10px;bottom:4px;font-size:10.5px;opacity:.6}
+.msg.in{justify-self:start;background:#21433b;border-bottom-left-radius:5px}
+.msg.out{justify-self:end;background:var(--amber);color:var(--amber-ink);border-bottom-right-radius:5px}
+.msg.vid{display:flex;align-items:center;gap:10px;padding-right:44px}
+.msg.vid span{font-weight:600;font-size:13.5px}
+@media (prefers-reduced-motion:no-preference){
+  .chat-anim .msg{animation:msgIn .55s cubic-bezier(.2,.8,.3,1) backwards;animation-delay:calc(var(--i)*.55s + .1s)}
+  @keyframes msgIn{from{opacity:0;transform:translateY(12px) scale(.96)}}
+}
+@media(min-width:1024px){body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 360px;column-gap:72px;align-items:center}}
+
+/* --- цены: светлая «меловая» полоса --- */
+body.pilot-v2 #plans{background:var(--chalk);color:var(--chalk-ink);padding-block:64px 72px;margin-top:64px}
+body.pilot-v2 #plans .tag{color:var(--amber-deep)}
+body.pilot-v2 #plans h2{color:var(--chalk-ink)}
+body.pilot-v2 #plans h2 em{color:var(--amber-deep)}
+body.pilot-v2 #plans .plan.primary{box-shadow:0 30px 60px -30px rgba(13,30,26,.55)}
+body.pilot-v2 #plans .plan:not(.primary){background:var(--chalk-2);border:1px solid var(--chalk-line);color:var(--chalk-ink)}
+body.pilot-v2 #plans .plan:not(.primary) .small,body.pilot-v2 #plans .plan:not(.primary) .cal-body,body.pilot-v2 #plans .plan:not(.primary) .cal-list span{color:var(--chalk-muted)}
+body.pilot-v2 #plans .plan:not(.primary) .maplink,body.pilot-v2 #plans .plan:not(.primary) .cal summary,body.pilot-v2 #plans .plan:not(.primary) .cal-list a,body.pilot-v2 #plans .plan:not(.primary) .pricepair b{color:var(--amber-deep)}
+body.pilot-v2 #plans .plan:not(.primary) .chip{background:var(--chalk-ink);color:var(--chalk-2)}
+body.pilot-v2 #plans .plan:not(.primary) .slot{background:#fff;border:1px solid var(--chalk-line);color:var(--chalk-ink)}
+body.pilot-v2 #plans .plan:not(.primary) .slot span{color:var(--chalk-muted)}
+body.pilot-v2 #plans .plan:not(.primary) .day{background:var(--chalk-ink)}
+body.pilot-v2 #plans .plan:not(.primary) .day b{color:#fff}
+body.pilot-v2 #plans .plan:not(.primary) .pricepair span{background:#fff;border:1px solid var(--chalk-line);color:var(--chalk-ink)}
+body.pilot-v2 #plans .plan:not(.primary) .btn-line{color:var(--chalk-ink);box-shadow:inset 0 0 0 1.5px var(--chalk-ink);background:transparent}
+body.pilot-v2 #plans .plan:not(.primary) .cal{border-color:var(--chalk-line);background:#fff}
+body.pilot-v2 #plans .plan:not(.primary) .tbtn{color:var(--chalk-ink)}
+
+/* --- об Алёне: цифра 105 --- */
+body.pilot-v2 .about-stat{display:flex;align-items:flex-end;gap:14px;padding:6px 0 4px}
+body.pilot-v2 .about-stat b{font:800 clamp(72px,22vw,128px)/.82 var(--display);color:var(--amber);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+body.pilot-v2 .about-stat span{font-size:14px;line-height:1.4;color:var(--muted);padding-bottom:4px}
+body.pilot-v2 #plans .plan.primary{color:var(--ink)}
+body.pilot-v2 #plans .plan.primary .fit div{color:var(--ink)}
+body.pilot-v2 .brand-journey .step .pl{position:relative}
+body.pilot-v2 .brand-journey .step .pl small{position:absolute;bottom:-6px;left:0;right:0;text-align:center;font-size:10.5px;letter-spacing:.08em;color:var(--muted)}
+body.pilot-v2 .brand-journey .step .pl svg text{font-family:var(--display)}
+body.pilot-v2 .hero-over h1{hyphens:manual;-webkit-hyphens:manual}
+body.pilot-v2 .brand-journey .step .pl svg{width:64px;height:64px;max-width:none}
+@media(min-width:1024px){
+  body.pilot-v2 .hero-over{right:48px;max-width:none}
+  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(44px,4.6vw,72px);max-width:17ch}
+  body.pilot-v2.design-pilot .hero-over h1>span{display:inline}
+}
+body.pilot-v2 .brand-journey .step{grid-template-columns:76px 1fr}
+body.pilot-v2 .brand-journey .step .pl{width:76px;height:76px}
+body.pilot-v2 .brand-journey .step .pl svg{width:76px;height:76px}
