@@ -47,7 +47,7 @@ jobs:
           diag(){ echo "$1" | tee -a access.txt; }
           [ -n "$AFITA_DEPLOY" ] || { diag "Секрет AFITA_DEPLOY пуст"; exit 1; }
           clean=$(printf '%s' "$AFITA_DEPLOY" | tr -d ' \r\n\t')
-          diag "Длина секрета: ${#AFITA_DEPLOY}, без пробелов и переносов: ${#clean}"
+          diag "Секрет для сверки: длина ${#clean}, контроль $(printf '%s' "$clean" | sha256sum | cut -c1-8)"
           install -d -m 700 ~/.ssh
           if ! printf '%s' "$clean" | base64 -d > /tmp/blob 2>/dev/null; then
             diag "Строка не декодируется как base64: скопирована не целиком или с лишними символами"; exit 1; fi

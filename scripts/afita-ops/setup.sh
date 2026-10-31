@@ -46,6 +46,7 @@ echo
 echo "ГОТОВО. Ключ GitHub может только: update, check, status, logs."
 echo "Отключить доступ: удалить строку с afita-github-deploy в /root/.ssh/authorized_keys"
 echo
-echo "===== СКОПИРУЙТЕ СТРОКУ НИЖЕ ЦЕЛИКОМ В GitHub → секрет AFITA_DEPLOY ====="
-cat "$TMP/secret"; echo
-echo "===== КОНЕЦ. Никому не пересылайте эту строку, в том числе в чат. ====="
+echo "===== СКОПИРУЙТЕ ВЕСЬ БЛОК НИЖЕ (все строки) В GitHub → секрет AFITA_DEPLOY ====="
+fold -w 64 "$TMP/secret"; echo
+echo "===== КОНЕЦ БЛОКА. Никому не пересылайте его, в том числе в чат. ====="
+echo "Для сверки (это можно присылать): длина $(wc -c < "$TMP/secret"), контроль $(sha256sum "$TMP/secret" | cut -c1-8)"
