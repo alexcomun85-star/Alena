@@ -31,7 +31,7 @@ const stageTokens={afita_composition:[7000,2000],afita_cooking:[9000,2500]};
 // aborts the call at once, so a retry still fits the deadline.
 const WHITESPACE_RUN=80;
 async function readStream(r,ctrl){const reader=r.body.getReader(),dec=new TextDecoder();let buf='',text='',run=0,final=null;
- const feed=delta=>{text+=delta;for(const ch of delta){if(ch===' '||ch==='\n'||ch==='\t'||ch==='\r'){if(++run>=WHITESPACE_RUN){ctrl.abort();throw Object.assign(Error('whitespace_loop'),{chars:text.length});}}else run=0;}if(text.length>100000){ctrl.abort();throw Error('invalid_output');}};
+ const feed=delta=>{text+=delta;for(const ch of delta){if(ch===' '||ch==='\n'||ch==='\t'||ch==='\r'){if(++run>=WHITESPACE_RUN){ctrl.abort();throw Object.assign(Error('whitespace_loop'),{chars:text.length,context:text.slice(0,text.length-run).slice(-160)});}}else run=0;}if(text.length>100000){ctrl.abort();throw Error('invalid_output');}};
  for(;;){const {done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
   while((i=buf.indexOf('\n\n'))>=0){const block=buf.slice(0,i);buf=buf.slice(i+2);const data=block.split('\n').filter(l=>l.startsWith('data:')).map(l=>l.slice(5).trim()).join('');if(!data||data==='[DONE]')continue;
    let ev;try{ev=JSON.parse(data)}catch{continue}
@@ -39,7 +39,7 @@ async function readStream(r,ctrl){const reader=r.body.getReader(),dec=new TextDe
    else if(ev.type==='response.completed'||ev.type==='response.incomplete'||ev.type==='response.failed')final=ev.response||{};
    else if(ev.type==='error')throw Error('provider_error');}}
  if(!final||final.status!=='completed')throw Error('incomplete');return text;}
-async function modelCall(req,fetcher,env,outputSchema,input,name){const model=env.OPENAI_MODEL||'gpt-4.1-mini';if(!/^[a-zA-Z0-9._-]{1,80}$/.test(model))throw Error('model_config');
+async function modelCall(req,fetcher,env,outputSchema,input,name){const model=(name==='afita_composition'&&env.OPENAI_COMPOSITION_MODEL)||env.OPENAI_MODEL||'gpt-4.1-mini';if(!/^[a-zA-Z0-9._-]{1,80}$/.test(model))throw Error('model_config');
  const left=(env.deadline||Date.now()+170000)-Date.now();if(left<10000)throw Error('deadline');const limit=Math.min(stageLimit[name]||45000,left);
  const cap=(stageTokens[name]||[3000,3000])[req.action==='week'?0:1],payload={model,store:false,stream:true,max_output_tokens:cap,input:[{role:'developer',content:instruction()},{role:'user',content:JSON.stringify(input)}],text:{format:{type:'json_schema',name,strict:true,schema:outputSchema}}};
  const ctrl=new AbortController();
@@ -69,7 +69,7 @@ async function buildMenu(req,fetcher,env){
  // Up to two retries after a loop, cut-off or broken JSON, while 60 s remain for the rest of the menu.
  let body;for(let attempt=1;;attempt++){try{body=await compose();break;}catch(e){
   const retryable=['incomplete','invalid_output','whitespace_loop'].includes(e.message)||e.name==='TimeoutError'||e instanceof SyntaxError;
-  if(!retryable||attempt>2||env.deadline-Date.now()<60000)throw e;console.error('Afita composition retry:',e.name==='TimeoutError'?'timeout':e.message+(e.chars?' after '+e.chars+' chars':''));}}
+  if(!retryable||attempt>2||env.deadline-Date.now()<60000)throw e;console.error('Afita composition retry:',e.name==='TimeoutError'?'timeout':e.message+(e.chars?' after '+e.chars+' chars':'')+(e.context?' | before: '+JSON.stringify(e.context):''));}}
  const placeholder='Приготовление будет составлено по проверенному составу.';
  for(const e of entries(body,req)){e.meal.steps=placeholder;tidy(e.meal);}
  let compositionRepairs=0,portionsAdjusted=false;const oilAdded=[],touched=new Set();
@@ -129,7 +129,7 @@ async function buildMenu(req,fetcher,env){
  try{C.normalize(body,req,AI_FOODS)}catch(err){throw failure(err.message)}
  return {body,portionsAdjusted,oilAdded};
 }
-export function aiStatus(env){return reply({revision:'stream-guard-20261031-7',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
+export function aiStatus(env){return reply({revision:'loop-context-20261031-8',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
 export async function aiRoute(request,env,{fetcher=fetch,now=Date.now}={}){
  if(!configured(env))return reply({code:'not_configured',error:'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'},503);
  const time=now(),ip=request.headers.get('CF-Connecting-IP')||request.headers.get('oai-authenticated-user-id');if(!ip)return reply({code:'identity_unavailable',error:'Не удалось проверить лимит запросов. Попробуйте позже.'},503);const epoch=Math.floor(time/86400000),owner=await digest(env.AI_BUDGET_SALT+':'+epoch+':'+ip);
@@ -146,7 +146,7 @@ export async function aiRoute(request,env,{fetcher=fetch,now=Date.now}={}){
   if(!await reserve(db,globalKey,bounded(env.AI_DAY_REQUESTS,20,200),expires)){await release(db,userKey);userReserved=false;return reply({code:'daily_limit',limit:'service',resetsAt,error:'Исчерпан общий дневной бюджет ИИ сервиса. Сохранённая неделя и готовая подборка доступны без ИИ.'},429);}globalReserved=true;
   const inserted=await db.prepare('INSERT INTO ai_requests (id, request_hash, owner, status, result, expires) VALUES (?, ?, ?, ?, NULL, ?) ON CONFLICT(id) DO NOTHING RETURNING id').bind(req.requestId,hash,owner,'pending',time+86400000).first();if(!inserted){await release(db,userKey);userReserved=false;await release(db,globalKey);globalReserved=false;return reply({code:'in_progress',error:'Этот запрос уже выполняется.'},409);}created=true;
   const {body,portionsAdjusted}=await buildMenu(req,fetcher,env);
-  const result={kind:'ai',version:1,requestId:req.requestId,model:env.OPENAI_MODEL||'gpt-4.1-mini',generatedAt:new Date(time).toISOString(),body,portionsAdjusted,arithmetic:'USDA/site-labels'};
+  const result={kind:'ai',version:1,requestId:req.requestId,model:env.OPENAI_COMPOSITION_MODEL?env.OPENAI_COMPOSITION_MODEL+' + '+(env.OPENAI_MODEL||'gpt-4.1-mini'):(env.OPENAI_MODEL||'gpt-4.1-mini'),generatedAt:new Date(time).toISOString(),body,portionsAdjusted,arithmetic:'USDA/site-labels'};
   await db.prepare('UPDATE ai_requests SET status = ?, result = ? WHERE id = ?').bind('done',JSON.stringify(result),req.requestId).run();
   await db.batch([db.prepare('DELETE FROM ai_requests WHERE id IN (SELECT id FROM ai_requests WHERE expires < ? LIMIT 100)').bind(time),db.prepare('DELETE FROM ai_budget WHERE bucket IN (SELECT bucket FROM ai_budget WHERE expires < ? LIMIT 100)').bind(time)]).catch(()=>{});
   return reply(result);

@@ -1,9 +1,11 @@
 #!/bin/bash
 # Контрольная генерация недели тем же кодом, что работает в afita-meals.
 # Рабочий генератор, его база и дневные лимиты не затрагиваются. Несколько центов за прогон.
-# Запуск: sudo bash afita_check_week.sh [число прогонов 1–10]
+# Запуск: sudo bash afita_check_week.sh [число прогонов 1–10] [модель для составления недели, по умолчанию как на сервере]
 set -euo pipefail
 RUNS=${1:-5}; [[ $RUNS =~ ^([1-9]|10)$ ]] || { echo "Число прогонов 1–10"; exit 2; }
+CMODEL=${2:-}; [[ -z $CMODEL || $CMODEL =~ ^[a-zA-Z0-9._-]{1,80}$ ]] || { echo "Неверное имя модели"; exit 2; }
+echo "Модель составления: ${CMODEL:-как на сервере (gpt-4.1-mini)}; остальные шаги: gpt-4.1-mini"
 ROOT=$(docker inspect afita-meals --format '{{range .Mounts}}{{if eq .Destination "/app"}}{{.Source}}{{end}}{{end}}')
 [ -n "$ROOT" ] || { echo "Контейнер afita-meals не найден"; exit 1; }
 echo "Версия: $(curl -s -m 5 http://127.0.0.1:18081/api/meal-plan/status | grep -o '"revision":"[^"]*"')"
@@ -13,7 +15,7 @@ cat > "$WORK/check.mjs" <<'JS'
 import {readFileSync} from 'node:fs';
 const {buildMenu}=await import('/dbg/app/handler.js');
 const C=globalThis.AfitaAIContract;
-const env={OPENAI_API_KEY:readFileSync('/run/secrets/openai_key','utf8').trim(),OPENAI_MODEL:'gpt-4.1-mini'};
+const env={OPENAI_API_KEY:readFileSync('/run/secrets/openai_key','utf8').trim(),OPENAI_MODEL:'gpt-4.1-mini',...(process.argv[3]?{OPENAI_COMPOSITION_MODEL:process.argv[3]}:{})};
 const runs=Number(process.argv[2]);let ok=0;
 for(let run=1;run<=runs;run++){
  console.log(`=== Прогон ${run}`);
@@ -26,8 +28,8 @@ for(let run=1;run<=runs;run++){
   catch(e){console.log(`  Шаг ${i} ${name}: СБОЙ ${e.name} через ${((Date.now()-t)/1000).toFixed(0)} с`);throw e;}};
  try{const {body,oilAdded}=await buildMenu(req,fetcher,env);ok++;
   console.log(`  ИТОГ: УСПЕХ за ${s()}, блюд ${(body.days||[]).reduce((a,d)=>a+d.meals.length,0)}`+(oilAdded?.length?`, учтено масло 5 г: ${oilAdded.join('; ')}`:''));}
- catch(e){console.log(`  ИТОГ: ОШИБКА за ${s()}: ${e.message}`+(e.reason?` | ${String(e.reason).slice(0,400)}`:''));}
+ catch(e){console.log(`  ИТОГ: ОШИБКА за ${s()}: ${e.message}`+(e.message==='provider_error'?' (модель недоступна для ключа или ошибка OpenAI)':'')+(e.reason?` | ${String(e.reason).slice(0,400)}`:''));}
 }
 console.log(`\nУСПЕШНО: ${ok} из ${runs}`);
 JS
-docker run --rm -v "$WORK":/dbg:ro -v /opt/alenafit-assistant/openai_key:/run/secrets/openai_key:ro node:24-bookworm-slim node /dbg/check.mjs "$RUNS" 2>&1 | grep --line-buffered -v "^Afita generation failed" | sed -u 's/^Afita composition retry: /  ↻ Повтор составления: /'
+docker run --rm -v "$WORK":/dbg:ro -v /opt/alenafit-assistant/openai_key:/run/secrets/openai_key:ro node:24-bookworm-slim node /dbg/check.mjs "$RUNS" $CMODEL 2>&1 | grep --line-buffered -v "^Afita generation failed" | sed -u 's/^Afita composition retry: /  ↻ Повтор составления: /'

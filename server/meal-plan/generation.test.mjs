@@ -182,6 +182,14 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
  console.log('Stream guard: whitespace loop aborted early, composition retried, normal stream parsed OK');
 }
 
+// A separate model can be set for composition only; every other stage keeps the default model.
+{
+ const models={};const env={...await environment(),OPENAI_COMPOSITION_MODEL:'gpt-4.1'};
+ const r=await aiRoute(request(),env,{fetcher:async(url,init)=>{const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);models[input.stage]=p.model;return provider(url,init);}});
+ assert.equal(r.status,200);assert.equal(models.composition,'gpt-4.1');assert.equal(models.cooking,'gpt-4.1-mini');
+ console.log('Composition model: configurable for composition only OK');
+}
+
 // A repair cannot address another meal or return duplicate IDs.
 env=await environment();response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
  const input=JSON.parse(JSON.parse(init.body).input[1].content);
