@@ -116,7 +116,7 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
  const run=async(fixOnRound)=>{let stages=[],round=0;const env=await environment();const response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
   const input=JSON.parse(JSON.parse(init.body).input[1].content);stages.push(input.stage);
   if(input.stage==='composition'){const bad=structuredClone(body);bad.days[0].meals[0].parts[0].food='Unknown';return answer(bad);}
-  if(input.stage==='repair'){round++;assert.equal(input.recipes.length,1);assert.equal(input.recipes[0].id,'0:0');assert.ok(input.takenTitles.includes(other),'taken titles are shown to the model');assert.ok(!input.takenTitles.includes(body.days[0].meals[0].title),'own title is not blocked');
+  if(input.stage==='repair'){round++;const ms=JSON.parse(init.body).text.format.schema.properties.repairs.items.properties.meal;assert.equal(ms.properties.steps,undefined,'composition repair cannot write cooking text');assert.ok(!ms.required.includes('steps'));assert.equal(input.recipes.length,1);assert.equal(input.recipes[0].id,'0:0');assert.ok(input.takenTitles.includes(other),'taken titles are shown to the model');assert.ok(!input.takenTitles.includes(body.days[0].meals[0].title),'own title is not blocked');
    const meal=structuredClone(body.days[0].meals[0]);if(round!==fixOnRound)meal.title=other;return answer({repairs:[{id:'0:0',meal}]});}
   return provider(url,init);
  }});return {response,stages};};

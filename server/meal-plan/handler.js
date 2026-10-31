@@ -20,14 +20,19 @@ function entries(body,req){return req.action==='week'?(body.days||[]).flatMap((d
 function collect(body,req){const issues=[];for(const e of entries(body,req)){try{C.meal(e.meal,C.slots[e.index],req,AI_FOODS)}catch(err){issues.push({...e,error:err.message});}}return issues;}
 function put(body,req,e,meal){if(req.action==='week')body.days[e.day].meals[e.index]=meal;else body.meals[0]=meal;}
 function patchSchema(items,mealSchema){return {type:'object',additionalProperties:false,properties:{repairs:{type:'array',minItems:items.length,maxItems:items.length,items:{type:'object',additionalProperties:false,properties:{id:{type:'string',enum:items.map(e=>e.day+':'+e.index)},meal:mealSchema},required:['id','meal']}}},required:['repairs']};}
+// Week composition is the longest answer: observed 17–22 s normally and over 55 s at peak load.
+// Each stage gets its own ceiling inside one 170 s deadline, so the browser (190 s) always gets an answer.
+const stageLimit={afita_composition:110000,afita_cooking:80000};
 async function modelCall(req,fetcher,env,outputSchema,input,name){const model=env.OPENAI_MODEL||'gpt-4.1-mini';if(!/^[a-zA-Z0-9._-]{1,80}$/.test(model))throw Error('model_config');
+ const left=(env.deadline||Date.now()+170000)-Date.now();if(left<10000)throw Error('deadline');const limit=Math.min(stageLimit[name]||45000,left);
  const payload={model,store:false,max_output_tokens:req.action==='week'?20000:3000,input:[{role:'developer',content:instruction()},{role:'user',content:JSON.stringify(input)}],text:{format:{type:'json_schema',name,strict:true,schema:outputSchema}}};
- const r=await fetcher('https://api.openai.com/v1/responses',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+env.OPENAI_API_KEY},body:JSON.stringify(payload),signal:AbortSignal.timeout(55000)});if(!r.ok)throw Error(r.status===429?'provider_limit':'provider_error');const data=await r.json();if(data.status!=='completed')throw Error('incomplete');const text=(data.output||[]).flatMap(x=>x.content||[]).filter(x=>x.type==='output_text').map(x=>x.text).join('');if(!text||text.length>100000)throw Error('invalid_output');return JSON.parse(text);}
+ const r=await fetcher('https://api.openai.com/v1/responses',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+env.OPENAI_API_KEY},body:JSON.stringify(payload),signal:AbortSignal.timeout(limit)});if(!r.ok)throw Error(r.status===429?'provider_limit':'provider_error');const data=await r.json();if(data.status!=='completed')throw Error('incomplete');const text=(data.output||[]).flatMap(x=>x.content||[]).filter(x=>x.type==='output_text').map(x=>x.text).join('');if(!text||text.length>100000)throw Error('invalid_output');return JSON.parse(text);}
 const tracked=[['масло',/^Масло/],['сахар',/^Сахар/],['мёд',/^Мёд/],['молоко',/^Молоко/],['сливки',/^Молоко|^Сметана/],['сыр',/^Сыр/],['сметана',/^Сметана/],['йогурт',/^Йогурт/],['майонез',/^Майонез/],['яйцо',/^Яйцо/]];
 const doNotMention=meal=>tracked.filter(([,food])=>!(meal.parts||[]).some(x=>food.test(x.food))).map(([w])=>w);
 const cookingRules='Каждое блюдо содержит doNotMention — продукты, которых нет в составе. Не пиши эти слова ни в какой форме, даже с «без» или «по желанию». Если масла нет: жарь на сухой антипригарной сковороде, запекай на пергаменте, хлеб подсушивай в тостере или на сухой сковороде, яйца готовь на сухой антипригарной сковороде под крышкой или варёными.';
 const failure=reason=>Object.assign(Error('validation_failed'),{reason});
 async function buildMenu(req,fetcher,env){
+ env={...env,deadline:Date.now()+170000};
  const full=schema(req),mealSchema=req.action==='week'?full.properties.days.items.properties.meals.items:full.properties.meals.items;
  const composition=structuredClone(full),draftMeal=req.action==='week'?composition.properties.days.items.properties.meals.items:composition.properties.meals.items;
  delete draftMeal.properties.steps;draftMeal.required=draftMeal.required.filter(k=>k!=='steps');
@@ -41,10 +46,10 @@ async function buildMenu(req,fetcher,env){
   if(compositionRepairs>=limit)throw failure(reason);compositionRepairs++;
   // The model must see the titles it may not reuse, otherwise a replacement can collide with another day.
   const ids=new Set(items.map(e=>e.day+':'+e.index)),takenTitles=[...new Set([...req.avoidTitles,...entries(body,req).filter(e=>!ids.has(e.day+':'+e.index)).map(e=>e.meal.title)])];
-  const result=await modelCall(req,fetcher,env,patchSchema(items,mealSchema),{stage:'repair',request:req,correction:reason,takenTitles,recipes:items.map(e=>({id:e.day+':'+e.index,meal:e.meal,error:e.error||reason})),foodNutritionPer100g:nutrition,instruction:'Исправь или замени только указанные блюда. Другие блюда изменить нельзя. Названия исправленных блюд не должны совпадать с takenTitles и между собой — придумай другое блюдо, а не переименование того же. Для ошибки приготовления сохрани состав и исправь текст.'},'afita_repairs');
+  const result=await modelCall(req,fetcher,env,patchSchema(items,draftMeal),{stage:'repair',request:req,correction:reason,takenTitles,recipes:items.map(e=>({id:e.day+':'+e.index,meal:e.meal,error:e.error||reason})),foodNutritionPer100g:nutrition,instruction:'Исправь или замени только указанные блюда. Другие блюда изменить нельзя. Названия исправленных блюд не должны совпадать с takenTitles и между собой — придумай другое блюдо, а не переименование того же. Приготовление не пиши: оно будет составлено отдельно по проверенному составу.'},'afita_repairs');
   if(!Array.isArray(result.repairs)||result.repairs.length!==items.length)throw failure('Неполный ответ исправления блюд.');
   const wanted=new Map(items.map(e=>[e.day+':'+e.index,e])),seen=new Set();
-  for(const patch of result.repairs){if(!wanted.has(patch.id)||seen.has(patch.id))throw failure('Неверный адрес исправления.');seen.add(patch.id);const e=wanted.get(patch.id);touched.add(patch.id);try{C.meal(patch.meal,C.slots[e.index],req,AI_FOODS)}catch(err){throw failure(err.message)}put(body,req,e,patch.meal);}
+  for(const patch of result.repairs){if(!wanted.has(patch.id)||seen.has(patch.id))throw failure('Неверный адрес исправления.');seen.add(patch.id);const e=wanted.get(patch.id);touched.add(patch.id);patch.meal.steps=placeholder;try{C.meal(patch.meal,C.slots[e.index],req,AI_FOODS)}catch(err){throw failure(err.message)}put(body,req,e,patch.meal);}
  }
  const titleKey=t=>String(t).toLocaleLowerCase('ru').replace(/ё/g,'е');
  // On a repeat, the dish that a repair just produced is the one sent back; the verified original stays.
@@ -87,7 +92,7 @@ async function buildMenu(req,fetcher,env){
  try{C.normalize(body,req,AI_FOODS)}catch(err){throw failure(err.message)}
  return {body,portionsAdjusted,oilAdded};
 }
-export function aiStatus(env){return reply({revision:'unique-titles-20261031-3',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
+export function aiStatus(env){return reply({revision:'stage-timeouts-20261031-4',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
 export async function aiRoute(request,env,{fetcher=fetch,now=Date.now}={}){
  if(!configured(env))return reply({code:'not_configured',error:'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'},503);
  const time=now(),ip=request.headers.get('CF-Connecting-IP')||request.headers.get('oai-authenticated-user-id');if(!ip)return reply({code:'identity_unavailable',error:'Не удалось проверить лимит запросов. Попробуйте позже.'},503);const epoch=Math.floor(time/86400000),owner=await digest(env.AI_BUDGET_SALT+':'+epoch+':'+ip);

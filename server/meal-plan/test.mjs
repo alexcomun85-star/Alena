@@ -5,7 +5,7 @@ assert.equal(new SQLite(':memory:').sqlite.prepare('SELECT COUNT(*) AS n FROM ai
 const server=createServer({DB},{trustedProxy:false});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base='http://127.0.0.1:'+server.address().port;
 try{
- let r=await fetch(base+'/api/meal-plan/status',{headers:{Origin:'https://alenafit.com'}});assert.equal(r.status,200);const status=await r.json();assert.equal(status.ready,false);assert.equal(status.revision,'unique-titles-20261031-3');assert.equal(r.headers.get('Access-Control-Allow-Origin'),'https://alenafit.com');
+ let r=await fetch(base+'/api/meal-plan/status',{headers:{Origin:'https://alenafit.com'}});assert.equal(r.status,200);const status=await r.json();assert.equal(status.ready,false);assert.equal(status.revision,'stage-timeouts-20261031-4');assert.equal(r.headers.get('Access-Control-Allow-Origin'),'https://alenafit.com');
  assert.equal((await fetch(base+'/api/meal-plan/status',{headers:{Origin:'https://evil.invalid'}})).status,403);
  assert.equal((await fetch(base+'/api/meal-plan',{method:'OPTIONS',headers:{Origin:'https://alenafit.com'}})).status,204);
  assert.equal((await fetch(base+'/api/meal-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,503);
