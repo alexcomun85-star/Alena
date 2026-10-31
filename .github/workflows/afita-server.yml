@@ -1,0 +1,86 @@
+name: Сервер Афиты — обновление и проверка
+
+# Пуш в ветку afita-deploy/<что угодно> — установить код этой ветки на сервер и проверить генерацию.
+# Пуш в ветку afita-check/<что угодно> — только проверить текущий сервер.
+# Откат: запушить afita-deploy/rollback на нужный старый коммит.
+# Сайт эти ветки не затрагивают. Отчёт — в ветке afita-reports (reports/latest.txt).
+on:
+  push:
+    branches: ['afita-deploy/**', 'afita-check/**']
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: afita-server
+  cancel-in-progress: false
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Тесты генератора перед установкой
+        id: tests
+        if: startsWith(github.ref_name, 'afita-deploy/')
+        run: |
+          cd server/meal-plan
+          node test.mjs
+          node generation.test.mjs
+          node balance.test.mjs
+
+      - name: Доступ к серверу
+        env:
+          AFITA_DEPLOY: ${{ secrets.AFITA_DEPLOY }}
+        run: |
+          if [ -z "$AFITA_DEPLOY" ]; then echo "::error::Нет секрета AFITA_DEPLOY (scripts/afita-ops/setup.sh)"; exit 1; fi
+          install -d -m 700 ~/.ssh
+          echo "$AFITA_DEPLOY" | base64 -d > /tmp/blob
+          HOST=$(sed -n 's/^HOST=//p' /tmp/blob); PORT=$(sed -n 's/^PORT=//p' /tmp/blob)
+          sed -n 's/^KNOWN=//p' /tmp/blob > ~/.ssh/known_hosts
+          sed -n '/BEGIN OPENSSH PRIVATE KEY/,/END OPENSSH PRIVATE KEY/p' /tmp/blob > ~/.ssh/afita; chmod 600 ~/.ssh/afita; rm /tmp/blob
+          printf 'Host afita\n HostName %s\n Port %s\n User root\n IdentityFile ~/.ssh/afita\n IdentitiesOnly yes\n StrictHostKeyChecking yes\n ServerAliveInterval 20\n' "$HOST" "$PORT" > ~/.ssh/config
+
+      - name: Установка на сервер
+        id: update
+        if: startsWith(github.ref_name, 'afita-deploy/')
+        run: ssh afita "update ${GITHUB_SHA}" 2>&1 | tee update.txt
+
+      - name: Проверка генерации (3 прогона)
+        id: check
+        if: always() && steps.update.outcome != 'failure'
+        run: |
+          ssh afita status 2>&1 | tee status.txt
+          ssh afita "check 3" 2>&1 | tee check.txt
+          ssh afita logs 2>&1 | tail -30 > logs.txt || true
+          ok=$(grep -c 'ИТОГ: УСПЕХ' check.txt || true)
+          echo "ok=$ok" >> "$GITHUB_OUTPUT"
+          [ "$ok" -gt 0 ]
+
+      - name: Отчёт в ветку afita-reports
+        if: always()
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          stamp=$(TZ=Europe/Moscow date +%Y%m%d-%H%M%S)
+          {
+            echo "Ветка: ${GITHUB_REF_NAME}"; echo "Коммит: ${GITHUB_SHA}"; echo "Время (МСК): $stamp"
+            echo "Тесты: ${{ steps.tests.outcome }} | Установка: ${{ steps.update.outcome }} | Проверка: ${{ steps.check.outcome }} | Успешных прогонов: ${{ steps.check.outputs.ok }} из 3"
+            for f in update.txt status.txt check.txt logs.txt; do [ -f "$f" ] && { echo; echo "----- $f"; cat "$f"; }; done
+          } > report.txt
+          cat report.txt >> "$GITHUB_STEP_SUMMARY"
+          url="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}"
+          if git clone -q --depth 1 --branch afita-reports "$url" rep 2>/dev/null; then :; else
+            mkdir rep && cd rep && git init -q -b afita-reports && git remote add origin "$url" && cd ..; fi
+          mkdir -p rep/reports
+          cp report.txt "rep/reports/$stamp-${GITHUB_SHA::7}.txt"; cp report.txt rep/reports/latest.txt
+          cd rep && git add reports && git -c user.name=afita-bot -c user.email=afita-bot@users.noreply.github.com commit -qm "Отчёт $stamp ${GITHUB_SHA::7}" && git push -q origin afita-reports
