@@ -1,0 +1,7 @@
+Ветка: afita-deploy/unique-titles
+Коммит: c1474cfb91df617a2497ec537d9dc341caf8ae75
+Время (МСК): 20261031-185110
+Тесты: success | Установка: skipped | Проверка: failure | Успешных прогонов:  из 3
+
+----- status.txt
+ssh: Could not resolve hostname afita: Temporary failure in name resolution
