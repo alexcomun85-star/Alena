@@ -151,6 +151,21 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
  console.log('Loop guard: capped composition retried once; day totals explained in numbers, at most two rounds ('+(rounds?rounds+' used':'balance fixed it')+') OK');
 }
 
+// Grams are whole numbers in the schema; odd egg weights are tidied; a still-invalid repaired dish gets another round.
+{
+ let seen=0,rounds=0;const env=await environment();const egg=body.days.flatMap((d,day)=>d.meals.map((m,index)=>({day,index,m}))).find(e=>e.m.parts.some(x=>x.food==='Яйцо куриное'));
+ const r=await aiRoute(request(),env,{fetcher:async(url,init)=>{
+  const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);
+  if(input.stage==='composition'){seen++;const g=p.text.format.schema.properties.days.items.properties.meals.items.properties.parts.items.properties.grams;assert.equal(g.type,'integer','grams cannot be an endless decimal');
+   const odd=structuredClone(body);odd.days[egg.day].meals[egg.index].parts.find(x=>x.food==='Яйцо куриное').grams=60;odd.days[0].meals[1].parts[0].food='Unknown';return answer(odd);}
+  if(input.stage==='repair'){rounds++;const meal=structuredClone(body.days[0].meals[1]);if(rounds===1)meal.parts[0].food='Unknown';return answer({repairs:[{id:'0:1',meal}]});}
+  return provider(url,init);
+ }});
+ assert.equal(r.status,200,'egg tidied to whole eggs, invalid repair retried');assert.equal(rounds,2);
+ const out=(await r.json()).body.days[egg.day].meals[egg.index].parts;const e=out.find(x=>(x[0]||x.food)==='Яйцо куриное');assert.equal((e[1]??e.grams)%50,0);
+ console.log('Integer grams: schema integer, eggs tidied to 50 g, invalid repaired dish gets a second round OK');
+}
+
 // A repair cannot address another meal or return duplicate IDs.
 env=await environment();response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
  const input=JSON.parse(JSON.parse(init.body).input[1].content);
