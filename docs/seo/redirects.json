@@ -1,0 +1,38 @@
+[
+  {
+    "url": "http://alenafit.com/",
+    "chain": [
+      {
+        "from": "http://alenafit.com/",
+        "status": 301,
+        "to": "https://alenafit.com/"
+      }
+    ],
+    "final": "https://alenafit.com/",
+    "status": 200
+  },
+  {
+    "url": "https://www.alenafit.com/",
+    "chain": [
+      {
+        "from": "https://www.alenafit.com/",
+        "status": 301,
+        "to": "https://alenafit.com/"
+      }
+    ],
+    "final": "https://alenafit.com/",
+    "status": 200
+  },
+  {
+    "url": "http://www.alenafit.com/",
+    "chain": [
+      {
+        "from": "http://www.alenafit.com/",
+        "status": 301,
+        "to": "https://alenafit.com/"
+      }
+    ],
+    "final": "https://alenafit.com/",
+    "status": 200
+  }
+]

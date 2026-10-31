@@ -1,0 +1,9 @@
+Existing-server adapter: SQLite, CORS, fail-closed config and route separation OK
+AI server: fail-closed setup, structured provider request, SQLite budget, idempotency, privacy, single correction and invalid-output rejection OK
+Structured shape: exactly seven days x four meals, one replacement, useful validation reason OK
+Pending lease: active requests retained, abandoned requests released without paid calls OK
+Quota accounting: failed menus refunded personally, real attempts retained globally, blocked clicks cost nothing, personal and service caps distinguished OK
+Staged recipes: verified composition before cooking, targeted repair, immutable valid dishes, immutable cooking weights, bounded calls and offline cache OK
+Portion balance: low-carbohydrate/low-energy draft repaired using existing foods, culinary bounds, unchanged recipes and strict revalidation OK
+Portion balance: excess protein, missing carbohydrates and produce repaired; replacement remains one meal OK
+Existing quota repair: legacy failed/stale menus credited, real service attempts retained, inflated counts repaired idempotently OK

@@ -33,7 +33,7 @@ jobs:
       - name: Установить средства проверки
         timeout-minutes: 8
         run: |
-          pip install --retries 2 --timeout 30 playwright==1.64.1
+          pip install --retries 2 --timeout 30 playwright==1.64.1 beautifulsoup4==4.12.3
           apt-get update -o Acquire::Retries=2 -o Acquire::http::Timeout=30
           apt-get install -y --no-install-recommends poppler-utils
       - name: Проверить сайт, калькуляторы и смену размеров экрана
@@ -54,6 +54,7 @@ jobs:
           PY
           # Браузерные проверки на общих серверах GitHub иногда сбиваются по времени — упавший набор повторяем один раз.
           retry() { "$@" || { echo "::warning::Повтор после сбоя: $*"; "$@"; }; }
+          python tests/seo_check.py
           node tests/food_storage.test.cjs
           node tests/nav_resize.test.cjs
           node tests/cycle_diary.test.cjs

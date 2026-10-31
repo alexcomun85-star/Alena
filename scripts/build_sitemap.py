@@ -2,12 +2,28 @@
 Запуск из корня репозитория: python scripts/build_sitemap.py (в публикации запускается автоматически)."""
 import glob
 import subprocess
+from html.parser import HTMLParser
 
 SITE = "https://alenafit.com/"
 SKIP = {"404.html", "offline.html"}
 # главная и ключевые инструменты — выше приоритет
 PRIORITY = {"index.html": "1.0", "progress.html": "0.8", "servisy.html": "0.8", "kalorii.html": "0.8",
             "vozvrat.html": "0.8", "testy.html": "0.8", "trener.html": "0.8"}
+
+
+class RobotsParser(HTMLParser):
+    """Read directives regardless of case, attribute order and quote style."""
+    def __init__(self):
+        super().__init__()
+        self.noindex = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() != "meta":
+            return
+        attrs = dict(attrs)
+        if (attrs.get("name") or "").lower() in {"robots", "googlebot", "yandex"}:
+            tokens = (attrs.get("content") or "").lower().replace(",", " ").split()
+            self.noindex |= bool({"noindex", "none"}.intersection(tokens))
 
 
 def lastmod(fn):
@@ -25,7 +41,9 @@ def main():
         if fn in SKIP:
             continue
         s = open(fn, encoding="utf-8").read()
-        if 'name="robots" content="noindex' in s:
+        robots = RobotsParser()
+        robots.feed(s)
+        if robots.noindex:
             continue
         loc = SITE if fn == "index.html" else SITE + fn
         lm = lastmod(fn)
