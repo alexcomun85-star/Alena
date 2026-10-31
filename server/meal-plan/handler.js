@@ -23,6 +23,9 @@ function patchSchema(items,mealSchema){return {type:'object',additionalPropertie
 async function modelCall(req,fetcher,env,outputSchema,input,name){const model=env.OPENAI_MODEL||'gpt-4.1-mini';if(!/^[a-zA-Z0-9._-]{1,80}$/.test(model))throw Error('model_config');
  const payload={model,store:false,max_output_tokens:req.action==='week'?20000:3000,input:[{role:'developer',content:instruction()},{role:'user',content:JSON.stringify(input)}],text:{format:{type:'json_schema',name,strict:true,schema:outputSchema}}};
  const r=await fetcher('https://api.openai.com/v1/responses',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+env.OPENAI_API_KEY},body:JSON.stringify(payload),signal:AbortSignal.timeout(55000)});if(!r.ok)throw Error(r.status===429?'provider_limit':'provider_error');const data=await r.json();if(data.status!=='completed')throw Error('incomplete');const text=(data.output||[]).flatMap(x=>x.content||[]).filter(x=>x.type==='output_text').map(x=>x.text).join('');if(!text||text.length>100000)throw Error('invalid_output');return JSON.parse(text);}
+const tracked=[['масло',/^Масло/],['сахар',/^Сахар/],['мёд',/^Мёд/],['молоко',/^Молоко/],['сливки',/^Молоко|^Сметана/],['сыр',/^Сыр/],['сметана',/^Сметана/],['йогурт',/^Йогурт/],['майонез',/^Майонез/],['яйцо',/^Яйцо/]];
+const doNotMention=meal=>tracked.filter(([,food])=>!(meal.parts||[]).some(x=>food.test(x.food))).map(([w])=>w);
+const cookingRules='Каждое блюдо содержит doNotMention — продукты, которых нет в составе. Не пиши эти слова ни в какой форме, даже с «без» или «по желанию». Если масла нет: жарь на сухой антипригарной сковороде, запекай на пергаменте, хлеб подсушивай в тостере или на сухой сковороде, яйца готовь на сухой антипригарной сковороде под крышкой или варёными.';
 const failure=reason=>Object.assign(Error('validation_failed'),{reason});
 async function buildMenu(req,fetcher,env){
  const full=schema(req),mealSchema=req.action==='week'?full.properties.days.items.properties.meals.items:full.properties.meals.items;
@@ -32,7 +35,7 @@ async function buildMenu(req,fetcher,env){
  let body=await modelCall(req,fetcher,env,composition,{stage:'composition',request:req,foodNutritionPer100g:nutrition,instruction:'Сначала составь блюда и ингредиенты. Инструкции приготовления будут созданы отдельно по проверенному составу.'},'afita_composition');
  const placeholder='Приготовление будет составлено по проверенному составу.';
  for(const e of entries(body,req))e.meal.steps=placeholder;
- let repaired=false,portionsAdjusted=false;
+ let repaired=false,portionsAdjusted=false;const oilAdded=[];
  async function repair(items,reason){
   if(repaired)throw failure(reason);repaired=true;
   const result=await modelCall(req,fetcher,env,patchSchema(items,mealSchema),{stage:'repair',request:req,correction:reason,recipes:items.map(e=>({id:e.day+':'+e.index,meal:e.meal,error:e.error||reason})),foodNutritionPer100g:nutrition,instruction:'Исправь или замени только указанные блюда. Другие блюда изменить нельзя. Для ошибки приготовления сохрани состав и исправь текст.'},'afita_repairs');
@@ -49,21 +52,30 @@ async function buildMenu(req,fetcher,env){
   try{const original=body;body=balanceMenu(body,req,AI_FOODS);portionsAdjusted ||= body!==original;C.normalize(body,req,AI_FOODS);}catch(err2){throw failure(err2.message)}
  }
  const meals=entries(body,req),cookingSchema={type:'object',additionalProperties:false,properties:{recipes:{type:'array',minItems:meals.length,maxItems:meals.length,items:{type:'object',additionalProperties:false,properties:{id:{type:'string',enum:meals.map(e=>e.day+':'+e.index)},steps:{type:'string'}},required:['id','steps']}}},required:['recipes']};
- const cooking=await modelCall(req,fetcher,env,cookingSchema,{stage:'cooking',recipes:meals.map(e=>({id:e.day+':'+e.index,...e.meal})),instruction:'Состав и граммовки уже проверены и неизменяемы. Напиши только приготовление по этому составу, без новых ингредиентов. Используй количества из состава. Соблюдай технологию, время и температуры. Вода и указанные приправы разрешены.'},'afita_cooking');
+ const cooking=await modelCall(req,fetcher,env,cookingSchema,{stage:'cooking',recipes:meals.map(e=>({id:e.day+':'+e.index,...e.meal,doNotMention:doNotMention(e.meal)})),instruction:cookingRules+' Состав и граммовки уже проверены и неизменяемы. Напиши только приготовление по этому составу, без новых ингредиентов. Используй количества из состава. Соблюдай технологию, время и температуры. Вода и указанные приправы разрешены.'},'afita_cooking');
  const wanted=new Map(meals.map(e=>[e.day+':'+e.index,e])),seen=new Set();
  if(!Array.isArray(cooking.recipes)||cooking.recipes.length!==meals.length)throw failure('Неполные инструкции приготовления.');
  for(const recipe of cooking.recipes){if(!wanted.has(recipe.id)||seen.has(recipe.id))throw failure('Неверный адрес инструкции.');seen.add(recipe.id);wanted.get(recipe.id).meal.steps=recipe.steps;}
  // Cooking text is repaired as text only: verified composition and grams are never resent, so they cannot drift.
- issues=collect(body,req);if(issues.length){
-  const ids=issues.map(e=>e.day+':'+e.index),fix=await modelCall(req,fetcher,env,{type:'object',additionalProperties:false,properties:{recipes:{type:'array',minItems:ids.length,maxItems:ids.length,items:{type:'object',additionalProperties:false,properties:{id:{type:'string',enum:ids},steps:{type:'string'}},required:['id','steps']}}},required:['recipes']},{stage:'cooking_repair',recipes:issues.map(e=>({id:e.day+':'+e.index,...e.meal,error:e.error})),instruction:'Перепиши только приготовление для указанных блюд, исправив ошибку из поля error. Состав и граммовки неизменяемы: используй только их, без новых ингредиентов. Вода и указанные приправы разрешены.'},'afita_cooking_repair');
+ // Up to two targeted rounds; the second one sees the rejected text.
+ issues=collect(body,req);
+ for(let round=1;issues.length&&round<=2;round++){
+  const ids=issues.map(e=>e.day+':'+e.index),fix=await modelCall(req,fetcher,env,{type:'object',additionalProperties:false,properties:{recipes:{type:'array',minItems:ids.length,maxItems:ids.length,items:{type:'object',additionalProperties:false,properties:{id:{type:'string',enum:ids},steps:{type:'string'}},required:['id','steps']}}},required:['recipes']},{stage:'cooking_repair',round,recipes:issues.map(e=>({id:e.day+':'+e.index,title:e.meal.title,parts:e.meal.parts,seasonings:e.meal.seasonings,doNotMention:doNotMention(e.meal),rejectedSteps:e.meal.steps,error:e.error})),instruction:cookingRules+' Перепиши приготовление указанных блюд заново, исправив ошибку из error. rejectedSteps отклонён — не копируй из него запрещённые слова. Состав и граммовки неизменяемы: используй только их, без новых ингредиентов. Вода и указанные приправы разрешены.'},'afita_cooking_repair');
   const seenFix=new Set();if(!Array.isArray(fix.recipes)||fix.recipes.length!==ids.length)throw failure('Неполное исправление приготовления.');
   for(const recipe of fix.recipes){if(!ids.includes(recipe.id)||seenFix.has(recipe.id))throw failure('Неверный адрес инструкции.');seenFix.add(recipe.id);const [d,i]=recipe.id.split(':').map(Number);entries(body,req).find(x=>x.day===d&&x.index===i).meal.steps=recipe.steps;}
-  const left=collect(body,req);if(left.length)throw failure(left.map(e=>e.error).join('\n'));
+  issues=collect(body,req);
  }
+ // Last resort for the most common case — frying fat: count 5 g of oil instead of discarding a whole week.
+ // The day totals are rechecked strictly; if they no longer fit, the menu is rejected honestly.
+ if(issues.length&&issues.every(e=>/неучтённый ингредиент: масло/.test(e.error)&&e.meal.parts.length<12&&!e.meal.parts.some(x=>/^Масло/.test(x.food)))){
+  for(const e of issues){e.meal.parts.push({food:'Масло подсолнечное',grams:5});oilAdded.push(e.meal.title);}
+  issues=collect(body,req);
+ }
+ if(issues.length)throw failure(issues.map(e=>e.error).join('\n'));
  try{C.normalize(body,req,AI_FOODS)}catch(err){throw failure(err.message)}
- return {body,portionsAdjusted};
+ return {body,portionsAdjusted,oilAdded};
 }
-export function aiStatus(env){return reply({revision:'cooking-text-repair-20261031-1',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
+export function aiStatus(env){return reply({revision:'cooking-text-repair-20261031-2',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
 export async function aiRoute(request,env,{fetcher=fetch,now=Date.now}={}){
  if(!configured(env))return reply({code:'not_configured',error:'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'},503);
  const time=now(),ip=request.headers.get('CF-Connecting-IP')||request.headers.get('oai-authenticated-user-id');if(!ip)return reply({code:'identity_unavailable',error:'Не удалось проверить лимит запросов. Попробуйте позже.'},503);const epoch=Math.floor(time/86400000),owner=await digest(env.AI_BUDGET_SALT+':'+epoch+':'+ip);

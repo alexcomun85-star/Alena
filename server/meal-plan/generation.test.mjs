@@ -86,6 +86,29 @@ const cooked=(await response.json()).body;assert.deepEqual(cooked.days[1],body.d
 response=await aiRoute(request(),env,{fetcher:cookRepair});assert.equal(response.status,200);assert.equal(cookingCalls,3,'cached final recipe never pays for cooking again');
 wrongCooking=false;env=await environment();response=await aiRoute(request(),env,{fetcher:cookRepair});assert.equal(response.status,502,'unfixed cooking text is rejected');const failed=await response.json();assert.equal(failed.code,'validation_failed','a rejected recipe is not reported as a temporary outage');assert.match(failed.reason,/.+/);
 
+// Oil written into cooking text for a dish without oil: forbidden words are named up front,
+// the repair gets a second targeted round, and as a last resort 5 g of oil is counted honestly.
+{
+ const target=body.days.flatMap((d,day)=>d.meals.map((m,index)=>({day,index,m}))).find(e=>!e.m.parts.some(x=>/^Масло/.test(x.food))&&e.m.parts.length<12);
+ const tid=target.day+':'+target.index,oily=body.days[target.day].meals[target.index].steps+' Обжарьте на масле.';
+ const run=async(cleanOnRound)=>{let stages=[];const env=await environment();const response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
+  const input=JSON.parse(JSON.parse(init.body).input[1].content);stages.push(input.stage+(input.round?':'+input.round:''));
+  if(input.stage==='cooking'){const r=input.recipes.find(e=>e.id===tid);assert.ok(r.doNotMention.includes('масло'),'absent oil is named before cooking');return answer({recipes:input.recipes.map(e=>({id:e.id,steps:e.id===tid?oily:body.days[Number(e.id.split(':')[0])].meals[Number(e.id.split(':')[1])].steps}))});}
+  if(input.stage==='cooking_repair'){assert.equal(input.recipes[0].id,tid);assert.ok(input.recipes[0].doNotMention.includes('масло'));assert.match(input.recipes[0].rejectedSteps,/масле/);assert.match(input.recipes[0].error,/масло/);
+   return answer({recipes:[{id:tid,steps:input.round===cleanOnRound?body.days[target.day].meals[target.index].steps:oily}]});}
+  return provider(url,init);
+ }});return {response,stages};};
+ let {response,stages}=await run(2);
+ assert.equal(response.status,200,'second targeted round fixes the text');assert.deepEqual(stages,['composition','cooking','cooking_repair:1','cooking_repair:2']);
+ let dish=(await response.json()).body.days[target.day].meals[target.index];assert.ok(!dish.parts.some(x=>/^Масло/.test(x[0]||x.food)),'no oil added when text was fixed');
+ ({response,stages}=await run(0));
+ assert.deepEqual(stages,['composition','cooking','cooking_repair:1','cooking_repair:2'],'at most two paid repair rounds');
+ const out=await response.json();
+ if(response.status===200){dish=out.body.days[target.day].meals[target.index];assert.ok(dish.parts.some(x=>(x[0]||x.food)==='Масло подсолнечное'&&(x[1]||x.grams)===5),'oil counted in the composition');}
+ else{assert.equal(out.code,'validation_failed');assert.match(out.reason,/.+/);}
+ console.log('Cooking oil: forbidden words named, two text-only rounds, oil fallback '+(response.status===200?'counted (5 g)':'rejected by day totals')+' OK');
+}
+
 // A repair cannot address another meal or return duplicate IDs.
 env=await environment();response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
  const input=JSON.parse(JSON.parse(init.body).input[1].content);
