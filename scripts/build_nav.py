@@ -94,16 +94,16 @@ def build():
             f'<i class="chev" aria-hidden="true"></i></summary><div class="mg-links">{mlinks}</div></details>')
     header = (
         '<!-- nav:start -->\n<a class="skip-link" href="#top">К основному содержимому</a>\n<header class="bar g">\n  <div class="w">\n'
-        '    <a class="brand" href="./" aria-label="ALENAFIT — на главную"><img class="brand-mark" src="img/brand/mark-light.svg" alt="" width="41" height="34"><span class="brand-text"><img class="brand-word" src="img/brand/wordmark-light.svg" alt="ALENAFIT" width="108" height="15"><small>сила без перегибов</small></span></a>\n'
+        '    <a class="brand" href="./" aria-label="ALENAFIT — на главную"><img class="brand-mark" src="img/brand/mark-light.svg" alt="" width="41" height="34"><span class="brand-text"><img class="brand-word" src="img/brand/wordmark-light.svg" alt="ALENAFIT" width="108" height="15"><small>Тренировки и питание</small></span></a>\n'
         '    <nav class="tnav" aria-label="Разделы">' + "".join(top) + '</nav>\n'
         '    <a class="zal-btn" href="moy-zal.html" aria-label="Мой зал — избранные разделы" title="Мой зал"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linejoin=\"round\"><path d=\"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z\"/></svg><span>Мой зал</span><i class="zal-n" hidden></i></a>\n'
         '    <button class="inst-btn" type="button" data-pwa aria-label="Установить приложение на телефон" title="Установить приложение"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Приложение</span></button>\n'
         '    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span>Меню</button>\n'
-        f'    <a class="btn btn-main" href="{START}" target="_blank" rel="noopener">СТАРТ</a>\n'
+        f'    <a class="btn btn-main" href="{START}" target="_blank" rel="noopener">Связаться</a>\n'
         '  </div>\n</header>\n'
         '<div class="mnav" id="mnav" hidden>\n  <nav class="mnav-in g" aria-label="Меню">\n'
         '    <a class="m-home" href="./">Главная</a>\n    <button type="button" class="m-install" data-pwa><img src="icons/icon-192.png" alt="" width="40" height="40"><span><b>Приложение на телефон</b><small>Иконка на рабочем столе, основные инструменты — без интернета</small></span></button>\n    <div class="m-zal"><a class="m-zal-head" href="moy-zal.html"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linejoin=\"round\"><path d=\"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z\"/></svg><span><b>Мой зал</b><small>Избранные разделы — всегда под рукой</small></span><i class="zal-n" hidden></i></a><div class="m-zal-links"></div></div>\n    ' + "\n    ".join(mob) + '\n'
-        f'    <div class="m-cta"><a class="btn btn-main btn-wide" href="{START}" target="_blank" rel="noopener">Написать «СТАРТ»</a></div>\n'
+        f'    <div class="m-cta"><a class="btn btn-main btn-wide" href="{START}" target="_blank" rel="noopener">Связаться в Telegram</a></div>\n'
         '  </nav>\n</div>\n<!-- nav:end -->')
     return header
 
@@ -131,20 +131,43 @@ def write_sections():
     print("sections", len(out))
 
 
+def build_home_footer():
+    groups = []
+    for _, title, items, _ in MENU:
+        links = ''.join('<a href="'+h+'">'+t+'</a>' for h,t,d in items if d is not None)
+        groups.append('<div><h3>'+title+'</h3>'+links+'</div>')
+    return '<!-- footer-nav:start --><nav class="home-footer-nav" aria-label="Разделы сайта в подвале">'+''.join(groups)+'</nav><!-- footer-nav:end -->'
+
+
 def main():
-    write_sections()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--page', help='Rebuild one page only')
+    args = parser.parse_args()
+    if not args.page:
+        write_sections()
     nav = build()
     old = re.compile(r'<header class="bar g">.*?</header>\s*<div class="mnav" id="mnav" hidden>.*?</nav>\s*</div>', re.S)
     marked = re.compile(r'<!-- nav:start -->.*?<!-- nav:end -->', re.S)
-    for fn in sorted(glob.glob("*.html")):
+    for fn in ([args.page] if args.page else sorted(glob.glob("*.html"))):
         s = open(fn, encoding="utf-8").read()
+        page_nav = nav
+        if fn == 'index.html':
+            mark = re.search(r'<svg class="brand-mark home-brand-mark".*?</svg>', s, re.S)
+            if mark:
+                page_nav = re.sub(r'<img class="brand-mark"[^>]*>', lambda _:mark[0], page_nav, count=1)
         if marked.search(s):
-            s2 = marked.sub(lambda m: nav, s, count=1)
+            s2 = marked.sub(lambda m: page_nav, s, count=1)
         elif old.search(s):
-            s2 = old.sub(lambda m: nav, s, count=1)
+            s2 = old.sub(lambda m: page_nav, s, count=1)
         else:
             print("skip", fn)
             continue
+        if fn == 'index.html':
+            if '<!-- footer-nav:start -->' in s2:
+                s2 = re.sub(r'<!-- footer-nav:start -->.*?<!-- footer-nav:end -->', lambda _:build_home_footer(), s2, flags=re.S)
+            else:
+                s2 = s2.replace('<footer class="g"><div class="w">', '<footer class="g"><div class="w">'+build_home_footer(), 1)
         if s2 != s:
             open(fn, "w", encoding="utf-8").write(s2)
             print("nav", fn)
