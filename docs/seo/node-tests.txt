@@ -1,0 +1,16 @@
+1244 nutrition checks: calories, exclusions, replacement, persistence and contextual advice OK
+✔ tests/nutrition_plan.test.cjs (3834.955344ms)
+516 checks: independent REE, manual calories below 1500, FFM applicability, all macros, honest fit and exact saved portions OK
+✔ tests/nutrition_targets.test.cjs (5906.941261ms)
+Online data: trusted sources, complete nutrition, real source fields and cache OK
+✔ tests/online_data.test.cjs (74.726456ms)
+135 recipe engine checks passed
+✔ tests/recipe_engine.test.cjs (128.409872ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6015.253757
