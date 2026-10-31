@@ -8,6 +8,7 @@
     'h1', 'h2', 'p', '.tag', 'article', 'figure', 'form', 'fieldset', 'details',
     '.test', '.step', '.cat', '.demo-card', '.stats', '.limits', '.creds',
     '.toc', '.cta', '.inv', '.study', '.quiz', '.tools-choices',
+    '.task-nav > a', '.hub-card', '.hand', '.myth', '.tool', '.eat-teaser', '.portrait', '.row-btns',
     '.invite-copy > *', '[data-motion]'
   ].join(',');
   const excluded = '.hero,.invite-portrait,svg,canvas,table,[aria-hidden="true"],[data-motion="off"]';
@@ -25,6 +26,7 @@
       observer.unobserve(el);
       pending.delete(el);
       el.dataset.revealPlayed = 'true';
+      el.classList.remove('motion-pending');
       // Never interrupt a person typing or using a control inside a card.
       if (el.contains(document.activeElement)) return;
       el.style.setProperty('--motion-delay', `${Math.min(index, 3) * 70}ms`);
@@ -37,9 +39,9 @@
       };
       el.addEventListener('animationend', e => { if(e.target === el) clean(); }, {once:true});
       // Also clean up if an existing component rule cancels the animation.
-      setTimeout(clean, 1000);
+      setTimeout(clean, 1500);
     });
-  }, {threshold: 0, rootMargin: '0px 0px -24px 0px'});
+  }, {threshold: 0, rootMargin: '0px 0px -80px 0px'});
   function collect(root) {
     if (stopped) return;
     const candidates = [...(root.matches?.(selector) ? [root] : []), ...root.querySelectorAll(selector)];
@@ -49,6 +51,11 @@
       const parent = el.parentElement?.closest(selector);
       if (parent && main.contains(parent) && !parent.closest(excluded)) return;
       registered.add(el);
+      // Only offscreen cards wait invisibly; initial content and controls stay readable.
+      if (el.matches('.task-nav > a,article,.cat,.hub-card,.hand,.myth,.tool,.step,.demo-card,.eat-teaser') &&
+          el.getBoundingClientRect().top >= (window.visualViewport?.height || innerHeight)) {
+        el.classList.add('motion-pending');
+      }
       pending.add(el);
       observer.observe(el);
     });
@@ -64,15 +71,26 @@
     observer.disconnect();
     mutations.disconnect();
     active.forEach(el => { el.classList.remove('motion-enter'); el.style.removeProperty('--motion-delay'); });
+    pending.forEach(el => el.classList.remove('motion-pending'));
     pending.clear(); active.clear();
   }
   document.documentElement.classList.add('unified-motion');
   collect(main);
   mutations.observe(main, {childList: true, subtree: true});
   document.addEventListener('focusin', event => {
+    pending.forEach(el => { if (el.contains(event.target)) {
+      el.classList.remove('motion-pending'); observer.unobserve(el); pending.delete(el);
+    } });
     if (!event.target.matches(':focus-visible')) return;
     active.forEach(el => { if (el.contains(event.target)) { el.classList.remove('motion-enter'); active.delete(el); } });
   });
-  document.addEventListener('beforeprint', stop);
+  addEventListener('beforeprint', stop);
+  // Browser find, anchor jumps and page restore must never leave a target hidden.
+  addEventListener('hashchange', () => {
+    pending.forEach(el => { if (el.matches(':target') || el.querySelector(':target')) {
+      el.classList.remove('motion-pending');
+    } });
+  });
+  addEventListener('pageshow', e => { if (e.persisted) stop(); });
   reduced.addEventListener('change', () => { if (reduced.matches) stop(); });
 })();
