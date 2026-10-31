@@ -2,7 +2,7 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-release-20261030-v49-repair';
+const VERSION = 'alenafit-release-20261031-v50-images';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
   "./js/nutrition-targets.js?v=20261030simple1",
@@ -120,6 +120,9 @@ const MEDIA = [
   "./img/brand/mark-light.svg",
   "./img/brand/wordmark-light.svg",
   "./img/hero_squat.jpg?v=2",
+  "./img/hero_squat-480.webp",
+  "./img/hero_squat-768.webp",
+  "./img/hero_squat-960.webp",
   "./img/inventar/gadzhety.webp",
   "./img/inventar/nabor.webp",
   "./img/odezhda/byust.webp",
@@ -138,6 +141,8 @@ const MEDIA = [
   "./img/pitanie/voda.webp",
   "./img/pitanie/zhiry.webp",
   "./img/portrait.jpg?v=3",
+  "./img/portrait-400.webp",
+  "./img/portrait-760.webp",
   "./img/recepty/kurica.webp",
   "./img/recepty/omlet.webp",
   "./img/recepty/ovsyanka.webp",

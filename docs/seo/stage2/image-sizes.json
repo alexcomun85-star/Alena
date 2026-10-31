@@ -1,0 +1,37 @@
+[
+  {
+    "file": "img/hero_squat-480.webp",
+    "width": 480,
+    "height": 480,
+    "bytes": 31294,
+    "source_bytes": 133284
+  },
+  {
+    "file": "img/hero_squat-768.webp",
+    "width": 768,
+    "height": 768,
+    "bytes": 63604,
+    "source_bytes": 133284
+  },
+  {
+    "file": "img/hero_squat-960.webp",
+    "width": 960,
+    "height": 960,
+    "bytes": 91836,
+    "source_bytes": 133284
+  },
+  {
+    "file": "img/portrait-400.webp",
+    "width": 400,
+    "height": 500,
+    "bytes": 19354,
+    "source_bytes": 86800
+  },
+  {
+    "file": "img/portrait-760.webp",
+    "width": 760,
+    "height": 950,
+    "bytes": 55406,
+    "source_bytes": 86800
+  }
+]
