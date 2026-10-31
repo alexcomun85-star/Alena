@@ -30,4 +30,4 @@ for(let run=1;run<=runs;run++){
 }
 console.log(`\nУСПЕШНО: ${ok} из ${runs}`);
 JS
-docker run --rm -v "$WORK":/dbg:ro -v /opt/alenafit-assistant/openai_key:/run/secrets/openai_key:ro node:24-bookworm-slim node /dbg/check.mjs "$RUNS" 2>&1 | grep -v "^Afita generation failed" | sed 's/^Afita composition retry: /  ↻ Повтор составления: /'
+docker run --rm -v "$WORK":/dbg:ro -v /opt/alenafit-assistant/openai_key:/run/secrets/openai_key:ro node:24-bookworm-slim node /dbg/check.mjs "$RUNS" 2>&1 | grep --line-buffered -v "^Afita generation failed" | sed -u 's/^Afita composition retry: /  ↻ Повтор составления: /'
