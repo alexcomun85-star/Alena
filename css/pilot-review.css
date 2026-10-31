@@ -359,3 +359,27 @@ body.pilot-v2 .brand-journey .step:last-child .pl{background:var(--amber);color:
 
 /* регалии на первом экране — обычная строка текста, не «таблетки» */
 body.pilot-v2 .hero .trust-line{display:block;font-size:14px;line-height:1.5;color:var(--muted);max-width:44ch}
+
+/* акцент цветом — только в главном заголовке первого экрана; в заголовках разделов он был случайным */
+body.pilot-v2 main section:not(.hero):not(.final) h2 em{color:inherit;font-style:normal}
+/* «кому подойдёт» и «кому не подойдёт» читаются как пара: зазор меньше */
+body.pilot-v2 main>#limits{padding-top:6px}
+
+/* ===== правки по итогам сквозной проверки ===== */
+/* единый зазор между окнами: у трёх блоков старые правила давали 64–88 px */
+body.pilot-v2 main>section#who,body.pilot-v2 main>section#how,body.pilot-v2 main>section#research,
+body.pilot-v2 main>section#limits,body.pilot-v2 main>section#coaching-demo,body.pilot-v2 main>section#plans,
+body.pilot-v2 main>section#quiz,body.pilot-v2 main>section#about,body.pilot-v2 main>section#tools,
+body.pilot-v2 main>section#zachem,body.pilot-v2 main>section#faq{padding-top:var(--gap-win)!important;padding-bottom:0!important}
+body.pilot-v2 main>section#who{padding-top:8px!important}
+/* цены пробного и разового занятия не рвутся на строки */
+body.pilot-v2 .plan .pricepair{flex-wrap:wrap!important;gap:8px}
+body.pilot-v2 .plan .pricepair span{flex:1 1 auto;white-space:nowrap;text-align:center}
+/* исследования: второстепенная строка со ссылками, а не две большие кнопки */
+body.pilot-v2 .pilot-science .w{display:block!important;padding:20px 22px!important}
+body.pilot-v2 .pilot-science p{margin:0;line-height:1.6}
+body.pilot-v2 .pilot-science a{color:var(--amber);text-underline-offset:3px}
+/* финальный блок: тот же зазор, что между окнами; заголовок без цветового акцента, как у разделов */
+body.pilot-v2 main>section.final{padding-top:0!important;margin-top:var(--gap-win)!important}
+body.pilot-v2 .final-invite h2 em{color:inherit}
+body.pilot-v2 .final-invite h2 br{display:none}

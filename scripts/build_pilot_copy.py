@@ -81,6 +81,39 @@ h, n = re.subn(r'<p class="trust-line">.*?</p>',
 if not n:
     raise SystemExit('нет строки регалий')
 
-# 11. Подвал: ссылка на удалённый блок не нужна; меню ссылалось на #creds — блок остаётся
+# 11. Логика страницы: порядок блоков = путь решения посетителя
+#     первый экран → кому подойдёт / не подойдёт → как начинаем → как выглядит разбор →
+#     форматы и цены → подобрать формат → обо мне → бесплатные инструменты → «зачем тренер» →
+#     исследования → вопросы → контакт
+def cut(sec_id):
+    global h
+    m = re.search(r'[ \t]*<section[^>]*\bid="%s"[^>]*>.*?</section>\n?' % re.escape(sec_id), h, re.S)
+    if not m:
+        raise SystemExit('нет секции ' + sec_id)
+    h = h[:m.start()] + h[m.end():]
+    return m.group(0)
+def insert_after(sec_id, block):
+    global h
+    m = re.search(r'<section[^>]*\bid="%s"[^>]*>.*?</section>\n?' % re.escape(sec_id), h, re.S)
+    h = h[:m.end()] + block + h[m.end():]
+insert_after('who', cut('limits'))          # «кому не подойдёт» — сразу за «кому подойдёт»
+insert_after('tools', cut('zachem'))        # «зачем тренер, если всё есть на сайте» — после того, как показали, что есть на сайте
+rep('<h2>Кому формат <em>не подойдёт</em></h2>', '<h2>Кому <em>не подойдёт</em></h2>')
+
+# 12. Повторы: 105 кг было 4 раза (подзаголовок, текст, крупная цифра, дипломы) — крупную цифру убираем
+h = re.sub(r'<div class="about-stat">.*?</div>\s*', '', h, count=1, flags=re.S)
+# кнопка «Форматы и цены» в блоке переписки ведёт на соседний блок ниже — лишняя
+h = h.replace('\n    <a class="btn btn-line" href="#plans">Форматы и цены</a>', '', 1)
+
+# 13. Исследования — одна строка со ссылками
+h, n = re.subn(r'(<section class="g pilot-science" id="research">\s*<div class="w">).*?(</div>\s*</section>)',
+    lambda m: m.group(1) + '\n      <p><b>Подход опирается на исследования.</b> Разборы простым языком — <a href="nauka.html">на сайте</a> и <a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">в канале</a>.</p>\n    ' + m.group(2),
+    h, count=1, flags=re.S)
+if not n:
+    raise SystemExit('нет блока исследований')
+# подвал: кнопка «Написать в Telegram» стоит сразу под такой же кнопкой финального блока — убираем
+h = re.sub(r'(<div class="pf-top">.*?)<a class="btn btn-main"[^>]*>Написать в Telegram</a>', r'\1', h, count=1, flags=re.S)
+
+# 14. Подвал: ссылка на удалённый блок не нужна; меню ссылалось на #creds — блок остаётся
 p.write_text(h, encoding="utf-8")
 print("copy ok", len(h))
