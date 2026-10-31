@@ -1,0 +1,403 @@
+/* Пилот главной по замечаниям 31.10.2026. Только pilot.html. Анимации не переопределяются. */
+.pilot-flag{position:relative;z-index:31;background:var(--amber);color:var(--amber-ink);font:600 13px/1.3 var(--body);text-align:center;padding:8px 16px}
+.pilot-flag a{color:inherit}
+
+/* первый экран: подсказка к кнопке и строка доверия */
+.cta-hint{font-size:14px;color:var(--ink);margin-top:12px}
+.trust-line{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.trust-line span{font-size:13px;line-height:1.3;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+
+/* «Зачем тренер»: кнопка внутри карточки */
+.eat-teaser .pilot-btn{margin-top:14px;pointer-events:none}
+
+/* инструменты: три отдельные плашки */
+#tools .task-nav{display:none!important}
+#tools .tool-group{background:var(--band);border:1px solid var(--line);border-top:3px solid var(--amber);border-radius:var(--r-lg);padding:20px 16px 18px;margin-top:16px}
+#tools .tool-group>h3{display:flex;align-items:center;gap:12px;font-size:19px}
+#tools .tg-ico{flex:none;width:40px;height:40px;padding:8px;border-radius:12px;background:var(--surface-2);color:var(--amber)}
+#tools .tool-group .cat{background:var(--surface-2);border-color:transparent;min-height:0}
+#tools .tool-group .cat:hover{border-color:var(--amber)}
+.tools-row{display:grid;gap:16px;margin-top:16px}
+#tools .tools-row>.tool-group{margin-top:0}
+@media(min-width:1024px){.tools-row{grid-template-columns:repeat(3,minmax(0,1fr))}#tools .tool-group .cat-grid{grid-template-columns:1fr}}
+
+/* наука одной строкой */
+.pilot-science .w{border:1px dashed var(--line);border-radius:var(--r-lg);padding:20px;display:grid;gap:12px}
+.pilot-science p{color:var(--muted)}
+.pilot-science p b{color:var(--ink)}
+
+/* подвал как меню */
+.pilot-foot .w{display:grid;gap:24px;padding-top:28px;font-size:14px}
+.pf-top{display:grid;gap:12px;justify-items:start}
+.pf-top p{color:var(--muted)}
+.pf-cols{display:grid;grid-template-columns:1fr 1fr;gap:22px 18px}
+.pf-cols div{display:grid;gap:8px;align-content:start;min-width:0}
+.pf-cols b{color:var(--ink);font:700 14px/1.3 var(--display);margin-bottom:2px}
+.pf-cols a{color:var(--muted);text-decoration:none;font-size:14px}
+.pf-cols a:hover{color:var(--amber)}
+.pf-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:14px;font-size:12px}
+.pf-bottom a{color:var(--amber)}
+@media(max-width:360px){.pf-cols{grid-template-columns:1fr}}
+@media(min-width:1024px){.pf-cols{grid-template-columns:repeat(5,minmax(0,1fr))}.pf-top{grid-template-columns:auto 1fr auto;align-items:center}}
+
+/* ===================== v2: дизайн-слой =====================
+
+/* =====================================================================
+   ДИЗАЙН-СЛОЙ ПИЛОТА (v6). Переписан целиком: три сценария вместо латок.
+   Палитра и шрифты — фирменные (тёмно-зелёный, янтарь, Unbounded + Golos).
+   Смелость в одном месте — фото с приседом на первом экране. Остальное тихо.
+
+   S  < 600 px   iPhone, внешний экран Fold, узкие Android.
+                 Одна колонка. Окна почти до края. Без «рамки в рамке».
+                 Однотипные карточки — лентой со свайпом.
+   M  600–1023   Раскрытый Fold (почти квадрат, низкий экран), iPad.
+                 Поток сверху вниз; внутри окна — только сбалансированные пары
+                 (две колонки ставим лишь там, где у колонок близкая высота).
+   L  ≥ 1024     ПК. Колонки и сетки.
+   ===================================================================== */
+
+body.pilot-v2{
+  --win:#18332d;              /* окно раздела: на тон светлее фона */
+  --win-2:#1f4038;            /* карточка внутри окна */
+  --win-edge:rgba(238,244,241,.08);
+  --win-hi:rgba(238,244,241,.045);
+  --gap-win:12px;             /* зазор между окнами */
+  --r-win:28px;
+}
+
+/* ---------- общая типографика ---------- */
+body.pilot-v2 main section h2{font-size:clamp(28px,7.4vw,52px);line-height:1.05;letter-spacing:-.03em;text-wrap:balance}
+body.pilot-v2 main .tag{display:inline-flex;align-items:center;gap:10px;font-size:11.5px}
+body.pilot-v2 main .tag::before{content:"";width:22px;height:2px;background:currentColor}
+
+/* ---------- окна разделов ---------- */
+body.pilot-v2 main>section:not(.hero):not(.final){padding-block:var(--gap-win) 0}
+body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{
+  background:linear-gradient(180deg,var(--win-hi),transparent 160px),var(--win);
+  border:1px solid var(--win-edge);border-radius:var(--r-win);
+  padding:32px 20px 28px;
+  box-shadow:0 24px 48px -36px rgba(0,0,0,.6)}
+body.pilot-v2 main>section.manifest>.w{overflow:hidden;position:relative}
+body.pilot-v2 main>.final{margin-top:var(--gap-win)}
+body.pilot-v2 .brand-journey .step,body.pilot-v2 .faq details,body.pilot-v2 .creds div{border-color:var(--win-edge)}
+body.pilot-v2 .pilot-science .w{border-style:solid!important}
+
+/* внутренние карточки — на тон светлее окна, без собственной рамки */
+body.pilot-v2 .plan:not(.primary),body.pilot-v2 .limits,body.pilot-v2 .prog{background:var(--win-2);border-color:transparent}
+body.pilot-v2 #plans .plan.primary{background:var(--band)}
+body.pilot-v2 .plan:not(.primary) .slot,body.pilot-v2 .plan:not(.primary) .pricepair span,body.pilot-v2 .plan:not(.primary) .chip,body.pilot-v2 .plan:not(.primary) .cal,body.pilot-v2 .quiz .opts label{background:var(--band)}
+body.pilot-v2 .quiz{background:transparent;border:0;padding:0;box-shadow:none}
+body.pilot-v2 #tools .tool-group{background:var(--band)}
+
+/* ---------- первый экран: общая часть ---------- */
+body.pilot-v2 .hero{padding-top:0}
+body.pilot-v2.design-pilot .hero .w>.hero-photo{position:relative;margin:0;width:100%;max-width:none;aspect-ratio:auto;overflow:hidden}
+body.pilot-v2.design-pilot .hero-photo>img{display:block;width:100%;object-fit:cover}
+body.pilot-v2 .hero-over{position:relative;z-index:3;display:grid;gap:12px}
+body.pilot-v2.design-pilot .hero-over h1{margin:0;letter-spacing:-.04em;line-height:1.02;text-shadow:none}
+body.pilot-v2.design-pilot .hero-over h1>span{display:inline}
+body.pilot-v2 .hero .sub{margin-top:18px}
+body.pilot-v2 .cta-hint{font-size:14px;color:var(--ink);margin-top:12px}
+body.pilot-v2 .trust-line{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+
+/* ---------- «По блину за раз» ---------- */
+body.pilot-v2 .brand-journey .step{grid-template-columns:64px 1fr;gap:16px;padding:16px 0;align-items:center}
+body.pilot-v2 .brand-journey .step::before{display:none}
+body.pilot-v2 .brand-journey .step .pl{display:grid;place-items:center;width:64px;height:64px;position:relative}
+body.pilot-v2 .brand-journey .step .pl svg{width:64px;height:64px;max-width:none}
+body.pilot-v2 .brand-journey .step .pl svg text{font-family:var(--display)}
+body.pilot-v2 .brand-journey .step b{font:700 17px/1.25 var(--display)}
+
+/* ---------- переписка: окно чата вместо макета телефона ---------- */
+body.pilot-v2 .pilot-demo .w{display:grid;gap:24px}
+body.pilot-v2 .demo-copy{display:grid;gap:14px;justify-items:start;min-width:0}
+body.pilot-v2 .demo-copy .lede{margin:0;max-width:46ch}
+body.pilot-v2 .demo-label{font-size:12px;line-height:1.45;color:var(--muted);border-left:2px solid var(--amber);padding-left:12px;max-width:48ch;margin:0}
+.chatwin{min-width:0;border-radius:22px;overflow:hidden;background:#0f231e;border:1px solid var(--win-edge)}
+.cw-top{display:flex;gap:11px;align-items:center;padding:12px 16px;background:#162f29;border-bottom:1px solid var(--win-edge)}
+.cw-top b{display:block;font-size:15px}
+.cw-top small{display:block;font-size:12px;color:var(--muted)}
+.cw-av{flex:none;width:36px;height:36px;border-radius:50%;background:#3b5a52;color:var(--ink);display:grid;place-items:center;font:700 14px var(--body)}
+.cw-chat{display:grid;gap:8px;padding:16px 14px 18px;align-content:start}
+.msg{margin:0;max-width:min(86%,420px);padding:9px 12px 19px;border-radius:18px;font-size:14.5px;line-height:1.4;position:relative;min-width:0}
+.msg time{position:absolute;right:10px;bottom:4px;font-size:10.5px;opacity:.6}
+.msg.in{justify-self:start;background:#21433b;border-bottom-left-radius:5px}
+.msg.out{justify-self:end;background:var(--amber);color:var(--amber-ink);border-bottom-right-radius:5px}
+.msg.vid{display:flex;align-items:center;gap:10px;padding-right:46px}
+.msg.vid span{font-weight:600;font-size:13.5px}
+@media (prefers-reduced-motion:no-preference){
+  .chat-anim .msg{animation:msgIn .5s cubic-bezier(.2,.8,.3,1) backwards;animation-delay:calc(var(--i)*.5s + .1s)}
+  @keyframes msgIn{from{opacity:0;transform:translateY(10px)}}
+}
+
+/* ---------- об Алёне ---------- */
+body.pilot-v2 .about-stat{display:flex;align-items:center;gap:16px;padding:4px 0}
+body.pilot-v2 .about-stat b{flex:none;font:800 clamp(64px,17vw,112px)/.85 var(--display);color:var(--amber);letter-spacing:-.05em}
+body.pilot-v2 .about-stat span{flex:1;min-width:0;font-size:14px;line-height:1.4;color:var(--muted)}
+body.pilot-v2 .creds div{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:3px}
+body.pilot-v2 .creds span{white-space:normal;text-align:left}
+
+/* ---------- лента со свайпом (только S) ---------- */
+.swipe-hint{display:none}
+
+/* =====================================================================
+   S  < 600 px
+   ===================================================================== */
+@media(max-width:599px){
+  body.pilot-v2{--gap-win:10px;--r-win:26px}
+  body.pilot-v2 main>section:not(.hero):not(.final)>.w{margin-inline:-12px}
+  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{padding:28px 18px 24px}
+
+  /* первый экран: фото открыто, заголовок под лицом на тёмной кромке */
+  body.pilot-v2.design-pilot .hero .w>.hero-photo{margin-inline:-20px;width:calc(100% + 40px);border-radius:0 0 26px 26px}
+  body.pilot-v2.design-pilot .hero-photo>img{height:min(54svh,520px);max-height:none;aspect-ratio:auto;object-position:44% 14%}
+  body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 55%,rgba(13,30,26,.75) 82%,var(--band) 100%)!important}
+  body.pilot-v2 .hero-over{margin-top:-64px}
+  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(29px,8.4vw,38px)}
+  body.pilot-v2.design-pilot .hero .w>.proof{grid-template-columns:1fr 1fr}
+
+  /* без «рамки в рамке» */
+  body.pilot-v2 .prog,body.pilot-v2 .limits{background:transparent;padding:0;border-radius:0;box-shadow:none}
+  body.pilot-v2 .prog{margin-top:16px;padding-top:16px;border-top:1px solid var(--win-edge)}
+
+  /* ленты со свайпом */
+  body.pilot-v2 .pswipe{display:flex!important;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-inline:-18px;padding:4px 18px 6px;scroll-padding-inline:18px}
+  body.pilot-v2 .pswipe::-webkit-scrollbar{display:none}
+  body.pilot-v2 .pswipe>*{scroll-snap-align:start;flex:0 0 84%;min-width:0}
+  body.pilot-v2 .swipe-hint.m-only{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+  body.pilot-v2 .swipe-hint.m-only::after{content:"";width:28px;height:2px;border-radius:2px;background:var(--amber)}
+
+  body.pilot-v2.editorial-refine #who .who{margin-top:20px}
+  body.pilot-v2.editorial-refine #who .who article{background:var(--band);border:0;border-radius:20px;padding:44px 18px 20px}
+  body.pilot-v2.editorial-refine #who .who article::before{top:18px;left:18px}
+  body.pilot-v2.editorial-refine #who .who h3{font-size:19px;margin-bottom:10px}
+
+  body.pilot-v2 #tools .tools-row{margin-top:18px}
+  body.pilot-v2 #tools .tools-row>.tool-group{flex-basis:86%;padding:18px 14px 14px;margin:0}
+  body.pilot-v2 #tools .tool-group .cat-grid{grid-template-columns:1fr;gap:6px}
+  body.pilot-v2 #tools .tool-group .cat{padding:11px 13px;gap:2px}
+
+  /* цены плотнее */
+  body.pilot-v2 .plans{gap:10px}
+  body.pilot-v2 .plan{padding:22px 16px 18px;border-radius:22px}
+  body.pilot-v2 .plan .fit{grid-template-columns:1fr}
+  body.pilot-v2 .plan .pricepair{flex-wrap:nowrap}
+  body.pilot-v2 .plan .pricepair span{flex:1;text-align:center}
+
+  /* об Алёне: портрет горизонтальный, не вытянутый */
+  body.pilot-v2 .about{grid-template-columns:minmax(0,1fr)!important;gap:16px}
+  body.pilot-v2 .portrait{width:100%;max-width:100%!important;height:auto!important;aspect-ratio:4/3!important;max-height:300px}
+  body.pilot-v2 .portrait img{height:100%;object-position:50% 22%}
+
+  /* «Зачем тренер»: по краям окон */
+  body.pilot-v2 #zachem .eat-teaser{border-radius:var(--r-win)}
+}
+
+/* =====================================================================
+   M  600–1023 px  (раскрытый Fold, iPad)
+   ===================================================================== */
+@media(min-width:600px) and (max-width:1023px){
+  body.pilot-v2{--gap-win:14px;--r-win:30px}
+  body.pilot-v2 .g>.w{max-width:880px}
+  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{padding:40px 32px 34px}
+  body.pilot-v2 main section h2{font-size:clamp(34px,5.6vw,48px)}
+
+  /* первый экран: фото-баннер сверху, заголовок во всю ширину, ниже две ровные колонки */
+  body.pilot-v2 .hero{padding-block:16px 40px}
+  body.pilot-v2.design-pilot .hero .w{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;row-gap:0;align-items:start}
+  body.pilot-v2.design-pilot .hero .w>*{grid-column:1/-1;grid-row:auto}
+  body.pilot-v2.design-pilot .hero .w>.hero-photo{grid-column:1/-1;border-radius:var(--r-win)}
+  body.pilot-v2.design-pilot .hero-photo>img{height:min(46svh,420px);aspect-ratio:auto;max-height:none;object-position:50% 18%}
+  body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 70%,rgba(13,30,26,.35) 100%)!important}
+  body.pilot-v2 .hero-over{margin-top:24px}
+  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(36px,6.2vw,54px);max-width:18ch}
+  body.pilot-v2.design-pilot .hero .w>.sub{grid-column:1;grid-row:3;font-size:16px}
+  body.pilot-v2.design-pilot .hero .w>.cta{grid-column:1;grid-row:4;margin-top:18px;flex-wrap:wrap}
+  body.pilot-v2.design-pilot .hero .w>.cta-hint{grid-column:1;grid-row:5}
+  body.pilot-v2.design-pilot .hero .w>.reassure{grid-column:1;grid-row:6}
+  body.pilot-v2.design-pilot .hero .w>.trust-line{grid-column:2;grid-row:3;margin-top:18px}
+  body.pilot-v2.design-pilot .hero .w>.proof{grid-column:2;grid-row:4/span 3;grid-template-columns:1fr 1fr;margin-top:12px;align-self:start}
+
+  /* для кого: сетка 2×2 */
+  body.pilot-v2.editorial-refine #who .who{grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+  body.pilot-v2.editorial-refine #who .who article{background:var(--band);border:0;border-radius:20px;padding:44px 20px 22px}
+  body.pilot-v2.editorial-refine #who .who article::before{top:18px;left:20px}
+  body.pilot-v2.editorial-refine #who .who h3{font-size:18px}
+
+  /* как работаем: шаги 2×2, график ниже на всю ширину */
+  body.pilot-v2 .brand-journey .steps{display:grid;grid-template-columns:1fr 1fr;column-gap:24px}
+  body.pilot-v2 .brand-journey .step{grid-template-columns:56px 1fr;align-items:start}
+  body.pilot-v2 .brand-journey .step .pl,body.pilot-v2 .brand-journey .step .pl svg{width:56px;height:56px}
+  body.pilot-v2 .prog{margin-top:20px}
+
+  /* переписка: текст и окно чата рядом, окно не выше текста */
+  body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);column-gap:24px;align-items:center}
+  body.pilot-v2 .msg{font-size:13.5px}
+
+  /* цены: одна карточка под другой, внутри — в две колонки */
+  body.pilot-v2 .plans{grid-template-columns:1fr!important;gap:12px}
+  body.pilot-v2 #plans .plan.primary{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);column-gap:24px;align-items:start}
+  body.pilot-v2 #plans .plan.primary>.plan-head,body.pilot-v2 #plans .plan.primary>ul{grid-column:1}
+  body.pilot-v2 #plans .plan.primary>.fit,body.pilot-v2 #plans .plan.primary>.small,body.pilot-v2 #plans .plan.primary>.btn{grid-column:2}
+  body.pilot-v2 #plans .plan.primary>.plan-head{grid-row:1}
+  body.pilot-v2 #plans .plan.primary>ul{grid-row:2/span 2}
+  body.pilot-v2 #plans .plan.primary>.fit{grid-row:1;grid-template-columns:1fr;align-self:start}
+  body.pilot-v2 #plans .plan.primary>.small{grid-row:2;align-self:start}
+  body.pilot-v2 #plans .plan.primary>.btn{grid-row:3;align-self:end}
+  body.pilot-v2 #groups .slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  body.pilot-v2 #groups .slot{grid-template-columns:1fr;justify-items:start;padding:12px}
+
+  /* об Алёне: портрет + вступление рядом (одной высоты), цифра и дипломы ниже */
+  body.pilot-v2 .about{grid-template-columns:minmax(0,.75fr) minmax(0,1.25fr)!important;gap:24px 28px;align-items:center}
+  body.pilot-v2 .portrait{width:100%;max-width:none!important;height:auto!important;aspect-ratio:4/5!important}
+  body.pilot-v2 .portrait img{height:100%;object-position:50% 20%}
+  body.pilot-v2 .about-text{display:contents}
+  body.pilot-v2 .about-text>p:first-child{grid-column:2;grid-row:1;align-self:center}
+  body.pilot-v2 .about-text>p.muted{grid-column:1/-1}
+  body.pilot-v2 .about-stat{grid-column:1/-1}
+  body.pilot-v2 .creds{grid-column:1/-1;grid-template-columns:1fr 1fr;column-gap:24px}
+  body.pilot-v2 .creds div:last-child{border-bottom:0}
+
+  /* «Зачем тренер»: фото слева, текст справа */
+  body.pilot-v2 #zachem .eat-photo{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);align-items:center;border-radius:var(--r-win)}
+  body.pilot-v2 #zachem .eat-photo img{height:100%!important;min-height:280px}
+  body.pilot-v2 #zachem .eat-photo>div{margin-top:0;padding:28px 28px 28px 8px}
+
+  /* инструменты: три группы одна под другой, внутри 2×2 */
+  body.pilot-v2 #tools .tools-row{grid-template-columns:1fr!important}
+  body.pilot-v2 #tools .tools-row>.tool-group:last-child{grid-column:auto}
+  body.pilot-v2 #tools .tool-group .cat-grid{grid-template-columns:1fr 1fr}
+
+  /* финал: фото и текст рядом, одной высоты */
+  body.pilot-v2 .invite-card{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);align-items:stretch}
+  body.pilot-v2 .invite-portrait{aspect-ratio:auto;height:100%;min-height:440px}
+  body.pilot-v2 .invite-portrait img{width:100%;height:100%;object-fit:cover;object-position:88% 20%}
+  body.pilot-v2 .invite-copy{width:auto;padding:32px 28px 26px}
+  body.pilot-v2 .final-invite h2{font-size:clamp(32px,5vw,44px)}
+
+  /* подвал: три колонки */
+  body.pilot-v2 .pf-cols{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+/* =====================================================================
+   L  ≥ 1024 px  (ПК)
+   ===================================================================== */
+@media(min-width:1024px){
+  body.pilot-v2{--gap-win:18px;--r-win:40px}
+  body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w{padding:68px 64px 60px}
+
+  body.pilot-v2 .hero{padding-block:20px 64px}
+  body.pilot-v2.design-pilot .hero .w{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:56px;row-gap:0;align-items:start}
+  body.pilot-v2.design-pilot .hero .w>*{grid-column:1/-1;grid-row:auto}
+  body.pilot-v2.design-pilot .hero .w>.hero-photo{border-radius:var(--r-win)}
+  body.pilot-v2.design-pilot .hero-photo>img{height:min(56vh,520px);aspect-ratio:auto;max-height:none;object-position:50% 22%}
+  body.pilot-v2 .hero-photo::after{background:linear-gradient(180deg,rgba(13,30,26,0) 70%,rgba(13,30,26,.3) 100%)!important}
+  body.pilot-v2 .hero-over{margin-top:36px}
+  body.pilot-v2.design-pilot .hero-over h1{font-size:clamp(48px,4.8vw,72px);max-width:20ch}
+  body.pilot-v2.design-pilot .hero .w>.sub{grid-column:1;grid-row:3;font-size:19px}
+  body.pilot-v2.design-pilot .hero .w>.cta{grid-column:1;grid-row:4;margin-top:22px}
+  body.pilot-v2.design-pilot .hero .w>.cta-hint{grid-column:1;grid-row:5}
+  body.pilot-v2.design-pilot .hero .w>.reassure{grid-column:1;grid-row:6}
+  body.pilot-v2.design-pilot .hero .w>.trust-line{grid-column:2;grid-row:3;margin-top:22px}
+  body.pilot-v2.design-pilot .hero .w>.proof{grid-column:2;grid-row:4/span 3;grid-template-columns:1fr 1fr;margin-top:14px;align-self:start}
+
+  body.pilot-v2 .brand-journey .step{grid-template-columns:72px 1fr}
+  body.pilot-v2 .brand-journey .step .pl,body.pilot-v2 .brand-journey .step .pl svg{width:72px;height:72px}
+
+  body.pilot-v2 .coaching-demo .w{max-width:1140px}
+  body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 440px;column-gap:72px;align-items:center}
+
+  body.pilot-v2 .tools-row{grid-template-columns:repeat(3,minmax(0,1fr))}
+  body.pilot-v2 #tools .tool-group .cat-grid{grid-template-columns:1fr}
+  body.pilot-v2 .creds{grid-template-columns:1fr 1fr;column-gap:28px}
+}
+
+/* правки после проверки */
+body.pilot-v2.design-pilot .hero-over h1{hyphens:manual;-webkit-hyphens:manual;overflow-wrap:normal}
+@media(min-width:1024px){body.pilot-v2.design-pilot .hero-photo>img{object-position:50% 4%}}
+@media(min-width:600px) and (max-width:1023px){body.pilot-v2.design-pilot .hero-photo>img{object-position:50% 8%}}
+
+/* ---------- телефон с перепиской: реальные пропорции, сообщения приходят по одному ---------- */
+body.pilot-v2 .phone{--pw:min(280px,76vw);position:relative;justify-self:center;width:var(--pw);aspect-ratio:9/19.5;padding:9px;border-radius:calc(var(--pw)*.16);background:#08120f;box-shadow:0 0 0 1.5px #2f4f47,0 36px 70px -24px rgba(0,0,0,.65)}
+body.pilot-v2 .phone::before{content:"";position:absolute;top:17px;left:50%;width:30%;height:22px;transform:translateX(-50%);border-radius:12px;background:#08120f;z-index:3}
+.ph-screen{height:100%;display:flex;flex-direction:column;border-radius:calc(var(--pw)*.13);overflow:hidden;background:#0f231e}
+.ph-status{display:flex;justify-content:space-between;align-items:center;padding:13px 22px 0 26px;height:40px;font:600 12px var(--body);color:var(--ink)}
+.ph-status i{width:22px;height:10px;border-radius:3px;border:1.5px solid currentColor;opacity:.8}
+body.pilot-v2 .phone .cw-top{padding:8px 12px 10px;flex:none}
+body.pilot-v2 .phone .cw-av{background:var(--amber);color:var(--amber-ink);width:34px;height:34px}
+body.pilot-v2 .phone .cw-top small{transition:color .2s}
+.cw-chat{position:relative;flex:1;min-height:0;overflow:hidden;padding:0}
+.cw-track{position:absolute;left:0;right:0;bottom:0;display:grid;gap:7px;padding:10px 10px 12px}
+.ph-input{flex:none;display:flex;align-items:center;gap:8px;margin:0 10px 14px;padding:9px 9px 9px 14px;border-radius:20px;background:#162f29;font-size:13px;color:var(--muted)}
+.ph-input span{flex:1}
+.ph-input i{width:26px;height:26px;border-radius:50%;background:var(--amber)}
+body.pilot-v2 .phone .msg{font-size:13px;max-width:84%;padding:8px 11px 18px;border-radius:16px}
+body.pilot-v2 .phone .msg time{font-size:10px}
+body.pilot-v2 .phone .msg.out{justify-self:end;background:#2c6e5f;color:var(--ink);border-radius:16px 16px 5px 16px}
+body.pilot-v2 .phone .msg.in{justify-self:start;background:var(--amber);color:var(--amber-ink);border-radius:16px 16px 16px 5px}
+body.pilot-v2 .phone .msg.vid{display:flex;align-items:center;gap:9px;padding-right:44px}
+.msg-day{justify-self:center;margin:4px 0 2px;padding:3px 10px;border-radius:10px;background:rgba(238,244,241,.08);font-size:11px;color:var(--muted)}
+.msg.typing{display:flex;gap:4px;padding:12px 13px!important}
+.msg.typing i{width:6px;height:6px;border-radius:50%;background:var(--amber-ink);opacity:.4;animation:tdot 1s infinite}
+.msg.typing i:nth-child(2){animation-delay:.15s}.msg.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tdot{50%{opacity:1;transform:translateY(-2px)}}
+/* появление: блок «растёт» снизу, поэтому старые сообщения плавно уезжают вверх */
+.cw-track>.pending{display:none}
+.cw-track>.shown,.cw-track>.typing{animation:msgGrow .45s cubic-bezier(.2,.8,.3,1) both;transform-origin:bottom}
+@keyframes msgGrow{from{opacity:0;max-height:0;transform:translateY(10px) scale(.96);margin-bottom:-7px}to{opacity:1;max-height:260px}}
+.cw-chat.fade .cw-track{opacity:0;transition:opacity .5s}
+@media(prefers-reduced-motion:reduce){.cw-track>*{animation:none!important}}
+
+@media(min-width:600px) and (max-width:1023px){body.pilot-v2 .phone{--pw:250px}body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 250px}}
+@media(min-width:1024px){body.pilot-v2 .phone{--pw:290px}body.pilot-v2 .pilot-demo .w{grid-template-columns:minmax(0,1fr) 290px}}
+@media(min-width:600px) and (max-height:700px){body.pilot-v2 .phone{--pw:230px}}
+
+/* ---------- шаги: номер в кружке ---------- */
+body.pilot-v2 .brand-journey .step .pl{width:44px!important;height:44px!important;border-radius:50%;border:1.5px solid var(--amber);color:var(--amber);font:700 17px/1 var(--display);display:grid;place-items:center}
+body.pilot-v2 .brand-journey .step{grid-template-columns:44px 1fr!important;align-items:start}
+body.pilot-v2 .brand-journey .step:last-child .pl{background:var(--amber);color:var(--amber-ink)}
+
+/* регалии на первом экране — обычная строка текста, не «таблетки» */
+body.pilot-v2 .hero .trust-line{display:block;font-size:14px;line-height:1.5;color:var(--muted);max-width:44ch}
+
+/* акцент цветом — только в главном заголовке первого экрана; в заголовках разделов он был случайным */
+body.pilot-v2 main section:not(.hero):not(.final) h2 em{color:inherit;font-style:normal}
+/* «кому подойдёт» и «кому не подойдёт» читаются как пара: зазор меньше */
+body.pilot-v2 main>#limits{padding-top:6px}
+
+/* ===== правки по итогам сквозной проверки ===== */
+/* единый зазор между окнами: у трёх блоков старые правила давали 64–88 px */
+body.pilot-v2 main>section#who,body.pilot-v2 main>section#how,body.pilot-v2 main>section#research,
+body.pilot-v2 main>section#limits,body.pilot-v2 main>section#coaching-demo,body.pilot-v2 main>section#plans,
+body.pilot-v2 main>section#quiz,body.pilot-v2 main>section#about,body.pilot-v2 main>section#tools,
+body.pilot-v2 main>section#zachem,body.pilot-v2 main>section#faq{padding-top:var(--gap-win)!important;padding-bottom:0!important}
+body.pilot-v2 main>section#who{padding-top:8px!important}
+/* цены пробного и разового занятия не рвутся на строки */
+body.pilot-v2 .plan .pricepair{flex-wrap:wrap!important;gap:8px}
+body.pilot-v2 .plan .pricepair span{flex:1 1 auto;white-space:nowrap;text-align:center}
+/* исследования: второстепенная строка со ссылками, а не две большие кнопки */
+body.pilot-v2 .pilot-science .w{display:block!important;padding:20px 22px!important}
+body.pilot-v2 .pilot-science p{margin:0;line-height:1.6}
+body.pilot-v2 .pilot-science a{color:var(--amber);text-underline-offset:3px}
+/* финальный блок: тот же зазор, что между окнами; заголовок без цветового акцента, как у разделов */
+body.pilot-v2 main>section.final{padding-top:0!important;margin-top:var(--gap-win)!important}
+body.pilot-v2 .final-invite h2 em{color:inherit}
+body.pilot-v2 .final-invite h2 br{display:none}
+
+/* телефон: плавность — без анимации высоты, только transform/opacity (управляет js/pilot-phone.js) */
+.cw-track>.shown,.cw-track>.typing{animation:none!important}
+.cw-track{will-change:transform;backface-visibility:hidden}
+.cw-track>.msg,.cw-track>.msg-day{will-change:transform,opacity}
+
+/* окна разделов разделены явно: зазор больше, край и верхний блик заметнее */
+body.pilot-v2{--gap-win:20px;--win-edge:rgba(238,244,241,.13)}
+@media(min-width:1024px){body.pilot-v2{--gap-win:28px}}
+body.pilot-v2 main>section:not(.hero):not(.final):not(#zachem)>.w,
+body.pilot-v2 #zachem .eat-teaser{box-shadow:inset 0 1px 0 rgba(238,244,241,.10),0 18px 40px -22px rgba(0,0,0,.85)}
+body.pilot-v2 #zachem .eat-teaser{border:1px solid var(--win-edge)}
+body.pilot-v2 main>section#who{padding-top:12px!important}
+/* карточки в ленте «Кому подойдёт» — шире зазор */
+@media(max-width:599px){body.pilot-v2 .pswipe{gap:12px}}
+/* карточки внутри окна: свой край, чтобы соседние не сливались */
+body.pilot-v2.editorial-refine #who .who article,body.pilot-v2 #tools .tool-group{border:1px solid var(--win-edge)!important}
+@media(max-width:599px){body.pilot-v2 .pswipe{gap:14px}body.pilot-v2 .pswipe>*{flex-basis:80%}}

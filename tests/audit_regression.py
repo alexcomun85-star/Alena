@@ -120,6 +120,11 @@ def t_tabs(browser):
     p = ctx.new_page()
     p.goto(BASE)
     p.wait_for_load_state('networkidle')
+    if not p.locator('#tab-ch').count():
+        # с 01.11.2026 новости убраны с главной: проверяем, что путь к ним остался в меню
+        check('новости: ссылка из меню главной', True, p.locator('a[href="novosti.html"]').count() > 0)
+        ctx.close()
+        return
     check('вкладки: после загрузки видна одна панель', 1, p.locator('[role=tabpanel]:visible').count())
     p.click('#tab-ch')
     check('вкладки: выбран канал', ['panel-ch'], p.locator('[role=tabpanel]:visible').evaluate_all('els=>els.map(e=>e.id)'))

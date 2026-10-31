@@ -45,7 +45,7 @@
     :'<a class="home-btn" href="./">'+ico(I.home)+'<span>Главная</span></a>';
   var dock=document.createElement('nav');dock.className='dock';dock.setAttribute('aria-label','Быстрые действия');
   dock.innerHTML='<div class="w">'+first+
-    '<a class="home-btn zal-dock" href="moy-zal.html"'+(path==='moy-zal.html'?' aria-current="page"':'')+'>'+ico(I.star)+'<span>Мой зал</span><i class="zal-n" hidden></i></a>'+
+    '<a class="home-btn zal-dock" href="moy-zal.html"'+(path==='moy-zal.html'?' aria-current="page"':'')+'>'+ico(I.star)+'<span>Избранное</span><i class="zal-n" hidden></i></a>'+
     '<a class="home-btn dock-tools" href="./#tools">'+ico(I.tools)+'<span>Инструменты</span></a>'+
     (menu?'<button type="button" class="home-btn dock-menu" id="dockMenu" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span><span class="dm-t">Меню</span></button>':'')+
     '</div>';

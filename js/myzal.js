@@ -50,10 +50,10 @@
       var s = BY[id]; if (!s) return;
       var before = ids.slice(), removing = has(id);
       if (removing) { ids = ids.filter(function (x) { return x !== id; }); }
-      else if (ids.length >= MAX) { toast('В Моём зале уже ' + MAX + ' разделов — уберите лишние'); return; }
+      else if (ids.length >= MAX) { toast('В избранном уже ' + MAX + ' разделов — уберите лишние'); return; }
       else { ids.push(id); }
       if (!save()) { ids = before; toast('Не удалось сохранить изменение. Прежнее избранное оставлено.'); }
-      else { toast(removing ? '«' + esc(s.t) + '» убран из Моего зала' : '«' + esc(s.t) + '» — в <a href="moy-zal.html">Моём зале</a>'); }
+      else { toast(removing ? '«' + esc(s.t) + '» убран из избранного' : '«' + esc(s.t) + '» — в <a href="moy-zal.html">избранном</a>'); }
       render();
     }
 
@@ -91,8 +91,8 @@
       toggles.forEach(function (b) {
         var on = has(b.dataset.id), s = BY[b.dataset.id];
         b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
-        b.querySelector('span').textContent = on ? 'В Моём зале' : 'В Мой зал';
-        b.setAttribute('aria-label', (on ? 'Убрать из Моего зала: ' : 'Добавить в Мой зал: ') + s.t);
+        b.querySelector('span').textContent = on ? 'В избранном' : 'В избранное';
+        b.setAttribute('aria-label', (on ? 'Убрать из избранного: ' : 'Добавить в избранное: ') + s.t);
       });
       document.querySelectorAll('.zal-n').forEach(function (i) { i.hidden = !n; i.textContent = n; });
       var ml = document.querySelector('.m-zal-links');
@@ -105,7 +105,7 @@
             '<button type="button" data-act="up" data-k="' + k + '" aria-label="Выше: ' + esc(s.t) + '"' + (k === 0 ? ' disabled' : '') + '>↑</button>' +
             '<button type="button" data-act="down" data-k="' + k + '" aria-label="Ниже: ' + esc(s.t) + '"' + (k === n - 1 ? ' disabled' : '') + '>↓</button>' +
             '<button type="button" data-act="del" data-k="' + k + '" aria-label="Убрать: ' + esc(s.t) + '">×</button></div></div>';
-        }).join('') : '<p class="zal-empty">Пока пусто. Отметьте разделы ниже или нажмите «В Мой зал» на странице раздела — он появится здесь.</p>';
+        }).join('') : '<p class="zal-empty">Пока пусто. Отметьте разделы ниже или нажмите «В избранное» на странице раздела — он появится здесь.</p>';
       }
       var all = document.getElementById('zalAll');
       if (all) {
@@ -127,7 +127,7 @@
       if (a === 'del') { var t = BY[ids[k]].t; ids.splice(k, 1); focusK = Math.min(k, ids.length - 1); }
       else { var j = a === 'up' ? k - 1 : k + 1; if (j < 0 || j >= ids.length) return; var x = ids[k]; ids[k] = ids[j]; ids[j] = x; focusK = j; }
       if (!save()) { ids = before; focusK = k; toast('Не удалось сохранить изменение. Прежнее избранное оставлено.'); }
-      else if (a === 'del') toast('«' + esc(t) + '» убран из Моего зала');
+      else if (a === 'del') toast('«' + esc(t) + '» убран из избранного');
       render();
       var nb = box.querySelector('button[data-act="' + a + '"][data-k="' + focusK + '"]') || box.querySelector('button[data-k="' + focusK + '"]');
       if (nb && !nb.disabled) nb.focus();

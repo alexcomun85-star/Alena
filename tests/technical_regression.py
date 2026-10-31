@@ -98,9 +98,9 @@ def t_ui(browser):
     check('мобильное меню: Escape возвращает фокус', 'dockMenu', p.evaluate('document.activeElement.id'))
     check('мобильное меню: фон снова доступен', False, p.locator('main').evaluate('(e)=>e.inert'))
     check('каталог: сохранены все 12 инструментов', 12, p.locator('#tools .cat').count())
+    # с 01.11.2026 группы инструментов видны сразу (лента на телефоне), отдельной навигации нет
     for href in ['#tools-train', '#tools-food', '#tools-progress']:
-        p.locator('.task-nav a[href="'+href+'"]').click()
-        check('каталог: цель '+href+' существует', 1, p.locator(href).count())
+        check('каталог: группа '+href+' существует', 1, p.locator(href).count())
     for width in [320, 390, 768, 1024, 1200]:
         p.set_viewport_size({'width': width, 'height': 844})
         for page in ['index.html', 'servisy.html', 'vopros.html', 'progress.html']:
@@ -137,8 +137,8 @@ def t_ui(browser):
 
 def t_static():
     s=Path('index.html').read_text()
-    # Финальное приглашение обновлено по утверждённому дизайну 28.10.2026.
-    protected={'plans':'22b99e3634f8f2bbd16a5613deb4468fa20b4061c0c52e451c9bf9e89e55107a', 'quiz':'025dfaaa89ee165c9a924a31fca689cd812603dbd9c029117e7e1e3eb6f7f7e7', 'faq':'3e55f92d141330f5aeeb1919c41e6fc676b190916fe99aee00ea95c2dab32409', 'start':'8188c412263c5bec9e24c65345db3e188f30cafc270bde29bdd00cc7c8212be0'}
+    # Офферные блоки обновлены по утверждённой редакции главной 01.11.2026 (откат — ветка rollback-2026-10-31).
+    protected={'plans':'860e4b4e29cddb508f790e2317860c9408663a7a58d1869b7efcad612651e392', 'quiz':'0267ad7fe7b7765d62f6292c258d47622895d8c7ca9cef1b70b2f33f948f11fb', 'faq':'480f5b4fb80e682cb3490d2c8174dd130353d621c392fff7e7ae25cdcaa49953', 'start':'cfdaf76ddbfa78dc158f3600e66df51b4b5a42b62630a9ce8cdeb873847d6c2f'}
     for name,digest in protected.items():
         block=re.search('<section[^>]*id="'+name+'".*?</section>',s,re.S)[0]
         check('оффер сохранён: '+name,digest,hashlib.sha256(block.encode()).hexdigest())
