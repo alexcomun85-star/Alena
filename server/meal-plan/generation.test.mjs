@@ -112,7 +112,7 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
 // A replacement dish named like a dish from another day: the model sees taken titles,
 // gets one more targeted round, and a persistent repeat is rejected before any cooking call.
 {
- const other=body.days[3].meals[0].title;
+ const other=body.days.slice(1).flatMap(d=>d.meals).find((m,i)=>i%4===0&&!/молок|кефир|ряженк/i.test(m.title)).title;
  const run=async(fixOnRound)=>{let stages=[],round=0;const env=await environment();const response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
   const input=JSON.parse(JSON.parse(init.body).input[1].content);stages.push(input.stage);
   if(input.stage==='composition'){const bad=structuredClone(body);bad.days[0].meals[0].parts[0].food='Unknown';return answer(bad);}
@@ -198,6 +198,17 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
   return provider(url,init);}});
  assert.equal(r.status,200);const out=(await r.json()).body;assert.equal(out.days.length,7);assert.equal(out.days[6].meals[0].title,body.days[6].meals[0].title);
  console.log('Seven day fields: day1…day7 required, converted to ordered days OK');
+}
+
+// Drinks without extremes: guidance in the instruction; a drink with milk/kefir in the title must be in parts.
+{
+ let rounds=0;const env=await environment();const r=await aiRoute(request(),env,{fetcher:async(url,init)=>{const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);
+  if(input.stage==='composition'){assert.match(p.input[0].content,/Напитки без крайностей/);assert.match(p.input[0].content,/Не предлагай соки, сладкие и газированные/);
+   const b=structuredClone(body);const m=b.days[0].meals[2];m.parts=m.parts.filter(x=>!/^Кефир/.test(x.food));m.title=m.title+' + кефир';return answer(b);}
+  if(input.stage==='repair'){rounds++;assert.match(input.recipes[0].error,/вне состава: кефир/);const meal=structuredClone(input.recipes[0].meal);meal.title=body.days[0].meals[2].title;return answer({repairs:[{id:input.recipes[0].id,meal}]});}
+  return provider(url,init);}});
+ assert.equal(r.status,200);assert.equal(rounds,1,'uncounted drink in the title is sent for repair');
+ console.log('Drinks: moderate guidance, uncounted drink in a title is repaired OK');
 }
 
 // A repair cannot address another meal or return duplicate IDs.
