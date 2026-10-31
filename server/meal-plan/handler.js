@@ -26,10 +26,27 @@ function patchSchema(items,mealSchema){return {type:'object',additionalPropertie
 // Token caps (normal output ×2.5) turn a loop into a fast 'incomplete', which composition retries once.
 const stageLimit={afita_composition:75000,afita_cooking:80000};
 const stageTokens={afita_composition:[7000,2000],afita_cooking:[9000,2500]};
+// Streaming answers are read as they arrive. gpt-4.1-mini sometimes degenerates into endless whitespace
+// inside strict JSON (seen live: tabs/newlines to the 7000-token cap after 40–50 s). A long whitespace run
+// aborts the call at once, so a retry still fits the deadline.
+const WHITESPACE_RUN=80;
+async function readStream(r,ctrl){const reader=r.body.getReader(),dec=new TextDecoder();let buf='',text='',run=0,final=null;
+ const feed=delta=>{text+=delta;for(const ch of delta){if(ch===' '||ch==='\n'||ch==='\t'||ch==='\r'){if(++run>=WHITESPACE_RUN){ctrl.abort();throw Object.assign(Error('whitespace_loop'),{chars:text.length});}}else run=0;}if(text.length>100000){ctrl.abort();throw Error('invalid_output');}};
+ for(;;){const {done,value}=await reader.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;
+  while((i=buf.indexOf('\n\n'))>=0){const block=buf.slice(0,i);buf=buf.slice(i+2);const data=block.split('\n').filter(l=>l.startsWith('data:')).map(l=>l.slice(5).trim()).join('');if(!data||data==='[DONE]')continue;
+   let ev;try{ev=JSON.parse(data)}catch{continue}
+   if(ev.type==='response.output_text.delta')feed(ev.delta||'');
+   else if(ev.type==='response.completed'||ev.type==='response.incomplete'||ev.type==='response.failed')final=ev.response||{};
+   else if(ev.type==='error')throw Error('provider_error');}}
+ if(!final||final.status!=='completed')throw Error('incomplete');return text;}
 async function modelCall(req,fetcher,env,outputSchema,input,name){const model=env.OPENAI_MODEL||'gpt-4.1-mini';if(!/^[a-zA-Z0-9._-]{1,80}$/.test(model))throw Error('model_config');
  const left=(env.deadline||Date.now()+170000)-Date.now();if(left<10000)throw Error('deadline');const limit=Math.min(stageLimit[name]||45000,left);
- const cap=(stageTokens[name]||[3000,3000])[req.action==='week'?0:1],payload={model,store:false,max_output_tokens:cap,input:[{role:'developer',content:instruction()},{role:'user',content:JSON.stringify(input)}],text:{format:{type:'json_schema',name,strict:true,schema:outputSchema}}};
- const r=await fetcher('https://api.openai.com/v1/responses',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+env.OPENAI_API_KEY},body:JSON.stringify(payload),signal:AbortSignal.timeout(limit)});if(!r.ok)throw Error(r.status===429?'provider_limit':'provider_error');const data=await r.json();if(data.status!=='completed')throw Error('incomplete');const text=(data.output||[]).flatMap(x=>x.content||[]).filter(x=>x.type==='output_text').map(x=>x.text).join('');if(!text||text.length>100000)throw Error('invalid_output');return JSON.parse(text);}
+ const cap=(stageTokens[name]||[3000,3000])[req.action==='week'?0:1],payload={model,store:false,stream:true,max_output_tokens:cap,input:[{role:'developer',content:instruction()},{role:'user',content:JSON.stringify(input)}],text:{format:{type:'json_schema',name,strict:true,schema:outputSchema}}};
+ const ctrl=new AbortController();
+ const r=await fetcher('https://api.openai.com/v1/responses',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+env.OPENAI_API_KEY},body:JSON.stringify(payload),signal:AbortSignal.any([ctrl.signal,AbortSignal.timeout(limit)])});if(!r.ok)throw Error(r.status===429?'provider_limit':'provider_error');
+ let text;if(String(r.headers.get('content-type')||'').includes('text/event-stream'))text=await readStream(r,ctrl);
+ else{const data=await r.json();if(data.status!=='completed')throw Error('incomplete');text=(data.output||[]).flatMap(x=>x.content||[]).filter(x=>x.type==='output_text').map(x=>x.text).join('');}
+ if(!text||text.length>100000)throw Error('invalid_output');return JSON.parse(text);}
 const tracked=[['масло',/^Масло/],['сахар',/^Сахар/],['мёд',/^Мёд/],['молоко',/^Молоко/],['сливки',/^Молоко|^Сметана/],['сыр',/^Сыр/],['сметана',/^Сметана/],['йогурт',/^Йогурт/],['майонез',/^Майонез/],['яйцо',/^Яйцо/]];
 const doNotMention=meal=>tracked.filter(([,food])=>!(meal.parts||[]).some(x=>food.test(x.food))).map(([w])=>w);
 const cookingRules='Каждое блюдо содержит doNotMention — продукты, которых нет в составе. Не пиши эти слова ни в какой форме, даже с «без» или «по желанию». Если масла нет: жарь на сухой антипригарной сковороде, запекай на пергаменте, хлеб подсушивай в тостере или на сухой сковороде, яйца готовь на сухой антипригарной сковороде под крышкой или варёными.';
@@ -49,9 +66,10 @@ async function buildMenu(req,fetcher,env){
  delete draftMeal.properties.steps;draftMeal.required=draftMeal.required.filter(k=>k!=='steps');
  const nutrition=C.foodList(AI_FOODS).map(r=>({food:r[0],k:r[1],p:r[2],f:r[3],c:r[4]}));
  const compose=()=>modelCall(req,fetcher,env,composition,{stage:'composition',request:req,foodNutritionPer100g:nutrition,instruction:'Сначала составь блюда и ингредиенты. Инструкции приготовления будут созданы отдельно по проверенному составу.'},'afita_composition');
- let body;try{body=await compose();}catch(e){
-  const retryable=e.message==='incomplete'||e.name==='TimeoutError'||e.message==='invalid_output'||e instanceof SyntaxError;
-  if(!retryable||env.deadline-Date.now()<85000)throw e;console.error('Afita composition retry:',e.name==='TimeoutError'?'timeout':e.message);body=await compose();}
+ // Up to two retries after a loop, cut-off or broken JSON, while 60 s remain for the rest of the menu.
+ let body;for(let attempt=1;;attempt++){try{body=await compose();break;}catch(e){
+  const retryable=['incomplete','invalid_output','whitespace_loop'].includes(e.message)||e.name==='TimeoutError'||e instanceof SyntaxError;
+  if(!retryable||attempt>2||env.deadline-Date.now()<60000)throw e;console.error('Afita composition retry:',e.name==='TimeoutError'?'timeout':e.message+(e.chars?' after '+e.chars+' chars':''));}}
  const placeholder='Приготовление будет составлено по проверенному составу.';
  for(const e of entries(body,req)){e.meal.steps=placeholder;tidy(e.meal);}
  let compositionRepairs=0,portionsAdjusted=false;const oilAdded=[],touched=new Set();
@@ -111,7 +129,7 @@ async function buildMenu(req,fetcher,env){
  try{C.normalize(body,req,AI_FOODS)}catch(err){throw failure(err.message)}
  return {body,portionsAdjusted,oilAdded};
 }
-export function aiStatus(env){return reply({revision:'integer-grams-20261031-6',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
+export function aiStatus(env){return reply({revision:'stream-guard-20261031-7',ready:configured(env),message:configured(env)?'ИИ готов составить меню.':'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'})}
 export async function aiRoute(request,env,{fetcher=fetch,now=Date.now}={}){
  if(!configured(env))return reply({code:'not_configured',error:'ИИ-генератор пока не подключён. Подборка готовых блюд доступна отдельно.'},503);
  const time=now(),ip=request.headers.get('CF-Connecting-IP')||request.headers.get('oai-authenticated-user-id');if(!ip)return reply({code:'identity_unavailable',error:'Не удалось проверить лимит запросов. Попробуйте позже.'},503);const epoch=Math.floor(time/86400000),owner=await digest(env.AI_BUDGET_SALT+':'+epoch+':'+ip);

@@ -166,6 +166,22 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
  console.log('Integer grams: schema integer, eggs tidied to 50 g, invalid repaired dish gets a second round OK');
 }
 
+// Streaming: a whitespace loop is cut early (not at the token cap) and composition is retried.
+{
+ const sse=events=>new Response(new ReadableStream({start(c){const e=new TextEncoder();for(const ev of events)c.enqueue(e.encode('data: '+JSON.stringify(ev)+'\n\n'));c.close();}}),{headers:{'Content-Type':'text/event-stream'}});
+ const json=JSON.stringify(body),half=Math.floor(json.length/2);let attempts=0,aborted=false;
+ const env=await environment();const r=await aiRoute(request(),env,{fetcher:async(url,init)=>{
+  const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);assert.equal(p.stream,true);
+  if(input.stage==='composition'){attempts++;
+   if(attempts===1){init.signal.addEventListener('abort',()=>{aborted=true});
+    return sse([{type:'response.output_text.delta',delta:json.slice(0,half)},...Array.from({length:50},()=>({type:'response.output_text.delta',delta:' \t\n'})),{type:'response.incomplete',response:{status:'incomplete'}}]);}
+   return sse([{type:'response.output_text.delta',delta:json.slice(0,half)},{type:'response.output_text.delta',delta:json.slice(half)},{type:'response.completed',response:{status:'completed'}}]);}
+  return provider(url,init);
+ }});
+ assert.equal(r.status,200,'whitespace loop retried');assert.equal(attempts,2);assert.ok(aborted,'looping stream was aborted early');
+ console.log('Stream guard: whitespace loop aborted early, composition retried, normal stream parsed OK');
+}
+
 // A repair cannot address another meal or return duplicate IDs.
 env=await environment();response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
  const input=JSON.parse(JSON.parse(init.body).input[1].content);
