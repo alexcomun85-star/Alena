@@ -128,6 +128,29 @@ wrongCooking=false;env=await environment();response=await aiRoute(request(),env,
  console.log('Unique titles: taken titles shown, second targeted round, persistent repeat rejected before cooking OK');
 }
 
+// A looping composition hits the token cap and is retried once; a day off target gets explicit numbers.
+{
+ let n=0;const env=await environment();const response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
+  const p=JSON.parse(init.body),input=JSON.parse(p.input[1].content);
+  if(input.stage==='composition'){n++;assert.ok(p.max_output_tokens<=7000,'composition output is capped');if(n===1)return Response.json({status:'incomplete',incomplete_details:{reason:'max_output_tokens'},output:[]});}
+  return provider(url,init);
+ }});
+ assert.equal(response.status,200,'one retry after a looping composition');assert.equal(n,2);
+ let rounds=0;const lean=structuredClone(body);
+ const fatty=x=>/^Масло|Сыр|Сметана|орех|Миндаль|Семечки|Арахис|Майонез/.test(x.food);
+ lean.days[5].meals.forEach(m=>m.parts=m.parts.filter(x=>!fatty(x)).length>=2?m.parts.filter(x=>!fatty(x)):m.parts);
+ const env2=await environment();const r2=await aiRoute(request(),env2,{fetcher:async(url,init)=>{
+  const input=JSON.parse(JSON.parse(init.body).input[1].content);
+  if(input.stage==='composition')return answer(lean);
+  if(input.stage==='repair'){rounds++;assert.match(input.correction,/при цели/,'plain target numbers');assert.match(input.correction,/нужно \d+–\d+/);
+   return answer({repairs:input.recipes.map(e=>{const [d,i]=e.id.split(':').map(Number);return {id:e.id,meal:body.days[d].meals[i]}})});}
+  return provider(url,init);
+ }});
+ const o2=await r2.json();
+ assert.ok(r2.status===200||o2.code==='validation_failed');assert.ok(rounds<=2);
+ console.log('Loop guard: capped composition retried once; day totals explained in numbers, at most two rounds ('+(rounds?rounds+' used':'balance fixed it')+') OK');
+}
+
 // A repair cannot address another meal or return duplicate IDs.
 env=await environment();response=await aiRoute(request(),env,{fetcher:async(url,init)=>{
  const input=JSON.parse(JSON.parse(init.body).input[1].content);
