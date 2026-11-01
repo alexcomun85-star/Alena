@@ -22,7 +22,7 @@ must('<link rel="canonical" href="https://alenafit.com/">', '<link rel="canonica
 must('<title>', '<title>[Пилот] ')
 
 # --- 1. дескриптор под логотипом
-must('<small>Сила без перегибов</small></span></a>', '<small>Тренировки и питание</small></span></a>')
+h = h  # подпись в шапке задаёт scripts/logo_lockup.py
 
 # --- 2. кнопки: «Написать в Telegram» + подсказка про СТАРТ, слово подставляется в чат
 h = h.replace(f'href="{TG}"', f'href="{TG_START}"')
@@ -95,7 +95,7 @@ for gid, ico in icons.items():
 
 # --- 12. подвал = те же 5 разделов, что в меню
 footer = f'''<footer class="g pilot-foot"><div class="w">
-  <div class="pf-top"><img class="foot-logo" src="img/brand/logo-light.svg" alt="ALENAFIT" width="150" height="96" loading="lazy"><p>Алёна Вислова · тренер и нутрициолог · Санкт-Петербург</p><a class="btn btn-main" href="{TG_START}" target="_blank" rel="noopener">Написать в Telegram</a></div>
+  <div class="pf-top"><span class="foot-lockup" role="img" aria-label="ALENAFIT — сила без перегибов. Тренировки и питание"><img class="fl-mark" src="img/brand/mark-light.svg" alt="" width="56" height="46" loading="lazy"><span class="fl-text"><img class="fl-word" src="img/brand/wordmark-light.svg" alt="" width="150" height="21" loading="lazy"><small>сила без перегибов</small></span><span class="fl-desc">Тренировки<br>и питание</span></span><p>Алёна Вислова · тренер и нутрициолог · Санкт-Петербург</p><a class="btn btn-main" href="{TG_START}" target="_blank" rel="noopener">Написать в Telegram</a></div>
   <nav class="pf-cols" aria-label="Разделы сайта">
     <div><b>Об Алёне</b><a href="#about">Подход</a><a href="#creds">Образование и соревнования</a><a href="#how">Как проходит работа</a><a href="#who">Кому подойдёт</a></div>
     <div><b>Тренировки</b><a href="servisy.html#trenirovka">Тренировка дня</a><a href="vozvrat.html">План возвращения</a><a href="zal.html">Карта зала</a><a href="odezhda.html">Одежда и обувь</a><a href="inventar.html">Инвентарь для дома</a><a href="gadzhety.html">Фитнес-гаджеты</a></div>

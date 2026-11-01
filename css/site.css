@@ -1241,3 +1241,25 @@ a .tg-ico{flex:none;display:inline-block;width:18px;height:18px;vertical-align:-
 .invite-action:has(.tg-ico){justify-content:flex-start}
 .invite-action .tg-ico+span{flex:1;text-align:left}
 .invite-action .tg-ico+span{white-space:nowrap;font-size:clamp(15px,4.4vw,17px)}
+
+/* ===== Логотип (01.11.2026): знак + ALENAFIT + «сила без перегибов» | ТРЕНИРОВКИ И ПИТАНИЕ ===== */
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand .brand-text{display:grid!important;gap:3px;flex:none}
+.brand .brand-text .brand-tag{display:block!important;font:400 11.5px/1.15 var(--body)!important;color:var(--muted)!important;letter-spacing:.01em;white-space:nowrap}
+.brand-desc{display:block;flex:none;margin-left:4px;padding-left:12px;border-left:2px solid var(--amber);
+  font:600 11.5px/1.15 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+@media (min-width:1024px){.brand-desc{font-size:12.5px;padding-left:14px}}
+/* узкие экраны и ПК с длинным меню: справа не помещается — показываем знак, надпись и подпись */
+@media (max-width:359px){.brand-desc{display:none}}
+/* ПК: меню длинное — направление справа только на широких экранах; на 1024–1199 остаётся один знак, как раньше */
+@media (min-width:1024px) and (max-width:1599px){.brand-desc{display:none}}
+@media (min-width:1024px) and (max-width:1199px){.brand .brand-text{display:none!important}}
+
+/* подвал: тот же логотип крупнее */
+.foot-lockup{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+.fl-mark{display:block;width:52px;height:auto}
+.fl-text{display:grid;gap:5px}
+.fl-word{display:block;width:150px;height:auto}
+.fl-text small{font-size:13px;color:var(--muted)}
+.fl-desc{padding-left:14px;border-left:2px solid var(--amber);font:600 13px/1.2 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+@media (max-width:359px){.fl-desc{border-left:0;padding-left:0;flex-basis:100%}}
