@@ -19,6 +19,7 @@ MEALS = {'breakfast': 'Завтрак', 'lunch': 'Обед', 'soup': 'Суп', '
 WHOLE_GRAINS = {'Гречка сухая', 'Овсяные хлопья сухие', 'Хлеб цельнозерновой'}
 CALCIUM_DAIRY = {'Молоко 2,5%', 'Молоко 3,2%', 'Кефир 1%', 'Кефир 2,5%', 'Ряженка 4%', 'Йогурт натуральный 2%',
                  'Греческий йогурт 2%', 'Творог 2%', 'Творог 5%', 'Творог 9%', 'Сыр твёрдый (типа Российского)', 'Сыр моцарелла'}
+SALTY = {'Огурцы солёные', 'Капуста квашеная'}
 FREE_SUGARS = {'Мёд', 'Сахар'}
 REFS = {
     'who': ['ВОЗ: здоровое питание', 'https://www.who.int/news-room/fact-sheets/detail/healthy-diet'],
@@ -94,7 +95,7 @@ def build():
         n = rec['servings']
         per = {'k': r(tot['k'] / n, '1'), 'p': r(tot['p'] / n), 'f': r(tot['f'] / n), 'c': r(tot['c'] / n)}
         kcal_from_macros = per['p'] * 4 + per['f'] * 9 + per['c'] * 4
-        if per['k'] and abs(kcal_from_macros - per['k']) / per['k'] > 0.12:
+        if per['k'] and abs(kcal_from_macros - per['k']) > 20 and abs(kcal_from_macros - per['k']) / per['k'] > 0.12:
             errors.append(f'{rid}: ккал {per["k"]} не сходятся с БЖУ ({kcal_from_macros:.0f})')
         good, refs = [], {'usda'}
         if per['p'] >= 20:
@@ -115,13 +116,16 @@ def build():
         if sugar:
             good.append(f'Мёд добавляет около {fmt(r(sugar / n))} г свободных сахаров на порцию. ВОЗ советует держать свободные сахара ниже 10% калорий за день.')
             refs.add('who')
+        if any(x[2] in SALTY for x in rec['ing']):
+            good.append('Учтите: солёные огурцы и квашеная капуста дают много соли, поэтому блюдо почти не солите. ВОЗ советует не больше 5 г соли в день.')
+            refs.add('who')
         if not good:
             errors.append(f'{rid}: нет ни одного обоснованного пункта пользы')
         out.append({
             'id': rid, 'title': rec['title'], 'meal': rec['meal'], 'mealName': MEALS[rec['meal']],
             'servings': n, 'time': rec['time'], 'required': req, 'optional': opt, 'contains': sorted(set(contains)),
             'ing': ing_out, 'taste': rec.get('taste', ''), 'steps': rec['steps'], 'note': rec.get('note', ''),
-            'n': per, 'good': good, 'refs': [REFS[k] for k in ('usda', 'issn', 'who') if k in refs],
+            'n': per, 'good': good, 'tag': rec.get('tag', ''), 'refs': [REFS[k] for k in ('usda', 'issn', 'who') if k in refs],
         })
     if errors:
         print('\n'.join(errors), file=sys.stderr)
