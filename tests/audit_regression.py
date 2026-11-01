@@ -209,6 +209,8 @@ def t_afit(browser):
     for width,height in [(320,740),(390,844),(768,900),(1200,900)]:
         p.set_viewport_size({'width':width,'height':height})
         launcher=p.locator('.afit-launch')
+        # с 01.11.2026 кнопка и окно анимированы: размеры меряем после окончания движения
+        p.wait_for_function("[...document.querySelectorAll('.afit-launch,#afit-window')].every(e=>e.getAnimations().every(a=>a.playState!=='running'))", timeout=5000)
         launch_box=launcher.bounding_box()
         if width<1024:
             check('Афита: компактная кнопка '+str(width), True, 44<=launch_box['width']<=50 and 44<=launch_box['height']<=50)
@@ -220,6 +222,7 @@ def t_afit(browser):
         p.click('.afit-launch')
         check('Афит: открыт '+str(width), True, p.is_visible('#afit-window'))
         check('Афит: фирменный знак '+str(width), True, p.locator('.afit-window .afit-symbol img').evaluate('(e)=>e.complete && e.naturalWidth>0'))
+        p.wait_for_function("[...document.querySelectorAll('.afit-launch,#afit-window')].every(e=>e.getAnimations().every(a=>a.playState!=='running'))", timeout=5000)
         box=p.locator('#afit-window').bounding_box()
         check('Афит: панель внутри экрана '+str(width), True, box['x']>=0 and box['y']>=0 and box['x']+box['width']<=width and box['y']+box['height']<=height)
         check('Афит: ссылка резервного открытия '+str(width), 'https://assistant.alenafit.com/', p.locator('.afit-fallback a').get_attribute('href'))

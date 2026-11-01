@@ -22,3 +22,8 @@ button,input,select,textarea{transition:border-color 180ms,background-color 180m
 @media print{:root,body{background:white;color:#183d31}.recipe,.week-day{background:white;color:#183d31}button{display:none}}
 .task-card:first-child{background:#f0a92b;color:#14251c;border-color:#f0a92b}.task-card:first-child small{color:#243e2e;opacity:1}
 @media(hover:hover){.task-card:first-child:hover{background:#f5bb50}}
+
+/* внутри окна Афиты (01.11.2026): без собственной шапки, «назад» — только не на главной вкладке */
+.afit-embed .tools-header{display:none}
+.afit-embed .tools-nav{top:0}
+.afit-embed body{background:#0f231e}

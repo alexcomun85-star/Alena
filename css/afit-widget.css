@@ -1,92 +1,143 @@
-.afit-symbol{display:grid;place-items:center;background:#102c25;border:1px solid #e7b56770;border-radius:50%;width:40px;height:40px;padding:8px}.afit-symbol img{display:block;width:100%;height:100%;object-fit:contain}
-.afit-launch{position:fixed;right:22px;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:32;display:flex;align-items:center;gap:11px;background:#173e2f;color:#f2f0e8;border:1px solid #94a37b;border-radius:40px;padding:8px 17px 8px 8px;box-shadow:0 8px 30px #071b1940;font:500 15px var(--body);cursor:pointer}.afit-launch small{display:block;font-size:10px;color:#c2d4c0;text-align:left}.afit-window{position:fixed;right:22px;bottom:calc(162px + env(safe-area-inset-bottom,0px));width:400px;height:min(650px,calc(100dvh - 190px));z-index:34;background:#f2f0e8;color:#193b31;border:1px solid #b5c5ae;border-radius:15px;box-shadow:0 16px 80px #071b1955;overflow:hidden;display:flex;flex-direction:column}.afit-window[hidden]{display:none}.afit-window header{display:flex;align-items:center;gap:12px;padding:15px 18px;background:#173e2f;color:#f2f0e8}.afit-window header small{display:block;font-size:10px;color:#c2d4c0}.afit-close{margin-left:auto;min-width:44px;min-height:44px;border:0;background:transparent;color:#f2f0e8;font:28px var(--body);cursor:pointer}.afit-window iframe{display:block;width:100%;flex:1;min-height:0;background:#f2f0e8;border:0}.afit-window .afit-access{margin:0;padding:10px 16px;font-size:11px;line-height:1.5;border-bottom:1px solid #c4cfbf}.afit-window .afit-fallback{padding:10px 16px;font-size:12px;background:#e2e8dc}.afit-window a{color:#193b31;text-underline-offset:3px}.afit-window a:focus-visible,.afit-launch:focus-visible,.afit-close:focus-visible{outline:3px solid #c78a37;outline-offset:3px}
-
-@media(max-width:480px){.afit-window{right:10px;width:calc(100% - 20px);bottom:calc(156px + env(safe-area-inset-bottom,0px));height:calc(100dvh - 180px)}.afit-launch{right:15px;bottom:calc(82px + env(safe-area-inset-bottom,0px))}.afit-launch small{display:none}.afit-launch .afit-symbol{width:34px;height:34px;padding:6px}}
-@media print{.afit-launch,.afit-window{display:none!important}}
-
-/* Maximize space for the conversation, including when the keyboard is open. */
-.afit-window header{flex:none;padding:8px 12px}.afit-window header small{display:none}.afit-window .afit-access{flex:none;padding:6px 12px;font-size:10px}.afit-window .afit-fallback{flex:none;padding:5px 12px;font-size:10px}.afit-window .afit-fallback a{white-space:normal}.afit-window iframe{min-height:0;flex:1 1 0}
-@media(max-height:500px){.afit-window .afit-access{display:none}.afit-window header{padding:3px 10px}.afit-window .afit-symbol{width:30px;height:30px;padding:5px}.afit-window .afit-fallback{padding:3px 10px}}
-
-/* Translucent brand launcher; no changes to the page design. */
-.afit-launch{background:rgba(16,44,37,.74);backdrop-filter:blur(16px) saturate(125%);-webkit-backdrop-filter:blur(16px) saturate(125%);border-color:rgba(231,181,103,.48);box-shadow:0 8px 28px rgba(4,20,15,.24),inset 0 1px rgba(255,255,255,.08)}
-@media(prefers-reduced-motion:no-preference){
-.afit-launch{animation:afit-arrive .65s cubic-bezier(.2,.7,.2,1) both;transition:background .25s,box-shadow .25s,transform .25s}
-.afit-launch .afit-symbol{animation:afit-breathe 5s ease-in-out 1s 3}
-.afit-launch:hover{background:rgba(16,44,37,.9);transform:translateY(-3px);box-shadow:0 12px 35px rgba(4,20,15,.35)}
-.afit-launch:active{transform:translateY(0) scale(.98)}
-.afit-window:not([hidden]){animation:afit-panel-in .3s cubic-bezier(.2,.7,.2,1)}
-@keyframes afit-arrive{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes afit-breathe{0%,100%{box-shadow:0 0 0 0 rgba(231,181,103,0)}50%{box-shadow:0 0 0 5px rgba(231,181,103,.12)}}
-@keyframes afit-panel-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* =====================================================================
+   АФИТА — кнопка и окно помощницы (редакция 01.11.2026, файл переписан целиком).
+   Палитра сайта: тёмно-зелёный, янтарь. Окно — того же вида, что разделы-окна главной.
+   Телефон < 600 px: лист снизу на весь экран, закрывается свайпом вниз.
+   Fold, планшет, ПК: панель у правого края, раскрывается из кнопки.
+   ===================================================================== */
+.afit-launch,.afit-window,.afit-nudge{
+  --af-bg:#0f231e;          /* фон окна */
+  --af-head:#162f29;        /* шапка */
+  --af-raise:#1f4038;       /* поднятые элементы */
+  --af-edge:rgba(238,244,241,.12);
+  --af-ink:#eef4f1;
+  --af-muted:#a9c0b7;
+  --af-amber:#f0a92b;
+  --af-amber-ink:#132823;
+  --af-ease:cubic-bezier(.2,.8,.25,1);
 }
-@media(prefers-reduced-motion:reduce){.afit-launch,.afit-launch .afit-symbol,.afit-window{animation:none!important;transition:none!important}}
-@media(prefers-reduced-transparency:reduce){.afit-launch{background:#173e2f;backdrop-filter:none;-webkit-backdrop-filter:none}}
-@supports not (backdrop-filter:blur(1px)){.afit-launch{background:#173e2f}}
+@media print{.afit-launch,.afit-window,.afit-nudge{display:none!important}}
 
+/* ---------- кнопка ---------- */
+.afit-launch{position:fixed;z-index:32;right:max(22px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));
+  display:flex;align-items:center;gap:10px;height:56px;padding:0 20px 0 6px;border-radius:999px;
+  background:rgba(16,44,37,.82);-webkit-backdrop-filter:blur(14px) saturate(125%);backdrop-filter:blur(14px) saturate(125%);
+  border:1px solid rgba(240,169,43,.45);color:var(--af-ink);font:600 15px/1.2 var(--body,'Golos Text',sans-serif);cursor:pointer;
+  box-shadow:0 10px 30px -10px rgba(0,0,0,.6),inset 0 1px rgba(255,255,255,.08);
+  transition:padding .35s var(--af-ease),gap .35s var(--af-ease),background .25s,transform .25s var(--af-ease),box-shadow .25s}
+.afit-launch small{display:block;margin-top:2px;font-size:11px;font-weight:400;color:var(--af-muted)}
+.afit-label{display:block;max-width:220px;overflow:hidden;white-space:nowrap;transition:max-width .35s var(--af-ease),opacity .2s}
+.afit-symbol{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#0d1e1a;border:1px solid rgba(240,169,43,.35)}
+.afit-symbol img{display:block;width:26px;height:26px;object-fit:contain}
+.afit-mark-svg{display:block;width:28px;height:auto;overflow:visible}
+.afit-launch:hover{background:rgba(16,44,37,.95);transform:translateY(-2px);box-shadow:0 14px 34px -10px rgba(0,0,0,.7),inset 0 1px rgba(255,255,255,.08)}
+.afit-launch:active{transform:scale(.97)}
+.afit-launch.is-compact{padding-right:6px;gap:0}
+.afit-launch.is-compact .afit-label{max-width:0;opacity:0}
+.afit-launch:focus-visible,.afit-window :focus-visible,.afit-nudge:focus-visible{outline:2px solid var(--af-amber);outline-offset:3px}
 
-/* The chat has its own navigation; keep the page dock from covering its composer. */
-body.afit-chat-open .dock,body.afit-chat-open .afit-launch{visibility:hidden;pointer-events:none}
-.afit-window{z-index:60}
-
-.afit-tabs{display:flex;gap:6px;padding:6px 12px;flex:none}.afit-tabs button{flex:1;min-height:40px;border:1px solid #819586;border-radius:9px;background:transparent;color:#193b31;font:inherit;cursor:pointer}.afit-tabs button[aria-pressed=true]{background:#173e2f;color:#fff}
-
-/* Compact tool shell: leave the viewport to the task. */
-.afit-window{width:min(430px,calc(100% - 20px));background:#f5f3ed}.afit-window header{padding:8px 12px}.afit-window header .afit-symbol{width:30px;height:30px;padding:5px}.afit-window .afit-access{font-size:10px;line-height:1.35;padding:5px 12px;background:#edeedf}.afit-tabs{padding:5px 12px;gap:4px;background:#edeedf}.afit-tabs button{min-height:34px;font-size:12px;padding:4px 10px;border:0;border-radius:7px}.afit-tabs button[aria-pressed=true]{background:#173e2f;color:#fff}.afit-window .afit-fallback{font-size:10px;margin:0;padding:5px 12px}.afit-window:has(.afit-tabs button:last-child[aria-pressed=true]) .afit-fallback{display:none}@media(max-width:600px){.afit-window{border-radius:14px;right:10px}.afit-window header{min-height:48px}.afit-close{min-height:36px;min-width:40px}}
-
-/* Mobile launcher: one quiet, touch-friendly brand icon above the dock. */
+/* телефон, Fold, планшет: круглая кнопка над нижней панелью */
 @media(max-width:1023px){
-  .afit-launch{right:max(12px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));width:48px;height:48px;box-sizing:border-box;padding:0;gap:0;justify-content:center;border-radius:50%;animation:none;box-shadow:0 3px 12px rgba(4,20,15,.2)}
-  .afit-launch .afit-symbol{width:44px;height:44px;box-sizing:border-box;padding:8px;background:transparent;border:0;animation:none}
-  .afit-launch>span:not(.afit-symbol){position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0}
+  .afit-launch{right:max(12px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));width:48px;height:48px;padding:0;gap:0;justify-content:center}
+  .afit-launch .afit-symbol{width:46px;height:46px;background:transparent;border:0}
+  .afit-launch .afit-label{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
   .afit-launch:hover,.afit-launch:active{transform:none}
 }
 
-/* Frosted glass keeps the mobile launcher quiet over both photos and text. */
-@media(max-width:1023px){
-  .afit-launch,.afit-launch:hover,.afit-launch:active{
-    background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.015) 54%,rgba(255,255,255,.035)),rgba(16,44,37,.04);
-    backdrop-filter:blur(10px) saturate(115%);
-    -webkit-backdrop-filter:blur(10px) saturate(115%);
-    border-color:rgba(255,255,255,.16);
-    box-shadow:0 3px 12px rgba(4,20,15,.08),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 0 rgba(255,255,255,.025);
-  }
-  .afit-launch .afit-symbol img{filter:drop-shadow(0 1px 2px rgba(4,20,15,.6))}
+/* подсказка рядом с кнопкой: одна за визит */
+.afit-nudge{position:fixed;z-index:32;right:max(70px,calc(env(safe-area-inset-right,0px) + 70px));bottom:calc(92px + env(safe-area-inset-bottom,0px));
+  max-width:min(250px,calc(100vw - 96px));margin:0;padding:10px 14px;border-radius:16px 16px 4px 16px;background:var(--af-amber);color:var(--af-amber-ink);
+  font:600 13.5px/1.35 var(--body,'Golos Text',sans-serif);box-shadow:0 10px 26px -10px rgba(0,0,0,.6);cursor:pointer}
+@media(min-width:1024px){.afit-nudge{right:calc(max(22px,env(safe-area-inset-right,0px)) + 8px);bottom:calc(152px + env(safe-area-inset-bottom,0px));border-radius:16px 16px 4px 16px}}
+
+/* ---------- окно ---------- */
+.afit-window{position:fixed;z-index:60;right:max(22px,env(safe-area-inset-right,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px));
+  width:min(420px,calc(100vw - 32px));height:min(680px,calc(100dvh - 44px));display:flex;flex-direction:column;overflow:hidden;
+  background:var(--af-bg);color:var(--af-ink);border:1px solid var(--af-edge);border-radius:28px;
+  box-shadow:0 30px 80px -20px rgba(0,0,0,.75),inset 0 1px rgba(255,255,255,.06);font-family:var(--body,'Golos Text',sans-serif)}
+.afit-window[hidden]{display:none}
+.afit-window header{position:relative;flex:none;display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"sym title close" "tabs tabs tabs";
+  align-items:center;gap:10px 12px;padding:14px 12px 12px 16px;background:var(--af-head);border-bottom:1px solid var(--af-edge)}
+.afit-window header .afit-symbol{grid-area:sym;width:38px;height:38px}
+.afit-title{grid-area:title;min-width:0}
+.afit-title b{display:block;font:700 16px/1.2 var(--head,'Unbounded',sans-serif)}
+.afit-title small{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:12px;color:var(--af-muted)}
+.afit-title small::before{content:"";width:7px;height:7px;border-radius:50%;background:#5fd08a;box-shadow:0 0 0 3px rgba(95,208,138,.18)}
+.afit-close{grid-area:close;width:40px;height:40px;border:0;border-radius:50%;background:rgba(255,255,255,.06);color:var(--af-ink);font:400 24px/1 var(--body,'Golos Text',sans-serif);cursor:pointer;transition:background .2s,color .2s}
+.afit-close:hover{background:rgba(255,255,255,.12);color:var(--af-amber)}
+.afit-grip{display:none}
+
+/* вкладки: компактный переключатель с бегунком, не конкурирует с кнопками внутри */
+.afit-tabs{grid-area:tabs;position:relative;display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:12px;background:#0d1e1a;--x:0%}
+.afit-tabs::before{content:"";position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:9px;background:var(--af-raise);
+  box-shadow:inset 0 1px rgba(255,255,255,.07);transform:translateX(var(--x));transition:transform .3s var(--af-ease)}
+.afit-tabs button{position:relative;min-height:36px;border:0;background:transparent;color:var(--af-muted);font:600 14px var(--body,'Golos Text',sans-serif);cursor:pointer;transition:color .2s}
+.afit-tabs button[aria-pressed=true]{color:var(--af-ink)}
+
+/* тело: фреймы и «открывает чат…» */
+.afit-body{position:relative;flex:1;min-height:0;display:flex}
+.afit-window iframe{display:block;flex:1;width:100%;min-height:0;border:0;background:var(--af-bg)}
+.afit-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--af-bg);color:var(--af-muted);font-size:13px}
+.afit-loading[hidden]{display:none}
+.afit-dots{display:flex;gap:5px;padding:12px 15px;border-radius:16px 16px 16px 5px;background:var(--af-raise)}
+.afit-dots i{width:7px;height:7px;border-radius:50%;background:var(--af-amber);opacity:.35;animation:afitDot 1s infinite}
+.afit-dots i:nth-child(2){animation-delay:.15s}.afit-dots i:nth-child(3){animation-delay:.3s}
+@keyframes afitDot{50%{opacity:1;transform:translateY(-2px)}}
+
+/* подвал окна: одна тихая строка */
+.afit-foot{flex:none;padding:7px 16px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--af-edge);background:var(--af-bg)}
+.afit-window .afit-access,.afit-window .afit-fallback{margin:0;font-size:11px;line-height:1.4;color:var(--af-muted)}
+.afit-window .afit-fallback{margin-top:4px}
+.afit-window .afit-fallback[hidden]{display:none}
+.afit-window .afit-fallback a{color:var(--af-amber)}
+
+/* пока окно открыто, нижняя панель сайта и кнопка не мешают */
+body.afit-chat-open .dock,body.afit-chat-open .afit-launch,body.afit-chat-open .afit-nudge{visibility:hidden;pointer-events:none}
+
+/* ---------- телефон: лист снизу ---------- */
+@media(max-width:599px){
+  .afit-window{left:0;right:0;top:8px;bottom:auto;width:auto;height:calc(100dvh - 8px);border-radius:24px 24px 0 0;border-bottom:0}
+  .afit-window header{padding-top:20px}
+  .afit-grip{display:block;position:absolute;top:7px;left:50%;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:rgba(238,244,241,.22)}
+  .afit-window header{touch-action:none}
 }
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  @media(max-width:1023px){.afit-launch,.afit-launch:hover,.afit-launch:active{background:#173e2f}}
-}
-@media(max-width:1023px) and (prefers-reduced-transparency:reduce){
-  .afit-launch,.afit-launch:hover,.afit-launch:active{background:#173e2f;backdrop-filter:none;-webkit-backdrop-filter:none}
+@media(max-height:500px){
+  .afit-window header{grid-template-columns:auto 1fr auto auto;grid-template-areas:"sym title tabs close";padding:6px 10px}
+  .afit-window header .afit-symbol{width:30px;height:30px}.afit-title small{display:none}.afit-tabs{width:200px}.afit-tabs button{min-height:30px}
+  .afit-access{display:none}
 }
 
-/* Afita follows the site's dark surfaces and amber accents. */
-.afit-window{background:#0d1e1a;color:#e8f0eb;border:1px solid #ffffff26;border-radius:22px;box-shadow:0 24px 80px #04100cc0}
-.afit-window header{position:static;min-height:64px;background:#142e27;border-bottom:1px solid #ffffff12;padding:10px 14px;box-shadow:none;backdrop-filter:none}
-.afit-window header b{font-family:var(--head,'Unbounded',sans-serif);font-size:14px}
-.afit-window header small{display:block;color:#afc4b9;font-size:10px;margin-top:4px}
-.afit-window .afit-symbol{background:#0d1e1a;border-color:#f0a92b50}
-.afit-close{border-radius:50%;font-size:26px;color:#c1d2c9}
-.afit-close:hover{background:#ffffff0d;color:#f0a92b}
-.afit-window .afit-access{color:#afc4b9;background:#0d1e1a;border-color:#ffffff12;font-size:10px;padding:8px 14px}
-.afit-tabs{margin:0;padding:8px 12px;gap:6px;background:#0d1e1a;border-bottom:1px solid #ffffff12}
-.afit-tabs button{flex:1;min-height:42px;border-radius:12px;color:#afc4b9;background:transparent;font-family:var(--body,'Golos Text',sans-serif);font-weight:600}
-.afit-tabs button[aria-pressed=true]{background:#f0a92b;color:#14251c;box-shadow:0 3px 12px #0002}
-.afit-window .afit-fallback{background:#142e27;color:#afc4b9;border-top:1px solid #ffffff12;padding:8px 14px}
-.afit-window a{color:#e8f0eb}
-.afit-window iframe{background:#0d1e1a}
-.afit-launch:focus-visible,.afit-window :focus-visible{outline:2px solid #f0a92b;outline-offset:3px}
+/* ---------- движение ---------- */
 @media(prefers-reduced-motion:no-preference){
- .afit-window:not([hidden]){animation:afitaOpen 380ms cubic-bezier(.16,1,.3,1) both;transform-origin:bottom right}
- .afit-window.is-closing{animation:afitaClose 180ms ease-in both;pointer-events:none}
- .afit-window:not([hidden]) .afit-tabs button{animation:none}
- .afit-window:not([hidden]) .afit-tabs button+button{animation-delay:160ms}
- .afit-window iframe{animation:none!important}
- .afit-tabs button,.afit-close{transition:background-color 180ms,color 180ms,box-shadow 180ms}
- @keyframes afitaOpen{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
- @keyframes afitaClose{to{opacity:0;transform:translateY(8px)}}
- @keyframes afitaTab{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  /* кнопка: появляется один раз, знак рисуется заново */
+  .afit-launch{animation:afitArrive .7s var(--af-ease) .6s both}
+  .afit-stroke{stroke-dasharray:1;stroke-dashoffset:0}
+  .afit-stroke.draw,.afit-launch .afit-stroke{animation:afitDraw 1.6s cubic-bezier(.22,.65,.25,1) .9s 1 backwards}
+  .afit-stroke.draw{animation-delay:0s}
+  .afit-launch::after{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;box-shadow:0 0 0 0 rgba(240,169,43,.45);animation:afitRing 2.4s ease-out 1.6s 2}
+  @keyframes afitArrive{from{opacity:0;transform:translateY(16px) scale(.9)}}
+  @keyframes afitDraw{from{stroke-dashoffset:1}}
+  @keyframes afitRing{70%,100%{box-shadow:0 0 0 12px rgba(240,169,43,0)}}
+
+  /* окно раскрывается из кнопки (на ПК и Fold) */
+  .afit-window.is-opening{animation:afitOpen .42s var(--af-ease) both;transform-origin:var(--ox,100%) var(--oy,100%)}
+  .afit-window.is-closing{animation:afitClose .22s ease-in both;transform-origin:var(--ox,100%) var(--oy,100%);pointer-events:none}
+  @keyframes afitOpen{from{opacity:0;transform:scale(.6);border-radius:40px}}
+  @keyframes afitClose{to{opacity:0;transform:scale(.7)}}
+  .afit-window.is-opening header>*,.afit-window.is-opening .afit-body{animation:afitFade .4s var(--af-ease) .12s both}
+  @keyframes afitFade{from{opacity:0;transform:translateY(6px)}}
+
+  /* телефон: лист выезжает снизу */
+  @media(max-width:599px){
+    .afit-window.is-opening{animation:afitSheetIn .42s var(--af-ease) both}
+    .afit-window.is-closing{animation:afitSheetOut .26s ease-in both}
+    @keyframes afitSheetIn{from{transform:translate3d(0,100%,0)}}
+    @keyframes afitSheetOut{to{transform:translate3d(0,100%,0)}}
+  }
+
+  .afit-nudge:not([hidden]){animation:afitNudge .45s var(--af-ease) both;transform-origin:100% 100%}
+  .afit-nudge.out{animation:afitNudgeOut .25s ease-in both}
+  @keyframes afitNudge{from{opacity:0;transform:translateY(8px) scale(.9)}}
+  @keyframes afitNudgeOut{to{opacity:0;transform:scale(.9)}}
 }
-@media(max-width:600px){.afit-window{border-radius:20px}.afit-window header{min-height:60px}.afit-tabs button{min-height:44px}}
-@media(max-height:500px){.afit-window header{min-height:44px;padding:3px 10px}.afit-window header small{display:none}.afit-tabs{padding:4px 10px}.afit-tabs button{min-height:36px}}
-@media(prefers-reduced-motion:reduce){.afit-window iframe,.afit-tabs button{animation:none!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){.afit-launch,.afit-window,.afit-nudge,.afit-stroke,.afit-tabs::before,.afit-dots i{animation:none!important;transition:none!important}}
+@media(prefers-reduced-transparency:reduce){.afit-launch{background:#173e2f;-webkit-backdrop-filter:none;backdrop-filter:none}}
