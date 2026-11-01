@@ -1,5 +1,5 @@
-/* Афита на сайте: кнопка, окно и вкладки «Чат / Задачи».
-   Чат — отдельный сайт assistant.alenafit.com (авторизация и API там), «Задачи» — assistant-tools.html.
+/* Афита на сайте: кнопка, окно и вкладки «Чат / Инструменты».
+   Чат — отдельный сайт assistant.alenafit.com (авторизация и API там), «Инструменты» — assistant-tools.html.
    Анимация: окно раскрывается из кнопки и сворачивается в неё; на телефоне это лист снизу,
    который закрывается свайпом вниз. При «уменьшить движение» всё без анимации. */
 (()=>{'use strict';
@@ -11,12 +11,12 @@
  const reduced=matchMedia('(prefers-reduced-motion: reduce)'),phone=matchMedia('(max-width:599px)');
  let previous=launch,closingTimer=0,failTimer=0;
 
- /* «Задачи» — второй фрейм, создаётся при первом переключении; чат при этом не перезагружается */
+ /* «Инструменты» — второй фрейм, создаётся при первом переключении; чат при этом не перезагружается */
  const tools=document.createElement('iframe');tools.title='Инструменты Афиты';tools.setAttribute('allow','microphone');tools.hidden=true;tools.style.display='none';frame.after(tools);
  const tabs=document.createElement('nav');tabs.className='afit-tabs';tabs.setAttribute('aria-label','Режим помощника');
- ['Чат','Задачи'].forEach((label,index)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.setAttribute('aria-pressed',String(index===0));
+ ['Чат','Инструменты'].forEach((label,index)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.setAttribute('aria-pressed',String(index===0));
   b.onclick=()=>{if(b.getAttribute('aria-pressed')==='true')return;
-   if(index&&!tools.getAttribute('src'))tools.src='assistant-tools.html?embed=1&v=20261101a2';
+   if(index&&!tools.getAttribute('src'))tools.src='assistant-tools.html?embed=1&v=20261101ux';
    frame.hidden=!!index;frame.style.display=index?'none':'';tools.hidden=!index;tools.style.display=index?'block':'none';
    if(loading)loading.hidden=!!index||frame.dataset.ready==='1';
    tabs.querySelectorAll('button').forEach((t,i)=>t.setAttribute('aria-pressed',String(i===index)));

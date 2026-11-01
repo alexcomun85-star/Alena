@@ -39,3 +39,29 @@ button,input,select,textarea{transition:border-color 180ms,background-color 180m
 .task-card:first-child .task-ico .ac{stroke:#14251c}
 .task-card>.task-txt{position:static;text-align:left}
 .task-ico svg{width:22px;height:22px}
+
+/* 01.11.2026: одна навигация — «← Все инструменты» вместо вкладок; плашка «Сохранено · Открыть» */
+.tools-header,.afit-embed .tools-header{display:flex;position:sticky;top:0;z-index:4;min-height:44px;background:#0f231e;border-bottom:1px solid var(--line);backdrop-filter:none}
+.afit-embed .tools-header .tools-brand{display:none}
+.tools-header #back{color:#e8f0eb;font-size:14px;font-weight:600;padding:8px 2px;min-height:44px}
+.tools-header #back:focus-visible{outline:2px solid #f0a92b;outline-offset:2px}
+html[data-view=home] .tools-header{display:none}
+html:not(.afit-embed)[data-view=home] .tools-header{display:flex}
+h1[tabindex]:focus{outline:none}
+.task-card{position:relative}
+.task-card .count{position:absolute;right:14px;top:50%;transform:translateY(-50%);min-width:26px;height:26px;padding:0 7px;border-radius:13px;background:#f0a92b;color:#14251c;font:700 13px/26px 'Golos Text',sans-serif;text-align:center}
+.task-card[data-task=report]{padding-right:52px!important}
+.write-alena{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:52px;border-radius:14px;font-size:15px;margin:4px 0 18px}
+.subtle.save[aria-pressed=true]{color:#f0a92b;border-color:#f0a92b80}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:14px;max-width:calc(100% - 32px);padding:10px 12px 10px 16px;border-radius:14px;background:#e8f0eb;color:#14251c;font-size:14px;font-weight:600;box-shadow:0 8px 24px #0008}
+.toast[hidden]{display:none}
+.toast button{border:0;background:#14251c;color:#f0a92b;font:700 13px 'Golos Text',sans-serif;padding:8px 12px;border-radius:10px;min-height:36px;cursor:pointer}
+.request-preview{margin-top:20px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#142e27}
+.request-preview .group-title{margin:0 0 8px}
+.message-text{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 6px;font-size:14px}
+.btn-link{display:inline-flex;align-items:center;justify-content:center;min-height:44px;text-decoration:none;border-radius:12px}
+.empty{color:var(--muted)}
+@media print{.toast,.tools-header,.write-alena{display:none!important}}
+.add-title{margin:22px 0 4px}
+#request-form .request-preview{margin:18px 0 0}
+#report>.pdf-title{display:none}

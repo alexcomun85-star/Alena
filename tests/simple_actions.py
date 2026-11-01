@@ -5,9 +5,9 @@ with sync_playwright() as p:
  b=p.chromium.launch();page=b.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  for width in (320,390,768,1280):
   page.set_viewport_size({'width':width,'height':844});page.goto('http://localhost:8766/assistant-tools.html')
-  expect(page.locator('.task-card')).to_have_count(6)
+  expect(page.locator('.task-card')).to_have_count(5)
   assert page.locator('input:visible').count()==0
-  page.get_by_role('button',name='Рацион на неделю',exact=True).click()
+  page.locator('[data-task=week]').click()
   page.locator('[name=menuSource][value=catalog]').check()
   page.locator('[name=mode][value=manual]').check()
   assert page.locator('input[type=number]:visible').count()==1
@@ -35,9 +35,9 @@ with sync_playwright() as p:
   expect(page.locator('.calculation-method')).to_contain_text('1264')
   expect(page.locator('.calculation-method a:not([href*="foodsafety.gov"])')).to_have_count(8)
   expect(page.locator('.calculation-method a[href="https://www.foodsafety.gov/food-safety-charts/safe-minimum-internal-temperatures"]')).to_have_count(1)
-  page.get_by_role('button',name='Все возможности Афиты',exact=True).click()
-  expect(page.locator('.task-card')).to_have_count(6)
-  page.get_by_role('button',name='Рацион на неделю',exact=True).click()
+  page.locator('#back').click()
+  expect(page.locator('.task-card')).to_have_count(5)
+  page.locator('[data-task=week]').click()
   page.locator('#week-settings>summary').click()
   expect(page.locator('[name=height]')).to_have_value('160')
   assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')

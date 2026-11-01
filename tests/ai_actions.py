@@ -27,7 +27,7 @@ with sync_playwright() as p:
   route.fulfill(json={'kind':'ai','version':1,'requestId':data['requestId'],'body':body,'model':'test-fixture','generatedAt':'2026-10-30T12:00:00Z'},headers={'Access-Control-Allow-Origin':'http://localhost:8766','Access-Control-Allow-Credentials':'true'})
  page.route('https://assistant.alenafit.com/api/meal-plan**',api)
  page.set_viewport_size({'width':390,'height':844});page.goto('http://localhost:8766/assistant-tools.html')
- page.get_by_role('button',name='Рацион на неделю',exact=True).click()
+ page.locator('[data-task=week]').click()
  expect(page.locator('[name=menuSource][value=ai]')).to_be_enabled()
  page.locator('[name=mode][value=manual]').check();page.locator('#nutrition-target').fill('1800');page.locator('[name=adult]').check()
  page.locator('[name=preferences]').fill('Люблю домашнюю кухню, не предлагать нут.')
@@ -51,7 +51,7 @@ with sync_playwright() as p:
  assert 'Меню составлено ИИ' in txt and 'КБЖУ независимо пересчитаны' in txt
  assert 'Контрольная замена одного блюда' in txt and 'ALENAFIT' in txt
  assert 'Подайте сразу после приготовления.' in txt
- page.reload();page.get_by_role('button',name='Рацион на неделю',exact=True).click()
+ page.reload();page.locator('[data-task=week]').click()
  page.locator('#restore-ai').click();expect(page.locator('.week-meal h3').first).to_have_text('Контрольная замена одного блюда')
  assert len(calls)==2,'offline restore must not call the model'
  state['bad']=True

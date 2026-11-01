@@ -286,3 +286,6 @@ svg .acf{fill:var(--amber,#f0a92b);stroke:none}
 @media(max-width:599px){
   .afit-window{top:calc(env(safe-area-inset-top,0px) + 8px);height:calc(100dvh - env(safe-area-inset-top,0px) - 8px)}
 }
+
+/* «Инструменты» длиннее «Задач»: в низком окне шире переключатель */
+@media(max-height:500px){.afit-tabs{width:240px}}
