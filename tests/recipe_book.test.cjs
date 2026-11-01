@@ -5,7 +5,7 @@ ok(book.length>=30,'book has pilot recipes');
 const ids=new Set();
 for(const r of book){
  ok(!ids.has(r.id),'unique '+r.id);ids.add(r.id);
- ok(r.ing.length>=2&&r.ing.length<=8,'2–8 products '+r.id);ok(r.time<=45,'time '+r.id);ok(r.steps.length>=2,'steps '+r.id);
+ const batch=!!r.plan;ok(r.ing.length>=2&&r.ing.length<=(batch?12:8),'products count '+r.id);ok(r.time<=(batch?120:45),'time '+r.id);if(batch){ok(r.days>=3&&r.days<=4&&r.plan.length===r.days,'plan per day '+r.id);ok(r.storage.some(x=>/3–4 дня/.test(x))&&r.storage.some(x=>/2 часа/.test(x)),'storage rules '+r.id)}ok(r.steps.length>=2,'steps '+r.id);
  const n=r.n;ok(n.k>40&&n.k<900,'kcal range '+r.id);
  const fromMacros=n.p*4+n.f*9+n.c*4;ok(Math.abs(fromMacros-n.k)<=20||Math.abs(fromMacros-n.k)/n.k<.12,'kcal matches macros (fibre in USDA carbs) '+r.id);
  ok(r.good.length>=1,'has benefit '+r.id);

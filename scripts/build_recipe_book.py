@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'data' / 'recipe-book.src.json'
 OUT = ROOT / 'js' / 'recipe-book.js'
 
-MEALS = {'breakfast': 'Завтрак', 'lunch': 'Обед', 'soup': 'Суп', 'dinner': 'Ужин', 'snack': 'Перекус', 'dessert': 'Десерт'}
+MEALS = {'breakfast': 'Завтрак', 'lunch': 'Обед', 'soup': 'Суп', 'dinner': 'Ужин', 'snack': 'Перекус', 'dessert': 'Десерт', 'batch': 'Готовка на 3–4 дня'}
 WHOLE_GRAINS = {'Гречка сухая', 'Овсяные хлопья сухие', 'Хлеб цельнозерновой'}
 CALCIUM_DAIRY = {'Молоко 2,5%', 'Молоко 3,2%', 'Кефир 1%', 'Кефир 2,5%', 'Ряженка 4%', 'Йогурт натуральный 2%',
                  'Греческий йогурт 2%', 'Творог 2%', 'Творог 5%', 'Творог 9%', 'Сыр твёрдый (типа Российского)', 'Сыр моцарелла'}
@@ -25,7 +25,9 @@ REFS = {
     'who': ['ВОЗ: здоровое питание', 'https://www.who.int/news-room/fact-sheets/detail/healthy-diet'],
     'issn': ['ISSN: позиция по белку, 2017', 'https://doi.org/10.1186/s12970-017-0177-8'],
     'usda': ['USDA FoodData Central', 'https://fdc.nal.usda.gov/'],
+    'mayo': ['Mayo Clinic: сколько хранить готовую еду', 'https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/expert-answers/food-safety/faq-20058500'],
 }
+STORAGE = ['Остудите еду и уберите в холодильник не позже чем через 2 часа после готовки.', 'Храните в закрытых контейнерах в холодильнике и съешьте за 3–4 дня. То, что не успеете, заморозьте сразу, в первый день.', 'Разогревайте до горячего состояния по всей порции (74 °C), перемешав в середине.']
 
 
 def r(x, places='0.1'):
@@ -65,10 +67,13 @@ def build():
         for i in req + opt:
             if i not in ids:
                 errors.append(f'{rid}: id «{i}» нет в recipe-engine.js')
-        if len(rec['ing']) > 8:
-            errors.append(f'{rid}: больше 8 продуктов')
-        if rec['time'] > 45:
-            errors.append(f'{rid}: дольше 45 минут')
+        batch = rec['meal'] == 'batch'
+        if len(rec['ing']) > (12 if batch else 8):
+            errors.append(f'{rid}: слишком много продуктов')
+        if rec['time'] > (120 if batch else 45):
+            errors.append(f'{rid}: слишком долго')
+        if batch and (len(rec.get('plan', [])) != rec.get('days', 0) or rec['days'] > 4):
+            errors.append(f'{rid}: план должен быть на каждый день, не больше 4 дней')
         tot = {'k': 0, 'p': 0, 'f': 0, 'c': 0}
         veg = grains = legumes = dairy = sugar = 0
         contains, ing_out = [], []
@@ -119,13 +124,16 @@ def build():
         if any(x[2] in SALTY for x in rec['ing']):
             good.append('Учтите: солёные огурцы и квашеная капуста дают много соли, поэтому блюдо почти не солите. ВОЗ советует не больше 5 г соли в день.')
             refs.add('who')
+        if batch:
+            refs.add('mayo')
         if not good:
             errors.append(f'{rid}: нет ни одного обоснованного пункта пользы')
         out.append({
             'id': rid, 'title': rec['title'], 'meal': rec['meal'], 'mealName': MEALS[rec['meal']],
             'servings': n, 'time': rec['time'], 'required': req, 'optional': opt, 'contains': sorted(set(contains)),
             'ing': ing_out, 'taste': rec.get('taste', ''), 'steps': rec['steps'], 'note': rec.get('note', ''),
-            'n': per, 'good': good, 'tag': rec.get('tag', ''), 'refs': [REFS[k] for k in ('usda', 'issn', 'who') if k in refs],
+            'n': per, 'good': good, 'tag': rec.get('tag', ''), 'refs': [REFS[k] for k in ('usda', 'issn', 'who', 'mayo') if k in refs],
+            **({'days': rec['days'], 'plan': rec['plan'], 'storage': STORAGE + rec.get('storage', [])} if batch else {}),
         })
     if errors:
         print('\n'.join(errors), file=sys.stderr)
