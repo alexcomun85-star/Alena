@@ -68,8 +68,9 @@ with sync_playwright() as p:
         page.locator('[name=message]').fill('<script>alert(1)</script>')
         assert page.locator('#result script').count()==0
         href=page.locator('#result a').get_attribute('href')
-        assert 'Gym_mom1988' in href and 'text=%D0%A1%D0%A2%D0%90%D0%A0%D0%A2' in href
-        assert page.locator('.message-text').inner_text().startswith('СТАРТ (Афита)')
+        assert 'Gym_mom1988' in href and 'text=' in href
+        assert page.locator('.message-text').inner_text().startswith('Здравствуйте, Алёна! Пишу с сайта через Афиту.')
+        assert 'СТАРТ' not in page.locator('#work').inner_text()
         assert page.locator('[name=consent]').count()==0
         go(page,'report')
         expect(page.locator('#report')).to_contain_text('104 ккал')
