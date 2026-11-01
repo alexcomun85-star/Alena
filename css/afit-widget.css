@@ -141,3 +141,19 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch,body.afit-chat-open .
 }
 @media(prefers-reduced-motion:reduce){.afit-launch,.afit-window,.afit-nudge,.afit-stroke,.afit-tabs::before,.afit-dots i{animation:none!important;transition:none!important}}
 @media(prefers-reduced-transparency:reduce){.afit-launch{background:#173e2f;-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+/* ---------- кнопка: почти прозрачное стекло (01.11.2026) ----------
+   Фон едва тонированный, за ним размытая страница; светлый край и блик сверху дают объём стекла. */
+.afit-launch,.afit-launch:hover{
+  background:linear-gradient(150deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.04) 45%,rgba(255,255,255,.08) 100%),rgba(13,30,26,.10);
+  -webkit-backdrop-filter:blur(18px) saturate(160%) brightness(1.05);backdrop-filter:blur(18px) saturate(160%) brightness(1.05);
+  border:1px solid rgba(255,255,255,.28);
+  box-shadow:0 10px 30px -12px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(255,255,255,.06)}
+.afit-launch:hover{background:linear-gradient(150deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(255,255,255,.10) 100%),rgba(13,30,26,.14)}
+.afit-launch .afit-symbol{background:transparent;border-color:rgba(255,255,255,.22)}
+.afit-launch .afit-label,.afit-launch .afit-mark-svg{filter:drop-shadow(0 1px 2px rgba(0,0,0,.55))}
+.afit-launch small{color:rgba(238,244,241,.85)}
+@media(max-width:1023px){.afit-launch .afit-symbol{border:0}}
+/* где стекло не поддерживается или прозрачность отключена — плотная кнопка, чтобы знак читался */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.afit-launch,.afit-launch:hover{background:rgba(16,44,37,.88)}}
+@media(prefers-reduced-transparency:reduce){.afit-launch,.afit-launch:hover{background:#173e2f;-webkit-backdrop-filter:none;backdrop-filter:none}}
