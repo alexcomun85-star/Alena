@@ -401,3 +401,19 @@ body.pilot-v2 main>section#who{padding-top:12px!important}
 /* карточки внутри окна: свой край, чтобы соседние не сливались */
 body.pilot-v2.editorial-refine #who .who article,body.pilot-v2 #tools .tool-group{border:1px solid var(--win-edge)!important}
 @media(max-width:599px){body.pilot-v2 .pswipe{gap:14px}body.pilot-v2 .pswipe>*{flex-basis:80%}}
+
+/* исследования (01.11.2026): вместо подчёркнутых ссылок — две карточки-перехода в стиле сайта */
+body.pilot-v2 .pilot-science .w{display:grid!important;gap:14px;padding:22px 20px!important}
+body.pilot-v2 .pilot-science .sci-lead{margin:0;color:var(--muted);line-height:1.55}
+body.pilot-v2 .pilot-science .sci-lead b{color:var(--ink)}
+.sci-links{display:grid;gap:10px}
+body.pilot-v2 .pilot-science a.sci-link{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;
+  background:var(--band);border:1px solid var(--win-edge);color:var(--ink);text-decoration:none;transition:border-color .2s,background .2s,transform .15s}
+.sci-link .dock-glass{margin:0;width:38px;height:38px}
+.sci-link span{min-width:0}
+.sci-link b{display:block;font:700 15px/1.25 var(--display)}
+.sci-link small{display:block;margin-top:2px;font-size:12.5px;color:var(--muted)}
+.sci-link em{font-style:normal;color:var(--amber);font-size:18px}
+body.pilot-v2 .pilot-science a.sci-link:hover{border-color:rgba(240,169,43,.5)}
+body.pilot-v2 .pilot-science a.sci-link:active{transform:scale(.98)}
+@media(min-width:600px){.sci-links{grid-template-columns:1fr 1fr}}

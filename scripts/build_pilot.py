@@ -18,7 +18,7 @@ TG_START = "https://t.me/Gym_mom1988?text=%D0%A1%D0%A2%D0%90%D0%A0%D0%A2"  # ?te
 
 # --- служебное: пилот не индексируется, своя стилевая надстройка
 must('<meta name="viewport"', '<meta name="robots" content="noindex,nofollow">\n<meta name="viewport"')
-must('<link rel="canonical" href="https://alenafit.com/">', '<link rel="canonical" href="https://alenafit.com/">\n<link rel="stylesheet" href="css/pilot-review.css?v=1">')
+must('<link rel="canonical" href="https://alenafit.com/">', '<link rel="canonical" href="https://alenafit.com/">\n<link rel="stylesheet" href="css/pilot-review.css?v=2">')
 must('<title>', '<title>[Пилот] ')
 
 # --- 1. дескриптор под логотипом

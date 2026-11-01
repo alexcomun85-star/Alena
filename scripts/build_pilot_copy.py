@@ -106,9 +106,8 @@ h = re.sub(r'<div class="about-stat">.*?</div>\s*', '', h, count=1, flags=re.S)
 h = h.replace('\n    <a class="btn btn-line" href="#plans">Форматы и цены</a>', '', 1)
 
 # 13. Исследования — одна строка со ссылками
-h, n = re.subn(r'(<section class="g pilot-science" id="research">\s*<div class="w">).*?(</div>\s*</section>)',
-    lambda m: m.group(1) + '\n      <p><b>Подход опирается на исследования.</b> Разборы простым языком — <a href="nauka.html">на сайте</a> и <a href="https://t.me/alena_gymmom" target="_blank" rel="noopener">в канале</a>.</p>\n    ' + m.group(2),
-    h, count=1, flags=re.S)
+SCI = '<section class="g pilot-science" id="research">\n    <div class="w">\n      <p class="sci-lead"><b>Подход опирается на исследования.</b> Разборы простым языком:</p>\n      <div class="sci-links">\n        <a class="sci-link" href="nauka.html"><i class="dock-glass" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20"/><path class="ac" d="M8.5 13.5c2.1-2.7 4.8-4.2 8.2-5"/></svg></i><span><b>Научные разборы</b><small>8 исследований на сайте</small></span><em aria-hidden="true">→</em></a>\n        <a class="sci-link" href="https://t.me/alena_gymmom" target="_blank" rel="noopener"><i class="dock-glass" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4L3 11l6 2.2"/><path class="ac" d="M21 4l-4 16-8-6.8L21 4"/></svg></i><span><b>Канал в Telegram</b><small>Новые разборы по мере выхода</small></span><em aria-hidden="true">↗</em></a>\n      </div>\n    </div>\n  </section>'
+h, n = re.subn(r'<section class="g pilot-science" id="research">.*?</section>', lambda m: SCI, h, count=1, flags=re.S)
 if not n:
     raise SystemExit('нет блока исследований')
 # подвал: кнопка «Написать в Telegram» стоит сразу под такой же кнопкой финального блока — убираем

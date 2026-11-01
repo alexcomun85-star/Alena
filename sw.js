@@ -5,7 +5,7 @@
 const VERSION = 'alenafit-release-20261101-v62-afita-dock';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
-  "./css/pilot-review.css?v=1",
+  "./css/pilot-review.css?v=2",
   "./js/pilot-phone.js?v=2",
   "./js/pilot-anchor.js?v=1",
   "./js/nutrition-targets.js?v=20261030simple1",
