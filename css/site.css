@@ -1263,3 +1263,9 @@ a .tg-ico{flex:none;display:inline-block;width:18px;height:18px;vertical-align:-
 }
 @media (min-width:1024px) and (max-width:1279px){.bar .w{gap:8px}.brand{--lock:32px;gap:8px}}
 @media (min-width:1024px) and (max-width:1199px){.bar .dd-btn{padding:0 5px}}
+/* Мой зал: карточки не шире панели — длинные названия переносятся, кнопки остаются внутри */
+.zal-list{grid-template-columns:minmax(0,1fr)}
+.zal-item{min-width:0}
+.zal-go b,.zal-go span{overflow-wrap:break-word}
+/* телефон: текст на всю ширину карточки, кнопки порядка — строкой справа снизу */
+@media (max-width:479px){.zal-item{flex-wrap:wrap;gap:0;padding:4px 4px 2px}.zal-go{flex:1 1 100%;padding:10px 12px 2px}.zal-ctl{margin-left:auto;gap:2px}.zal-ctl button{width:40px;height:40px}}
