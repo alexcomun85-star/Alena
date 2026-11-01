@@ -157,3 +157,19 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch,body.afit-chat-open .
 /* где стекло не поддерживается или прозрачность отключена — плотная кнопка, чтобы знак читался */
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.afit-launch,.afit-launch:hover{background:rgba(16,44,37,.88)}}
 @media(prefers-reduced-transparency:reduce){.afit-launch,.afit-launch:hover{background:#173e2f;-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+/* ---------- кнопка: «воздушная» (01.11.2026, ещё прозрачнее) ----------
+   Почти без тона и с лёгким размытием — страница видна сквозь кнопку; объём держат тонкий светлый край и блик. */
+.afit-launch,.afit-launch:hover{
+  background:linear-gradient(160deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,0) 50%,rgba(255,255,255,.03) 100%);
+  -webkit-backdrop-filter:blur(2.5px) saturate(130%);backdrop-filter:blur(2.5px) saturate(130%);
+  border:1px solid rgba(255,255,255,.24);
+  box-shadow:0 8px 24px -14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.30)}
+.afit-launch:hover{background:linear-gradient(160deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.02) 50%,rgba(255,255,255,.06) 100%)}
+.afit-launch .afit-symbol{border-color:rgba(255,255,255,.16)}
+.afit-launch .afit-label,.afit-launch .afit-mark-svg{filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}
+/* лёгкое парение: 3 px вверх-вниз, очень медленно */
+@media(prefers-reduced-motion:no-preference){
+  .afit-launch .afit-symbol{animation:afitFloat 6s ease-in-out 2.5s infinite}
+  @keyframes afitFloat{50%{transform:translateY(-3px)}}
+}
