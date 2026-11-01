@@ -17,6 +17,8 @@ _af_db_path = '/state/afit_access.sqlite'
 def _af_db():
     db = _af_sql.connect(_af_db_path, timeout=10)
     db.execute('CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, used INTEGER NOT NULL DEFAULT 0, member_until INTEGER NOT NULL DEFAULT 0)')
+    if 'used_day' not in [r[1] for r in db.execute('PRAGMA table_info(sessions)')]:
+        db.execute('ALTER TABLE sessions ADD COLUMN used_day INTEGER NOT NULL DEFAULT -1')
     db.execute('CREATE TABLE IF NOT EXISTS login_attempts (id INTEGER PRIMARY KEY, sid TEXT NOT NULL, at INTEGER NOT NULL)')
     return db
 
@@ -34,6 +36,8 @@ def _af_session(handler):
     handler._af_cookie = 'afit_session='+sid+'.'+signature+'; Path=/; Max-Age=31536000; Secure; HttpOnly; SameSite=Lax'
     with _af_db() as db:
         db.execute('INSERT OR IGNORE INTO sessions(id) VALUES (?)', (sid,))
+        day = int(_af_time.time()) // 86400
+        db.execute('UPDATE sessions SET used=0, used_day=? WHERE id=? AND used_day<>?', (day, sid, day))
         row = db.execute('SELECT used, member_until FROM sessions WHERE id=?', (sid,)).fetchone()
     return sid, row[0], row[1] > int(_af_time.time())
 
@@ -51,7 +55,7 @@ def _af_get(self):
     if self.path.split('?')[0] != '/session': return _af_original_get(self)
     try:
         sid, used, member = _af_session(self)
-        return self.send_json(200, {'remaining': max(0, 30-used), 'member': member, 'limit': 30})
+        return self.send_json(200, {'remaining': max(0, 5-used), 'member': member, 'limit': 5})
     except Exception:
         return self.send_json(503, {'error': 'Не удалось проверить доступ. Попробуйте позже.'})
 
@@ -101,7 +105,7 @@ def _af_post(self):
             with _af_db() as db:
                 db.execute('BEGIN IMMEDIATE')
                 used = db.execute('SELECT used FROM sessions WHERE id=?', (sid,)).fetchone()[0]
-                if used >= 30:
+                if used >= 5:
                     return self.send_json(401, {'error': 'Для продолжения войдите как участник ALENAFIT.', 'code': 'member_required', 'remaining': 0})
                 db.execute('UPDATE sessions SET used=used+1 WHERE id=?', (sid,))
     except Exception:

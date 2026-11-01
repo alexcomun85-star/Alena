@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import {createServer,SQLite,repairBudgets} from './server.mjs';
+import {createServer,SQLite,repairBudgets,verifyMember} from './server.mjs';
 const DB=new SQLite(':memory:');
 assert.equal(new SQLite(':memory:').sqlite.prepare('SELECT COUNT(*) AS n FROM ai_requests').get().n,0);
 const server=createServer({DB},{trustedProxy:false});await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base='http://127.0.0.1:'+server.address().port;
 try{
- let r=await fetch(base+'/api/meal-plan/status',{headers:{Origin:'https://alenafit.com'}});assert.equal(r.status,200);const status=await r.json();assert.equal(status.ready,false);assert.equal(status.revision,'title-check-20261031-11');assert.equal(r.headers.get('Access-Control-Allow-Origin'),'https://alenafit.com');
+ let r=await fetch(base+'/api/meal-plan/status',{headers:{Origin:'https://alenafit.com'}});assert.equal(r.status,200);const status=await r.json();assert.equal(status.ready,false);assert.equal(status.revision,'guest-limits-20261101-title-check-20261031-11');assert.equal(r.headers.get('Access-Control-Allow-Origin'),'https://alenafit.com');
  assert.equal((await fetch(base+'/api/meal-plan/status',{headers:{Origin:'https://evil.invalid'}})).status,403);
  assert.equal((await fetch(base+'/api/meal-plan',{method:'OPTIONS',headers:{Origin:'https://alenafit.com'}})).status,204);
  assert.equal((await fetch(base+'/api/meal-plan',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,503);
@@ -29,3 +29,9 @@ assert.equal(repairDB.sqlite.prepare('SELECT used FROM ai_budget WHERE bucket=?'
 assert.equal(repairDB.sqlite.prepare("SELECT COUNT(*) AS n FROM ai_requests WHERE status='failed_refunded'").get().n,5);
 repairBudgets(repairDB,time);assert.equal(repairDB.sqlite.prepare('SELECT used FROM ai_budget WHERE bucket=?').get('global:'+day).used,7,'restart repair is idempotent');
 console.log('Existing quota repair: legacy failed/stale menus credited, real service attempts retained, inflated counts repaired idempotently OK');
+
+assert.equal(await verifyMember(undefined,()=>{throw Error('no request without cookie')}),false);
+assert.equal(await verifyMember('signed-cookie',async()=>Response.json({member:true})),true);
+assert.equal(await verifyMember('forged-cookie',async()=>Response.json({member:false})),false);
+assert.equal(await verifyMember('cookie',async()=>{throw Error('unavailable')}),false);
+console.log('Password membership: checked through existing server session; missing, invalid and unavailable sessions stay guests OK');

@@ -12,19 +12,19 @@ with sync_playwright() as p:
  def api(route):
   r=route.request
   if r.method=='OPTIONS':
-   route.fulfill(status=204,headers={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'content-type','Access-Control-Allow-Methods':'GET,POST,OPTIONS'});return
+   route.fulfill(status=204,headers={'Access-Control-Allow-Origin':'http://localhost:8766','Access-Control-Allow-Credentials':'true','Access-Control-Allow-Headers':'content-type','Access-Control-Allow-Methods':'GET,POST,OPTIONS'});return
   if r.method=='GET':
-   route.fulfill(json={'ready':True,'message':'Тестовое подключение: контрольные ответы, не реальная генерация.'},headers={'Access-Control-Allow-Origin':'*'});return
+   route.fulfill(json={'ready':True,'message':'Тестовое подключение: контрольные ответы, не реальная генерация.'},headers={'Access-Control-Allow-Origin':'http://localhost:8766','Access-Control-Allow-Credentials':'true'});return
   data=r.post_data_json;calls.append(data)
   assert 'weight' not in data and 'height' not in data and 'age' not in data
   assert data['targets']['k']==1800
   if state['reject']:
-   route.fulfill(status=502,json={'code':'validation_failed','error':'Меню не прошло проверку','reason':'В приготовлении есть неучтённый ингредиент: масло.'},headers={'Access-Control-Allow-Origin':'*'});return
+   route.fulfill(status=502,json={'code':'validation_failed','error':'Меню не прошло проверку','reason':'В приготовлении есть неучтённый ингредиент: масло.'},headers={'Access-Control-Allow-Origin':'http://localhost:8766','Access-Control-Allow-Credentials':'true'});return
   if state['bad']:body={'days':[]}
   elif data['action']=='replace':
    meal=copy.deepcopy(fixture['days'][data['day']]['meals'][data['index']]);meal['title']='Контрольная замена одного блюда';body={'meals':[meal]}
   else:body=fixture
-  route.fulfill(json={'kind':'ai','version':1,'requestId':data['requestId'],'body':body,'model':'test-fixture','generatedAt':'2026-10-30T12:00:00Z'},headers={'Access-Control-Allow-Origin':'*'})
+  route.fulfill(json={'kind':'ai','version':1,'requestId':data['requestId'],'body':body,'model':'test-fixture','generatedAt':'2026-10-30T12:00:00Z'},headers={'Access-Control-Allow-Origin':'http://localhost:8766','Access-Control-Allow-Credentials':'true'})
  page.route('https://assistant.alenafit.com/api/meal-plan**',api)
  page.set_viewport_size({'width':390,'height':844});page.goto('http://localhost:8766/assistant-tools.html')
  page.get_by_role('button',name='Рацион на неделю',exact=True).click()

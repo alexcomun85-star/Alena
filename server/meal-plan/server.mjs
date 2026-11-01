@@ -23,12 +23,16 @@ export function repairBudgets(DB,time=Date.now()){
  }catch(e){db.exec('ROLLBACK');throw e;}
 }
 const origins=new Set(['https://alenafit.com','https://www.alenafit.com','https://assistant.alenafit.com']);
+export async function verifyMember(cookie,sessionFetcher=fetch){
+ if(!cookie)return false;
+ try{const response=await sessionFetcher('https://assistant.alenafit.com/session',{headers:{Cookie:cookie},redirect:'error',signal:AbortSignal.timeout(5000)});return response.ok&&(await response.json()).member===true;}catch{return false;}
+}
 export function createServer(env,{fetcher=fetch,trustedProxy=true}={}){
  const server=http.createServer(async(req,res)=>{
   const origin=req.headers.origin;
   const cors={'Cache-Control':'no-store','Content-Type':'application/json; charset=utf-8','Vary':'Origin'};
   if(origin&&!origins.has(origin)){res.writeHead(403,cors);res.end('{"error":"Недопустимый источник запроса"}');return;}
-  if(origin)Object.assign(cors,{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type'});
+  if(origin)Object.assign(cors,{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Credentials':'true','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type'});
   if(req.method==='OPTIONS'){res.writeHead(204,cors);res.end();return;}
   const path=new URL(req.url,'http://localhost').pathname;
   if(!['/api/meal-plan','/api/meal-plan/status'].includes(path)){res.writeHead(404,cors);res.end('{}');return;}
@@ -43,7 +47,9 @@ export function createServer(env,{fetcher=fetch,trustedProxy=true}={}){
     const actor=trustedProxy?req.headers['x-real-ip']:req.socket.remoteAddress;
     if(typeof actor!=='string'||actor.length>100){res.writeHead(503,cors);res.end('{}');return;}
     const request=new Request('http://localhost/api/meal-plan',{method:'POST',headers:{'Content-Type':'application/json','CF-Connecting-IP':actor},body:Buffer.concat(chunks)});
-    response=await aiRoute(request,env,{fetcher});
+    // Membership is checked by the existing password gate; client flags are ignored.
+    const member=await verifyMember(req.headers.cookie);
+    response=await aiRoute(request,{...env,AFITA_VERIFIED_MEMBER:member},{fetcher});
    }
    res.writeHead(response.status,{...Object.fromEntries(response.headers),...cors});res.end(await response.text());
   }catch{res.writeHead(500,cors);res.end('{"error":"Сервис временно недоступен"}');}
