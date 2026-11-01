@@ -211,7 +211,7 @@ def t_afit(browser):
         # с 01.11.2026 на телефоне и Fold Афита — центр нижней панели, на ПК — капсула в углу
         sel='.dock-afit' if width<1024 else '.afit-launch'
         launcher=p.locator(sel)
-        p.wait_for_function("[...document.querySelectorAll('.afit-launch,#afit-window,.dock-afit-glass')].every(e=>e.getAnimations().every(a=>a.playState!=='running'))", timeout=5000)
+        p.wait_for_function("[...document.querySelectorAll('.afit-launch,#afit-window,.dock-afit-glass')].every(e=>e.getAnimations().every(a=>a.playState!=='running'||a.effect.getTiming().iterations===Infinity))", timeout=5000)
         launch_box=launcher.bounding_box()
         if width<1024:
             check('Афита: в нижней панели '+str(width), True, p.locator('.dock .dock-afit').is_visible())
@@ -224,7 +224,7 @@ def t_afit(browser):
         p.click(sel)
         check('Афит: открыт '+str(width), True, p.is_visible('#afit-window'))
         check('Афит: фирменный знак '+str(width), True, p.locator('.afit-window .afit-symbol img').evaluate('(e)=>e.complete && e.naturalWidth>0'))
-        p.wait_for_function("[...document.querySelectorAll('.afit-launch,#afit-window')].every(e=>e.getAnimations().every(a=>a.playState!=='running'))", timeout=5000)
+        p.wait_for_function("[...document.querySelectorAll('.afit-launch,#afit-window')].every(e=>e.getAnimations().every(a=>a.playState!=='running'||a.effect.getTiming().iterations===Infinity))", timeout=5000)
         box=p.locator('#afit-window').bounding_box()
         check('Афит: панель внутри экрана '+str(width), True, box['x']>=0 and box['y']>=0 and box['x']+box['width']<=width and box['y']+box['height']<=height)
         check('Афит: ссылка резервного открытия '+str(width), 'https://assistant.alenafit.com/', p.locator('.afit-fallback a').get_attribute('href'))

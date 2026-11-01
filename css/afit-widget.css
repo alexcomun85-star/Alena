@@ -214,3 +214,14 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch,body.afit-chat-open .
 .dock .dock-afit{gap:0}
 .dock .dock-afit .dock-afit-glass{margin:-6px 0 -2px}
 .dock .dock-afit span{line-height:inherit}
+
+/* ---------- знак Афиты рисуется циклично, как логотип в шапке (01.11.2026) ----------
+   Янтарная дуга прорисовывается за 1,8 с, держится, мягко гаснет и рисуется снова. Цикл 7 с. */
+.dock-afit-mark{display:block;width:22px;height:auto;overflow:visible;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+.dock-afit-glass img{display:none}
+@media(prefers-reduced-motion:no-preference){
+  .afit-stroke-loop{stroke-dasharray:1;stroke-dashoffset:0;animation:afitDrawLoop 7s ease-in-out 1s infinite!important}
+  @keyframes afitDrawLoop{0%{stroke-dashoffset:1;opacity:1}30%{stroke-dashoffset:0}84%{stroke-dashoffset:0;opacity:1}94%{stroke-dashoffset:0;opacity:0}100%{stroke-dashoffset:1;opacity:0}}
+  .dock-afit-glass{animation:afitDockIn .6s cubic-bezier(.2,.8,.25,1) .4s both,afitGlow 7s ease-in-out 1s infinite}
+  @keyframes afitGlow{20%,40%{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 0 3px rgba(240,169,43,.2)}0%,70%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 0 3px rgba(240,169,43,.06)}}
+}
