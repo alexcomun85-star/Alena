@@ -202,3 +202,15 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch,body.afit-chat-open .
   }
 }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.dock-afit-glass{background:#173e2f}}
+
+/* Афита встроена в нижнюю панель (01.11.2026): не выходит за её край.
+   Круг того же роста, что и строка значков, выделен стеклом и янтарным контуром — центр панели виден без «выпирания». */
+.dock .dock-afit{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.dock-afit-glass{width:34px;height:34px;margin:0;border-color:rgba(240,169,43,.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 0 3px rgba(240,169,43,.08)}
+.dock-afit-glass img{width:20px;height:20px}
+.dock .dock-afit span{font-size:11.5px;line-height:1.1}
+/* подпись «Афита» на одной линии с остальными: круг выше значков на 12 px — компенсируем поровну сверху и снизу */
+.dock .dock-afit{gap:0}
+.dock .dock-afit .dock-afit-glass{margin:-6px 0 -2px}
+.dock .dock-afit span{line-height:inherit}

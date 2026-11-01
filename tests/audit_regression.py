@@ -216,8 +216,9 @@ def t_afit(browser):
         if width<1024:
             check('Афита: в нижней панели '+str(width), True, p.locator('.dock .dock-afit').is_visible())
             check('Афита: угловая кнопка скрыта '+str(width), False, p.locator('.afit-launch').is_visible())
-            glass=p.locator('.dock-afit-glass').bounding_box()
-            check('Афита: круг не меньше 44 px '+str(width), True, glass['width']>=44 and glass['height']>=44)
+            glass=p.locator('.dock-afit-glass').bounding_box();dock_box=p.locator('.dock').bounding_box()
+            check('Афита: зона нажатия не меньше 44 px '+str(width), True, launch_box['width']>=44 and launch_box['height']>=44)
+            check('Афита: круг не выходит за панель '+str(width), True, glass['y']>=dock_box['y'] and glass['y']+glass['height']<=dock_box['y']+dock_box['height'])
             check('Афита: доступное имя '+str(width), True, p.get_by_role('link',name='Афита',exact=False).count()>0)
             p.screenshot(path=str(OUT / f'afit-compact-{width}.png'))
         p.click(sel)
