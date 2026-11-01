@@ -78,8 +78,10 @@ def main():
         check('корзина: флажок читается без замены на вопрос',True,'[ ]' in txt and '?' not in txt)
         p.close()
         p=fresh(ctx,'index.html');p.click('#dockMenu')
-        check('меню: полупрозрачный фон',True,'0.78' in p.locator('#mnav').evaluate('(e)=>getComputedStyle(e).backgroundColor'))
-        check('меню: есть размытие',True,'18px' in p.locator('#mnav').evaluate('(e)=>getComputedStyle(e).backdropFilter'))
+        # 01.11.2026: меню прозрачнее (стекло); проверяем смысл, а не точное число
+        bg=p.locator('#mnav').evaluate('(e)=>getComputedStyle(e).backgroundColor')
+        check('меню: полупрозрачный фон',True,bg.startswith('rgba') and float(bg.rstrip(')').split(',')[-1])<0.8)
+        check('меню: есть размытие',True,'blur(' in p.locator('#mnav').evaluate('(e)=>getComputedStyle(e).backdropFilter'))
         p.wait_for_function("getComputedStyle(document.querySelector('.mnav-in')).opacity==='1'")
         p.screenshot(path=str(OUT/'glass-menu-mobile.png'))
         ctx.close();b.close()

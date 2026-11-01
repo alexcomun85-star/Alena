@@ -247,3 +247,19 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch,body.afit-chat-open .
 .dock .dock-afit .dock-glass{border-color:rgba(240,169,43,.5);background:linear-gradient(160deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.02) 55%,rgba(255,255,255,.06) 100%),rgba(13,30,26,.35)}
 .dock .dock-afit .dock-afit-glass{margin:-6px 0 -2px}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.dock-glass{background:rgba(255,255,255,.06)}}
+
+/* ---------- мобильное меню (01.11.2026): прозрачнее, разделы выпадают ----------
+   Фон — тёмное стекло: страница угадывается сквозь меню, текст читается за счёт сильного размытия. */
+@media(max-width:1023px){
+  .mnav{background:rgba(13,30,26,.52)!important;-webkit-backdrop-filter:blur(24px) saturate(140%)!important;backdrop-filter:blur(24px) saturate(140%)!important}
+  .mg{border-color:rgba(255,255,255,.08)}
+  .mg summary{transition:color .2s}
+  .mg[open] summary{color:var(--amber)}
+  .mg summary .chev{transition:transform .3s cubic-bezier(.2,.8,.25,1)}
+  .mg[open] .mg-links{animation:none!important}
+  .mg-links{padding-bottom:12px}
+  .mnav-in .mg-links a{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)!important}
+  .mnav-in .mg-links a:active,.mnav-in .mg-links a:hover{background:rgba(255,255,255,.09)}
+}
+@media(max-width:1023px) and (prefers-reduced-transparency:reduce){.mnav{background:#0d1e1a!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){@media(max-width:1023px){.mnav{background:rgba(13,30,26,.94)!important}}}
