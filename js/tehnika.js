@@ -46,7 +46,7 @@
   function open(s,name,from){
     if(!Object.prototype.hasOwnProperty.call(C,s))return;
     if(!dlg){dlg=document.createElement('dialog');dlg.className='how-dlg';dlg.setAttribute('aria-label','Техника упражнения');
-      dlg.innerHTML='<div class="how-in"><button type="button" class="how-x" aria-label="Закрыть">×</button><img alt="" width="720" height="960"><div class="how-copy"></div><p class="small">Общая схема техники. Сомневаетесь, что делаете правильно, — снимите подход на видео и пришлите Алёне, напишите «СТАРТ».</p></div>';
+      dlg.innerHTML='<div class="how-in"><button type="button" class="how-x" aria-label="Закрыть">×</button><img alt="" width="720" height="960"><div class="how-copy"></div><p class="small">Общая схема техники. Сомневаетесь, что делаете правильно, — снимите подход на видео и пришлите Алёне, напишите мне в Telegram.</p></div>';
       document.body.appendChild(dlg);
       dlg.addEventListener('click',function(e){if(e.target===dlg||e.target.closest('.how-x'))dlg.close()});
       dlg.addEventListener('close',function(){if(dlg._from)try{dlg._from.focus()}catch(e){}})}

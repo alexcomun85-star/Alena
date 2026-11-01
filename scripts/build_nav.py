@@ -20,7 +20,7 @@ MENU = [
     ("me", "Об Алёне", [
         ("./#about", "Подход", "Тренировки, которые делают жизнь лучше"),
         ("./#creds", "Образование и соревнования", "Дипломы и бронза WRPF"),
-        ("./#how", "Как проходит работа", "От «СТАРТ» до первой тренировки"),
+        ("./#how", "Как проходит работа", "От первого сообщения до тренировки"),
         ("./#who", "Кому подойдёт", "И кому формат не подойдёт"),
     ], ("./#about", "Привет, я Алёна", "Тренер и нутрициолог, Санкт-Петербург")),
     ("train", "Тренировки", [
@@ -58,7 +58,7 @@ MENU = [
         ("trener.html", "Зачем тренер и нутрициолог", "Честно: кому хватит сайта, а кому нет"),
         ("./#faq", "Частые вопросы", "Опыт, дом, техника, питание, оплата"),
         ("./#start", "Контакты", "Telegram для записи и канал"),
-    ], (START, "Первый шаг — «СТАРТ»", "Напишите в Telegram, подберу формат")),
+    ], (START, "Первый шаг", "Напишите в Telegram, подберу формат")),
 ]
 
 
@@ -99,11 +99,11 @@ def build():
         '    <a class="zal-btn" href="moy-zal.html" aria-label="Избранное — сохранённые разделы" title="Избранное"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linejoin=\"round\"><path d=\"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z\"/></svg><span>Избранное</span><i class="zal-n" hidden></i></a>\n'
         '    <button class="inst-btn" type="button" data-pwa aria-label="Установить приложение на телефон" title="Установить приложение"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Приложение</span></button>\n'
         '    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav"><span class="burger" aria-hidden="true"></span>Меню</button>\n'
-        f'    <a class="btn btn-main" href="{START}" target="_blank" rel="noopener">СТАРТ</a>\n'
+        f'    <a class="btn btn-main" href="{START}" target="_blank" rel="noopener"><svg class="tg-ico" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M21.4 3.6 2.9 10.7c-1.2.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.7c.3-1.3-.5-1.9-1.5-1.5zM8.6 13.4l9.6-6.1c.5-.3.9-.1.5.2l-7.9 7.2-.3 3.6z"/></svg><span>Написать</span></a>\n'
         '  </div>\n</header>\n'
         '<div class="mnav" id="mnav" hidden>\n  <nav class="mnav-in g" aria-label="Меню">\n'
         '    <a class="m-home" href="./">Главная</a>\n    <button type="button" class="m-install" data-pwa><img src="icons/icon-192.png" alt="" width="40" height="40"><span><b>Приложение на телефон</b><small>Иконка на рабочем столе, основные инструменты — без интернета</small></span></button>\n    <div class="m-zal"><a class="m-zal-head" href="moy-zal.html"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linejoin=\"round\"><path d=\"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z\"/></svg><span><b>Избранное</b><small>Разделы, которые вы отметили звёздочкой</small></span><i class="zal-n" hidden></i></a><div class="m-zal-links"></div></div>\n    ' + "\n    ".join(mob) + '\n'
-        f'    <div class="m-cta"><a class="btn btn-main btn-wide" href="{START}" target="_blank" rel="noopener">Написать «СТАРТ»</a></div>\n'
+        f'    <div class="m-cta"><a class="btn btn-main btn-wide" href="{START}" target="_blank" rel="noopener"><svg class="tg-ico" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M21.4 3.6 2.9 10.7c-1.2.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.7c.3-1.3-.5-1.9-1.5-1.5zM8.6 13.4l9.6-6.1c.5-.3.9-.1.5.2l-7.9 7.2-.3 3.6z"/></svg><span>Написать в Telegram</span></a></div>\n'
         '  </nav>\n</div>\n<!-- nav:end -->')
     return header
 

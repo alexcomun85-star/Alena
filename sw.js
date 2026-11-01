@@ -2,7 +2,7 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-release-20261101-v62-afita-dock';
+const VERSION = 'alenafit-release-20261101-v63-telegram';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
   "./css/pilot-review.css?v=2",
@@ -17,7 +17,7 @@ const CORE = [
   "./js/recipe-engine.js?v=20261029pantry2",
   "./assistant-tools.html",
   "./css/assistant-tools.css?v=20261101a2",
-  "./js/assistant-tools.js?v=20261101a2",
+  "./js/assistant-tools.js?v=20261101tg",
   "./img/alena-invitation.webp",
   "./",
   "./404.html",
@@ -59,7 +59,7 @@ const CORE = [
   "./css/home-motion.css?v=20261028b",
   "./css/afit-widget.css?v=20261101j",
   "./js/afit-widget.js?v=20261101d",
-  "./css/site.css?v=20261029m",
+  "./css/site.css?v=20261101tg",
   "./js/brand-pilot.js?v=1",
   "./js/card-reveal.js?v=20261031smooth1",
   "./js/cycle-diary.js?v=20261028d",
@@ -81,10 +81,10 @@ const CORE = [
   "./js/progress.js?v=20261028d",
   "./js/pwa.js?v=20261028b",
   "./js/recepty.js?v=20261029actions1",
-  "./js/sections.js?v=1",
-  "./js/tehnika.js?v=20261028b",
-  "./js/trener.js?v=20261026i",
-  "./js/vozvrat.js?v=20261027c"
+  "./js/sections.js?v=2",
+  "./js/tehnika.js?v=20261101tg",
+  "./js/trener.js?v=20261101tg",
+  "./js/vozvrat.js?v=20261101tg"
 ];
 const MEDIA = [
   "./img/gym/treadmill.webp?v=4",

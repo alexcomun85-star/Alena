@@ -137,8 +137,8 @@ def t_ui(browser):
 
 def t_static():
     s=Path('index.html').read_text()
-    # Офферные блоки обновлены по утверждённой редакции главной 01.11.2026 (откат — ветка rollback-2026-10-31).
-    protected={'plans':'860e4b4e29cddb508f790e2317860c9408663a7a58d1869b7efcad612651e392', 'quiz':'0267ad7fe7b7765d62f6292c258d47622895d8c7ca9cef1b70b2f33f948f11fb', 'faq':'480f5b4fb80e682cb3490d2c8174dd130353d621c392fff7e7ae25cdcaa49953', 'start':'cfdaf76ddbfa78dc158f3600e66df51b4b5a42b62630a9ce8cdeb873847d6c2f'}
+    # Офферные блоки: редакция главной 01.11.2026 + значок Telegram на кнопках (откат — ветка rollback-2026-10-31).
+    protected={'plans': '12a1cc79d518cd27f8935e82466da71d1e169a4df478023bc23cb8bb2ad40f57', 'quiz': '0267ad7fe7b7765d62f6292c258d47622895d8c7ca9cef1b70b2f33f948f11fb', 'faq': '480f5b4fb80e682cb3490d2c8174dd130353d621c392fff7e7ae25cdcaa49953', 'start': 'a75b44d7a1056715965f28beaa88dc21dbf77afcbad4e3e4af6f626e1d6b2b69'}
     for name,digest in protected.items():
         block=re.search('<section[^>]*id="'+name+'".*?</section>',s,re.S)[0]
         check('оффер сохранён: '+name,digest,hashlib.sha256(block.encode()).hexdigest())
