@@ -96,7 +96,7 @@ def build():
             if name in FREE_SUGARS:
                 sugar += row['c'] * ready / 100
             contains.append(iid)
-            ing_out.append([label, grams])
+            ing_out.append([label, grams, iid] if batch else [label, grams])
         n = rec['servings']
         per = {'k': r(tot['k'] / n, '1'), 'p': r(tot['p'] / n), 'f': r(tot['f'] / n), 'c': r(tot['c'] / n)}
         kcal_from_macros = per['p'] * 4 + per['f'] * 9 + per['c'] * 4
