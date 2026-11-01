@@ -27,3 +27,15 @@ button,input,select,textarea{transition:border-color 180ms,background-color 180m
 .afit-embed .tools-header{display:none}
 .afit-embed .tools-nav{top:0}
 .afit-embed body{background:#0f231e}
+
+/* задачи (01.11.2026): вместо стрелки-эмодзи «↗» — пиктограмма задачи в стеклянном круге, в стиле логотипа */
+.task-card{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:14px;padding:16px 16px!important}
+.task-ico{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;flex:none;color:#e8f0eb;
+  background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,0) 55%,rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.task-ico svg{display:block}
+.task-ico .ac{stroke:#f0a92b}
+.task-txt{min-width:0}
+.task-card:first-child .task-ico{color:#14251c;background:rgba(20,37,28,.10);border-color:rgba(20,37,28,.28);box-shadow:none}
+.task-card:first-child .task-ico .ac{stroke:#14251c}
+.task-card>.task-txt{position:static;text-align:left}
+.task-ico svg{width:22px;height:22px}
