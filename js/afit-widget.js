@@ -39,14 +39,14 @@
  addEventListener('resize',fit);
 
  /* окно растёт из кнопки: точка начала анимации — центр кнопки */
- function origin(){const l=launch.getBoundingClientRect(),p=panel.getBoundingClientRect();
+ function origin(){const l=(previous&&previous.getBoundingClientRect().width?previous:launch).getBoundingClientRect(),p=panel.getBoundingClientRect();
   panel.style.setProperty('--ox',Math.round(l.left+l.width/2-p.left)+'px');panel.style.setProperty('--oy',Math.round(l.top+l.height/2-p.top)+'px')}
 
  function finish(){panel.hidden=true;panel.inert=false;panel.classList.remove('is-closing');panel.style.removeProperty('transform');panel.style.removeProperty('transition');document.body.classList.remove('afit-chat-open');previous.focus()}
- function hide(immediate=false){if(panel.hidden||panel.classList.contains('is-closing'))return;launch.setAttribute('aria-expanded','false');panel.inert=true;
+ function hide(immediate=false){if(panel.hidden||panel.classList.contains('is-closing'))return;document.querySelectorAll('[data-open-afit]').forEach(b=>b.setAttribute('aria-expanded','false'));panel.inert=true;
   if(immediate||reduced.matches)finish();else{panel.classList.add('is-closing');closingTimer=setTimeout(finish,phone.matches?260:220)}}
  function show(event){clearTimeout(closingTimer);hideNudge();panel.inert=false;panel.classList.remove('is-closing');previous=event.currentTarget;panel.hidden=false;
-  document.body.classList.add('afit-chat-open');launch.setAttribute('aria-expanded','true');
+  document.body.classList.add('afit-chat-open');document.querySelectorAll('[data-open-afit]').forEach(b=>b.setAttribute('aria-expanded',String(b===previous||b===launch&&previous===launch)));
   if(!frame.getAttribute('src')){frame.src='https://assistant.alenafit.com/?embed=1';if(loading)loading.hidden=false;
    failTimer=setTimeout(()=>{if(frame.dataset.ready!=='1'&&fallback)fallback.hidden=false},10000)}
   fit();origin();
@@ -54,7 +54,8 @@
   close.focus({preventScroll:true})}
  panel.addEventListener('animationend',e=>{if(e.target===panel)panel.classList.remove('is-opening')});
 
- document.querySelectorAll('[data-open-afit]').forEach(button=>button.addEventListener('click',event=>{if(event.currentTarget===launch&&!panel.hidden)hide();else show(event)}));
+ /* кнопок две: капсула в углу (ПК) и центр нижней панели (телефон, Fold); панель создаёт nav.js раньше этого скрипта */
+ document.querySelectorAll('[data-open-afit]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();if(!panel.hidden)hide();else show(event)}));
  close.addEventListener('click',()=>hide());
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden)hide(true)});
 
@@ -78,5 +79,5 @@
  function hideNudge(){if(nudge&&!nudge.hidden){nudge.classList.add('out');setTimeout(()=>{nudge.hidden=true;nudge.classList.remove('out')},250)}}
  let seen=false;try{seen=sessionStorage.getItem('afit_nudge')==='1'}catch(e){}
  if(nudge&&!seen)setTimeout(()=>{if(!panel.hidden||document.hidden)return;nudge.hidden=false;try{sessionStorage.setItem('afit_nudge','1')}catch(e){}
-  nudge.onclick=()=>launch.click();setTimeout(hideNudge,7000)},20000);
+  nudge.onclick=()=>{const d=document.querySelector('.dock-afit');(d&&d.offsetParent?d:launch).click()};setTimeout(hideNudge,7000)},20000);
 })();

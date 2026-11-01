@@ -89,7 +89,7 @@ with sync_playwright() as p:
     page.route('https://assistant.alenafit.com/**',lambda route:route.fulfill(status=200,content_type='text/html',body='<p>Тестовый чат</p>'))
     page.set_viewport_size({'width':390,'height':844})
     page.goto('http://localhost:8766/')
-    page.locator('.afit-launch').click()
+    page.locator('.dock-afit').click()  # 390 px: Афита в центре нижней панели
     panel=page.locator('.afit-window')
     expect(panel).to_be_visible()
     panel.get_by_role('button',name='Задачи',exact=True).click()
@@ -107,7 +107,7 @@ with sync_playwright() as p:
     expect(tools.locator('#search')).to_have_value('яблоко')
     page.locator('.afit-close').click()
     expect(panel).to_be_hidden()
-    expect(page.locator('.afit-launch')).to_be_focused()
+    expect(page.locator('.dock-afit')).to_be_focused()
     assert not errors,errors
     browser.close()
 print('Assistant actions: four viewport sizes, calculations, validation, recipes, format, request escaping and report OK')

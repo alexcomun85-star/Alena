@@ -173,3 +173,32 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch,body.afit-chat-open .
   .afit-launch .afit-symbol{animation:afitFloat 6s ease-in-out 2.5s infinite}
   @keyframes afitFloat{50%{transform:translateY(-3px)}}
 }
+
+/* ---------- телефон и Fold: Афита в центре нижней панели (01.11.2026) ----------
+   Плавающая кнопка в углу на этих экранах не нужна: она перекрывала текст. На ПК (≥1024) панели нет — остаётся капсула. */
+.dock .dock-afit{position:relative;color:var(--af-ink,#eef4f1)}
+.dock-afit-glass{display:grid;place-items:center;width:48px;height:48px;margin:-22px auto 2px;border-radius:50%;
+  background:linear-gradient(160deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.02) 55%,rgba(255,255,255,.06) 100%),rgba(13,30,26,.35);
+  -webkit-backdrop-filter:blur(4px) saturate(130%);backdrop-filter:blur(4px) saturate(130%);
+  border:1px solid rgba(255,255,255,.26);box-shadow:0 8px 22px -10px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.32)}
+.dock-afit-glass img{width:26px;height:26px;display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+.dock .dock-afit span{display:block;text-align:center;color:var(--af-ink,#eef4f1)}
+.dock .dock-afit:active,.dock .dock-afit[aria-expanded="true"]{background:none}
+.dock .dock-afit:active .dock-afit-glass{transform:scale(.94)}
+@media(max-width:1023px){
+  .afit-launch{display:none!important}
+  .afit-nudge{right:auto;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));border-radius:16px;text-align:center}
+  .afit-nudge::after{content:"";position:absolute;left:50%;bottom:-6px;width:12px;height:12px;margin-left:-6px;background:inherit;transform:rotate(45deg);border-radius:2px}
+}
+@media(prefers-reduced-motion:no-preference){
+  .dock-afit-glass img{animation:afitFloat 6s ease-in-out 2.5s infinite}
+  .dock-afit-glass{animation:afitDockIn .6s cubic-bezier(.2,.8,.25,1) .4s both}
+  @keyframes afitDockIn{from{opacity:0;transform:translateY(10px) scale(.8)}}
+  @media(max-width:1023px){
+    .afit-nudge:not([hidden]){animation:afitNudgeC .45s cubic-bezier(.2,.8,.25,1) both}
+    .afit-nudge.out{animation:afitNudgeCOut .25s ease-in both}
+    @keyframes afitNudgeC{from{opacity:0;transform:translate(-50%,8px) scale(.92)}to{transform:translateX(-50%)}}
+    @keyframes afitNudgeCOut{to{opacity:0;transform:translate(-50%,4px) scale(.95)}}
+  }
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.dock-afit-glass{background:#173e2f}}

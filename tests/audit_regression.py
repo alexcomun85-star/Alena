@@ -208,18 +208,19 @@ def t_afit(browser):
     check('Афит: чат не загружается заранее', None, p.locator('#afit-window iframe[title="Чат с Афитой"]').get_attribute('src'))
     for width,height in [(320,740),(390,844),(768,900),(1200,900)]:
         p.set_viewport_size({'width':width,'height':height})
-        launcher=p.locator('.afit-launch')
-        # с 01.11.2026 кнопка и окно анимированы: размеры меряем после окончания движения
-        p.wait_for_function("[...document.querySelectorAll('.afit-launch,#afit-window')].every(e=>e.getAnimations().every(a=>a.playState!=='running'))", timeout=5000)
+        # с 01.11.2026 на телефоне и Fold Афита — центр нижней панели, на ПК — капсула в углу
+        sel='.dock-afit' if width<1024 else '.afit-launch'
+        launcher=p.locator(sel)
+        p.wait_for_function("[...document.querySelectorAll('.afit-launch,#afit-window,.dock-afit-glass')].every(e=>e.getAnimations().every(a=>a.playState!=='running'))", timeout=5000)
         launch_box=launcher.bounding_box()
         if width<1024:
-            check('Афита: компактная кнопка '+str(width), True, 44<=launch_box['width']<=50 and 44<=launch_box['height']<=50)
-            check('Афита: доступное имя '+str(width), True, p.get_by_role('button',name='Афита',exact=False).count()>0)
-            dock=p.locator('.dock')
-            if dock.is_visible():
-                check('Афита: выше нижнего меню '+str(width), True, launch_box['y']+launch_box['height']<=dock.bounding_box()['y'])
+            check('Афита: в нижней панели '+str(width), True, p.locator('.dock .dock-afit').is_visible())
+            check('Афита: угловая кнопка скрыта '+str(width), False, p.locator('.afit-launch').is_visible())
+            glass=p.locator('.dock-afit-glass').bounding_box()
+            check('Афита: круг не меньше 44 px '+str(width), True, glass['width']>=44 and glass['height']>=44)
+            check('Афита: доступное имя '+str(width), True, p.get_by_role('link',name='Афита',exact=False).count()>0)
             p.screenshot(path=str(OUT / f'afit-compact-{width}.png'))
-        p.click('.afit-launch')
+        p.click(sel)
         check('Афит: открыт '+str(width), True, p.is_visible('#afit-window'))
         check('Афит: фирменный знак '+str(width), True, p.locator('.afit-window .afit-symbol img').evaluate('(e)=>e.complete && e.naturalWidth>0'))
         p.wait_for_function("[...document.querySelectorAll('.afit-launch,#afit-window')].every(e=>e.getAnimations().every(a=>a.playState!=='running'))", timeout=5000)
@@ -229,7 +230,7 @@ def t_afit(browser):
         p.screenshot(path=str(OUT / f'afit-{width}.png'))
         p.keyboard.press('Escape')
         check('Афит: Escape закрывает панель '+str(width), False, p.is_visible('#afit-window'))
-        check('Афит: возврат фокуса '+str(width), True, p.locator('.afit-launch').evaluate('(e)=>document.activeElement===e'))
+        check('Афит: возврат фокуса '+str(width), True, p.locator(sel).evaluate('(e)=>document.activeElement===e'))
     ctx.close()
 
 

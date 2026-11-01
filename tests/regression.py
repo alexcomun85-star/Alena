@@ -560,7 +560,7 @@ def t_dock(ctx):
         check(f"панель ({path}): в шапке телефона нет кнопок", True, hidden)
         check(f"панель ({path}): шапка не липнет", "relative", page.evaluate("getComputedStyle(document.querySelector('.bar')).position"))
         labels = page.eval_on_selector_all(".dock .w > *", "e=>e.map(x=>x.innerText.trim())")
-        check(f"панель ({path}): кнопки снизу", [first, "Избранное", "Инструменты", "Меню"], labels)
+        check(f"панель ({path}): кнопки снизу", [first, "Избранное", "Афита", "Инструменты", "Меню"], labels)
         page.mouse.wheel(0, 2000)
         page.wait_for_timeout(200)
         r = page.evaluate("document.querySelector('.dock').getBoundingClientRect()")
