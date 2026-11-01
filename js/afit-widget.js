@@ -29,9 +29,11 @@
 
  /* клавиатура на телефоне: окно по высоте видимой области */
  const viewport=window.visualViewport;
+ let probe=null;
+ function safeTop(){if(!probe){probe=document.createElement('i');probe.style.cssText='position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';document.body.appendChild(probe)}return probe.offsetHeight||0}
  function fit(){
   if(!viewport||panel.hidden)return;
-  if(phone.matches){panel.style.top=Math.round(viewport.offsetTop+8)+'px';panel.style.bottom='auto';panel.style.height=Math.round(viewport.height-8)+'px'}
+  if(phone.matches){const t=safeTop()+8;panel.style.top=Math.round(viewport.offsetTop+t)+'px';panel.style.bottom='auto';panel.style.height=Math.round(viewport.height-t)+'px'}
   else if(viewport.height<innerHeight-100){panel.style.top=(viewport.offsetTop+8)+'px';panel.style.bottom='auto';panel.style.height=Math.max(120,Math.min(680,viewport.height-16))+'px'}
   else{panel.style.removeProperty('top');panel.style.removeProperty('bottom');panel.style.removeProperty('height')}
  }

@@ -281,3 +281,8 @@ svg .acf{fill:var(--amber,#f0a92b);stroke:none}
 .dock .dock-menu .burger::before,.dock .dock-menu .burger::after{background:var(--ink,#eef4f1)}
 .menu-open .dock .dock-menu .burger{background:transparent}
 .menu-open .dock .dock-menu .burger::before,.menu-open .dock .dock-menu .burger::after{background:var(--amber,#f0a92b)}
+
+/* iPhone (01.11.2026): лист Афиты начинается ниже строки состояния и «чёлки», а не под ними */
+@media(max-width:599px){
+  .afit-window{top:calc(env(safe-area-inset-top,0px) + 8px);height:calc(100dvh - env(safe-area-inset-top,0px) - 8px)}
+}
