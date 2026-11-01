@@ -1242,24 +1242,24 @@ a .tg-ico{flex:none;display:inline-block;width:18px;height:18px;vertical-align:-
 .invite-action .tg-ico+span{flex:1;text-align:left}
 .invite-action .tg-ico+span{white-space:nowrap;font-size:clamp(15px,4.4vw,17px)}
 
-/* ===== Логотип (01.11.2026): знак + ALENAFIT + «сила без перегибов» | ТРЕНИРОВКИ И ПИТАНИЕ ===== */
-.brand{display:flex;align-items:center;gap:10px;min-width:0}
-.brand .brand-text{display:grid!important;gap:3px;flex:none}
-.brand .brand-text .brand-tag{display:block!important;font:400 11.5px/1.15 var(--body)!important;color:var(--muted)!important;letter-spacing:.01em;white-space:nowrap}
-.brand-desc{display:block;flex:none;margin-left:4px;padding-left:12px;border-left:2px solid var(--amber);
-  font:600 11.5px/1.15 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
-@media (min-width:1024px){.brand-desc{font-size:12.5px;padding-left:14px}}
-/* узкие экраны и ПК с длинным меню: справа не помещается — показываем знак, надпись и подпись */
-@media (max-width:359px){.brand-desc{display:none}}
-/* ПК: меню длинное — направление справа только на широких экранах; на 1024–1199 остаётся один знак, как раньше */
-@media (min-width:1024px) and (max-width:1599px){.brand-desc{display:none}}
-@media (min-width:1024px) and (max-width:1199px){.brand .brand-text{display:none!important}}
+/* ===== Логотип (01.11.2026): знак + ALENAFIT + «сила без перегибов» | ТРЕНИРОВКИ И ПИТАНИЕ =====
+   Надпись — один SVG (viewBox 725×140): масштабируется целиком, пропорции не меняются ни на одном экране.
+   Знак = 0,85 высоты надписи — как в эталоне. */
+.brand{display:flex;align-items:center;gap:10px;min-width:0;--lock:40px}
+.brand .brand-mark{height:calc(var(--lock)*.85);width:auto;flex:none}
+.brand-lock{display:block;flex:none;height:var(--lock);width:auto;aspect-ratio:725/140;overflow:visible}
+.brand-lock .bl-tag,.foot-lock .bl-tag{font:400 31px var(--body);fill:var(--muted)}
+.brand-lock .bl-desc,.foot-lock .bl-desc{font:600 44px var(--body);fill:var(--ink)}
+@media (max-width:359px){.brand{--lock:34px;gap:8px}}
+@media (min-width:1024px){.brand{--lock:42px;gap:12px}}
+@media (min-width:1024px) and (max-width:1279px){.brand{--lock:36px;gap:9px}}
 
-/* подвал: тот же логотип крупнее */
-.foot-lockup{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px}
-.fl-mark{display:block;width:52px;height:auto}
-.fl-text{display:grid;gap:5px}
-.fl-word{display:block;width:150px;height:auto}
-.fl-text small{font-size:13px;color:var(--muted)}
-.fl-desc{padding-left:14px;border-left:2px solid var(--amber);font:600 13px/1.2 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
-@media (max-width:359px){.fl-desc{border-left:0;padding-left:0;flex-basis:100%}}
+/* подвал: тот же логотип одним рисунком, по ширине колонки */
+.foot-lock{display:block;width:min(100%,420px);height:auto;aspect-ratio:900/140;margin-bottom:12px}
+/* ПК до 1600 px: место под логотип целиком — кнопка Telegram в шапке становится круглой со значком (подпись остаётся для экранных читалок) */
+@media (min-width:1024px) and (max-width:1599px){
+ .bar .w>.btn:has(.tg-ico){width:44px;min-width:44px;padding:0;justify-content:center;gap:0}
+ .bar .w>.btn:has(.tg-ico) span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+@media (min-width:1024px) and (max-width:1279px){.bar .w{gap:8px}.brand{--lock:32px;gap:8px}}
+@media (min-width:1024px) and (max-width:1199px){.bar .dd-btn{padding:0 5px}}

@@ -522,7 +522,7 @@ def t_myzal(ctx):
     page.route("**/site.css*", lambda r: r.abort())
     page.goto(BASE + "nauka.html")
     page.wait_for_timeout(300)
-    big = page.evaluate("[...document.querySelectorAll('svg')].filter(s=>!s.closest('.viz,figure')&&s.getBoundingClientRect().width>48).length")
+    big = page.evaluate("[...document.querySelectorAll('svg')].filter(s=>!s.closest('.viz,figure')&&!s.matches('.brand-lock,.foot-lock')&&s.getBoundingClientRect().width>48).length")
     check("Мой зал: без стилей нет гигантских иконок", 0, big)
     page.close()
     m.close()
