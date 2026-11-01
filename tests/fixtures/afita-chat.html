@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Афита — помощница Алёны</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f3ed;color:#263b35;font:16px/1.6 system-ui,sans-serif}
+main{max-width:760px;margin:auto;padding:28px 18px}
+header{border-bottom:1px solid #ccd5cd;padding-bottom:20px}
+small{letter-spacing:.12em;font-size:11px;text-transform:uppercase}
+h1{font-size:clamp(28px,6vw,42px);line-height:1.15;margin:12px 0}
+p{margin:8px 0}
+.muted{color:#63736c;font-size:14px}
+#messages{min-height:35vh;padding:20px 0}
+.message{padding:16px 20px;background:white;border:1px solid #dce2da;border-radius:18px;margin:12px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.user{background:#e3ebe1;margin-left:32px}
+form{position:sticky;bottom:0;background:#f5f3ed;padding:12px 0}
+textarea{width:100%;min-height:100px;padding:14px;border:1px solid #8b9d90;border-radius:14px;font:inherit;resize:vertical;background:white}
+button{border:0;border-radius:12px;padding:13px 22px;background:#294d3f;color:white;font:inherit;cursor:pointer}
+button:disabled{opacity:.5;cursor:wait}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}
+button:focus-visible,textarea:focus-visible{outline:3px solid #b7894f;outline-offset:3px}
+</style>
+<style>form{position:static}textarea{min-height:70px}</style>
+
+<style id="afit-fixed-composer">
+html,body{height:100%;overflow:hidden}body{height:100dvh;background:#f5f3ed;color:#263b35}
+main{height:100%;max-width:760px;margin:auto;padding:0 14px;display:flex;flex-direction:column;min-height:0}
+header{flex:none;padding:12px 0 9px}header small{display:none}header h1{font-size:20px;margin:0}header p{font-size:11px;margin:4px 0}
+#messages{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:8px 0 14px;scroll-padding-bottom:12px}
+.message{font-size:15px;line-height:1.6;margin:8px 0;padding:12px 14px;border-radius:14px}.user{margin-left:24px}
+#form{position:static;flex:none;z-index:2;margin:0;padding:9px 0 max(10px,env(safe-area-inset-bottom));border-top:1px solid #ccd5cd;background:#f5f3ed}
+#form label{display:none}#question{display:block;min-height:48px;height:56px;max-height:96px;resize:none;font-size:16px;padding:10px 12px}
+.actions{margin-top:7px;gap:8px}#send{padding:10px 18px;min-height:44px}#status{font-size:11px}#form>p{display:none}
+html.embedded header{display:none}html.embedded main{padding:0 12px}
+@media(max-height:400px){#question{height:46px;min-height:46px}#form{padding-top:6px;padding-bottom:6px}.actions{margin-top:4px}#send{padding:6px 16px;min-height:38px}}
+</style><script id="afit-embed-layout">
+if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');
+if(window.parent===window&&window.visualViewport){addEventListener('DOMContentLoaded',()=>{const fit=()=>document.body.style.height=window.visualViewport.height+'px';window.visualViewport.addEventListener('resize',fit);fit()})}
+</script>
+<style id="afit-typing-motion">
+.afit-thinking{display:flex;align-items:center;gap:5px;font-size:13px;color:#63736c;min-height:43px}.afit-thinking span{margin-right:5px}.afit-thinking i{width:5px;height:5px;background:currentColor;border-radius:50%;animation:afit-dot 1.2s ease-in-out infinite}.afit-thinking i:nth-of-type(2){animation-delay:.15s}.afit-thinking i:nth-of-type(3){animation-delay:.3s}
+.afit-writing:after{content:"";display:inline-block;vertical-align:-.1em;width:2px;height:1em;background:currentColor;margin-left:3px;animation:afit-caret .8s steps(2) infinite}
+@keyframes afit-dot{0%,70%,100%{opacity:.3;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}@keyframes afit-caret{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.afit-thinking i,.afit-writing:after{animation:none}}
+</style>
+<style id="afit-member-composer">
+#form{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:5px 8px;align-items:end;flex:none;border-top:1px solid #ccd5cd;padding-top:9px}
+#form[hidden],#afit-member-panel[hidden]{display:none!important}
+#question{grid-column:1;grid-row:1;width:100%;height:48px;min-height:48px;max-height:100px;padding:12px;border-radius:18px;resize:none;outline-offset:1px}
+#form .actions{display:contents}#send{grid-column:2;grid-row:1;display:grid;place-items:center;width:44px;height:44px;min-height:44px;padding:0;margin-bottom:2px;border-radius:50%;background:#294d3f;box-shadow:none}
+#status{grid-column:1/-1;grid-row:2;font-size:11px;min-height:15px;margin:0;padding-left:4px}#form>p{display:none}
+#afit-quota{font-size:10px;color:#63736c;margin:3px 0;flex:none}
+#afit-member-panel{flex:none;background:#edf1e8;border-top:1px solid #ccd5cd;padding:12px 0 8px}
+#afit-member-panel h2{font:600 16px/1.3 system-ui,sans-serif;margin:0 0 4px}#afit-member-panel p{font-size:12px;color:#63736c;margin:4px 0 10px}
+#afit-member-form{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0;background:transparent;position:static}
+#afit-member-form label{display:grid;gap:3px;font-size:11px;min-width:0}#afit-member-form input{width:100%;min-width:0;padding:10px;border:1px solid #8b9d90;border-radius:10px;font:16px system-ui,sans-serif;background:#fff;color:#263b35}
+#afit-member-form button{grid-column:1/-1;min-height:42px;padding:8px 16px}#afit-member-status{grid-column:1/-1;font-size:11px;color:#63736c}
+@media(max-height:400px){#afit-member-panel{padding:6px 0}#afit-member-panel p{display:none}#afit-member-form{gap:4px}#afit-member-form input{padding:6px}#afit-member-form button{min-height:36px}#question{height:44px;min-height:44px}#afit-quota{margin:0;font-size:9px}}
+</style>
+
+<style id="afita-site-theme-v1">
+:root{color-scheme:dark;--af-bg:#0d1e1a;--af-surface:#142e27;--af-text:#e8f0eb;--af-muted:#afc4b9;--af-line:#304b40;--af-amber:#f0a92b}
+html,body{background:var(--af-bg)!important;color:var(--af-text)!important;font-family:'Golos Text',system-ui,sans-serif}
+header{background:transparent!important;color:var(--af-text)!important}header h1{color:var(--af-text)}header p,header small{color:var(--af-muted)!important}
+#messages{scrollbar-color:#486158 var(--af-bg)}
+.message{background:var(--af-surface)!important;color:var(--af-text)!important;border:1px solid var(--af-line);border-radius:16px;box-shadow:0 4px 16px #0000000d}
+.message.user,.user{background:#25483a!important;color:var(--af-text)!important;border-color:#426351}
+.message a{color:#f5bd59!important}.message code,.message pre{background:#0d1e1a!important;color:#e8f0eb!important}
+#form{background:var(--af-bg)!important;border-color:var(--af-line)!important}
+#question,#afit-member-form input{background:var(--af-surface)!important;color:var(--af-text)!important;border:1px solid #486158!important;border-radius:14px;caret-color:var(--af-amber)}
+#question::placeholder,#afit-member-form input::placeholder{color:#9db4a8;opacity:1}
+#question:focus,#afit-member-form input:focus{border-color:var(--af-amber)!important;outline:2px solid #f0a92b55;outline-offset:2px}
+#send,#afit-member-form button{background:var(--af-amber)!important;color:#14251c!important;border-color:var(--af-amber)!important;font-weight:600}
+#send{width:auto!important;min-width:44px;padding:10px 12px!important;border-radius:14px!important}
+#send:disabled,#afit-member-form button:disabled{opacity:.5}
+#status,#afit-quota,#afit-member-status,.afit-thinking{color:var(--af-muted)!important}
+#afit-member-panel{background:var(--af-surface)!important;border-color:var(--af-line)!important;border-radius:16px;padding:14px}
+#afit-member-panel h2{color:var(--af-text)!important}#afit-member-panel p,#afit-member-form label{color:var(--af-muted)!important}
+a{color:#f5bd59}:focus-visible{outline:2px solid var(--af-amber);outline-offset:3px}
+@media(hover:hover){#send:not(:disabled):hover,#afit-member-form button:not(:disabled):hover{background:#f5bb50!important}}
+@media(prefers-reduced-motion:no-preference){
+.message{animation:afitaMessageIn 320ms cubic-bezier(.2,.65,.25,1) backwards}
+#send,#question,#afit-member-form input{transition:background-color 180ms,border-color 180ms,box-shadow 180ms}
+@keyframes afitaMessageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+}
+@media(prefers-reduced-motion:reduce){.message,#send,#question,#afit-member-form input{animation:none!important;transition:none!important}}
+@media print{html,body,.message,.message.user{background:white!important;color:#183d31!important}}
+</style>
+<main>
+<header>
+<small>Алёна Вислова · Сила без перегибов</small>
+<h1>Афита — помощница Алёны</h1>
+<p class="muted">Виртуальная помощница Алёны · тестовая версия. Не отправляйте персональные и медицинские данные.</p>
+</header>
+<section id="messages" role="log" aria-live="polite" aria-label="Переписка">
+<div class="message">Здравствуйте! Я Афита, виртуальная помощница Алёны. Помогу разобраться в программах, тренировках и питании. Какая у вас цель?</div>
+</section>
+<div id="afit-member-panel" hidden><h2>Вход для участников ALENAFIT</h2><p>Для участников онлайн-сопровождения и занятий в зале.</p><form id="afit-member-form"><label>Логин<input name="login" autocomplete="username" required maxlength="32"></label><label>Пароль<input type="password" name="password" autocomplete="current-password" required maxlength="128"></label><button type="submit">Войти</button><span id="afit-member-status" role="status"></span></form></div><p id="afit-quota" role="status"></p>
+<form id="form">
+<label for="question">Ваш вопрос</label>
+<textarea id="question" maxlength="1500" required placeholder="С чего начать после перерыва?"></textarea>
+<div class="actions">
+<span id="status" class="muted" role="status">До 1500 символов</span>
+<button id="send">Отправить</button>
+</div>
+<p class="muted">Афита учитывает последние сообщения. При обновлении страницы переписка сбрасывается.</p>
+</form>
+</main>
+<script>
+const form=document.querySelector('#form');
+const input=document.querySelector('#question');
+const button=document.querySelector('#send');
+const status=document.querySelector('#status');
+const messages=document.querySelector('#messages');
+const history=[];
+function add(text,user=false){
+ // AFIT_NO_REPEAT_INTRO
+ if(!user){
+  const cleaned=text.replace(/^(?:(?:Здравствуйте|Привет|Добрый день)[!.,\s]*)?Я\s*[—–-]?\s*Афита[\s\S]{0,260}?(?:ALENAFIT|Алёны(?:\s+Висловой)?)[.!]\s*/i,'').replace(/^(?:Здравствуйте|Привет|Добрый день)[!.,]\s*/i,'');
+  if(cleaned.trim())text=cleaned;
+ }
+
+ const el=document.createElement('div');
+ el.className='message'+(user?' user':'');
+ el.textContent='';
+ const re=/https:\/\/[^\s<>"\])]+/g;
+ let position=0;
+ for(const match of text.matchAll(re)){
+  const url=match[0].replace(/[.,;:!?]+$/,'');
+  el.append(document.createTextNode(text.slice(position,match.index)));
+  const link=document.createElement('a');
+  link.href=url;
+  link.textContent=url;
+  link.target='_blank';
+  link.rel='noopener noreferrer';
+  link.style.color='inherit';
+  link.style.textDecoration='underline';
+  el.append(link);
+  position=match.index+url.length;
+ }
+ el.append(document.createTextNode(text.slice(position)));
+ messages.append(el);
+ messages.scrollTop=messages.scrollHeight;
+}
+
+// AFIT_TYPING_V1
+function showThinking(){
+ const el=document.createElement('div');el.className='message afit-thinking';el.setAttribute('role','status');el.setAttribute('aria-label','Афита печатает');
+ const label=document.createElement('span');label.textContent='Афита печатает';el.append(label);
+ for(let i=0;i<3;i++){const dot=document.createElement('i');dot.setAttribute('aria-hidden','true');el.append(dot)}
+ messages.append(el);messages.scrollTop=messages.scrollHeight;return el;
+}
+async function typeAnswer(text){
+ add(text);
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ const el=messages.lastElementChild,content=document.createDocumentFragment();
+ while(el.firstChild)content.append(el.firstChild);
+ const full=content.textContent||'',node=document.createTextNode('');el.append(node);el.classList.add('afit-writing');el.setAttribute('aria-hidden','true');
+ const duration=Math.min(5000,Math.max(600,full.length*9));
+ await new Promise(resolve=>{let start=0;
+  function step(time){if(!start)start=time;const progress=Math.min(1,(time-start)/duration);
+   const follow=messages.scrollHeight-messages.scrollTop-messages.clientHeight<70;
+   node.textContent=full.slice(0,Math.ceil(full.length*progress));if(follow)messages.scrollTop=messages.scrollHeight;
+   if(progress<1)requestAnimationFrame(step);else resolve();
+  }requestAnimationFrame(step);
+ });
+ el.replaceChildren(content);el.classList.remove('afit-writing');el.removeAttribute('aria-hidden');
+}
+
+form.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const message=input.value.trim();
+ if(!message||button.disabled)return;
+ add(message,true);
+ input.value='';
+ button.disabled=true;
+ status.textContent='Афита печатает…';
+ const waiting=showThinking();
+ const controller=new AbortController();
+ const timeout=setTimeout(()=>controller.abort(),60000);
+ try{
+  const response=await fetch('/chat',{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({message,history:history.slice(-4)}),
+   signal:controller.signal
+  });
+  if(response.status===401){input.value=message;await refreshAccess();throw Error('Для продолжения войдите как участник ALENAFIT.');}
+  if(response.status===429)throw Error('Суточный лимит Афиты исчерпан. Попробуйте завтра.');
+  const data=await response.json();
+  if(!response.ok||!data.answer)throw Error(data.error||'Сервис временно недоступен.');
+  waiting.remove();
+  await typeAnswer(data.answer);
+  history.push({role:'user',content:message.slice(0,400)});
+  history.push({role:'assistant',content:data.answer.slice(0,400)});
+  history.splice(0,Math.max(0,history.length-4));
+  status.textContent='Ответ готов';
+ }catch(error){
+  waiting.remove();
+  add(error.name==='AbortError'?'Время ожидания истекло. Попробуйте позже.':error.message);
+  status.textContent='Не удалось получить ответ';
+ }finally{
+  waiting.remove();
+  clearTimeout(timeout);
+  button.disabled=false;
+  await refreshAccess();
+ }
+});
+// AFIT_MEMBER_UI_V1
+const memberPanel=document.querySelector('#afit-member-panel');
+const memberForm=document.querySelector('#afit-member-form');
+const memberStatus=document.querySelector('#afit-member-status');
+const quotaNote=document.querySelector('#afit-quota');
+function setAccessState(data){
+ const locked=!data.member&&data.remaining===0;
+ memberPanel.hidden=!locked;
+ form.hidden=locked;
+ quotaNote.textContent=data.member?'Доступ участника ALENAFIT':`Доступно вопросов: ${data.remaining} из 30`;
+ if(locked)status.textContent='Войдите, чтобы продолжить разговор';
+}
+async function refreshAccess(){
+ try{const r=await fetch('/session',{cache:'no-store'});if(r.ok)setAccessState(await r.json())}catch(e){quotaNote.textContent=''}
+}
+memberForm.addEventListener('submit',async e=>{
+ e.preventDefault();const submit=memberForm.querySelector('button');if(submit.disabled)return;
+ submit.disabled=true;memberStatus.textContent='Проверяю доступ…';
+ try{
+  const r=await fetch('/member-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({login:memberForm.elements.login.value.trim(),password:memberForm.elements.password.value})});
+  const d=await r.json();if(!r.ok)throw Error(d.error||'Не удалось войти');
+  memberForm.elements.password.value='';setAccessState({member:true,remaining:0});status.textContent='Можно продолжать';input.focus();
+ }catch(err){memberStatus.textContent=err.message}
+ finally{submit.disabled=false}
+});
+button.setAttribute('aria-label','Отправить сообщение');button.title='Отправить сообщение';
+button.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+refreshAccess();
+
+</script>
+</html>

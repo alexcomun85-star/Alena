@@ -229,3 +229,12 @@ env=await environment();response=await aiRoute(request(),env,{fetcher:async(url,
  throw Error('must not cook invalid composition');
 }});assert.equal(response.status,502);assert.match((await response.json()).reason,/адрес исправления/);
 console.log('Staged recipes: verified composition before cooking, targeted repair, immutable valid dishes, immutable cooking weights, bounded calls and offline cache OK');
+
+// Guest tasks: exactly two completed requests; existing member quota stays intact.
+env=await environment();
+for(let i=0;i<2;i++)assert.equal((await aiRoute(request({...req,requestId:'guest_limit_request_0000'+i}),env,{fetcher:provider})).status,200);
+const guestCalls=calls;
+assert.equal((await aiRoute(request({...req,requestId:'guest_limit_request_00003'}),env,{fetcher:provider})).status,429);
+assert.equal(calls,guestCalls,'blocked guest must not invoke model');
+assert.equal((await aiRoute(request({...req,requestId:'guest_limit_request_00003'}),{...env,AFITA_VERIFIED_MEMBER:true},{fetcher:provider})).status,200,'verified member retains previous allowance');
+console.log('Guest task quota: two requests, third blocked before model, password member allowance preserved OK');

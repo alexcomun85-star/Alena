@@ -71,6 +71,8 @@ jobs:
           python tests/nutrition_actions.py
           python tests/simple_actions.py
           python tests/ai_actions.py
+          python tests/test_access_gate.py
+          python tests/afit_composer.py
           python tests/assistant_actions.py
           retry python tests/regression.py
           retry python tests/audit_regression.py

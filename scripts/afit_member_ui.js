@@ -7,7 +7,7 @@ function setAccessState(data){
  const locked=!data.member&&data.remaining===0;
  memberPanel.hidden=!locked;
  form.hidden=locked;
- quotaNote.textContent=data.member?'Доступ участника ALENAFIT':`Доступно вопросов: ${data.remaining} из 30`;
+ quotaNote.textContent=data.member?'Доступ участника ALENAFIT':`Доступно вопросов: ${data.remaining} из ${data.limit||5}`;
  if(locked)status.textContent='Войдите, чтобы продолжить разговор';
 }
 async function refreshAccess(){
@@ -26,3 +26,9 @@ memberForm.addEventListener('submit',async e=>{
 button.setAttribute('aria-label','Отправить сообщение');button.title='Отправить сообщение';
 button.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
 refreshAccess();
+
+// AFIT_COMPOSER_FIT_V2
+function fitQuestion(){input.style.height='auto';input.style.height=Math.min(160,Math.max(76,input.scrollHeight))+'px'}
+input.addEventListener('input',fitQuestion);
+new ResizeObserver(fitQuestion).observe(form);
+fitQuestion();input.scrollTop=0;
