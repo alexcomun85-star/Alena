@@ -263,3 +263,9 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch,body.afit-chat-open .
 }
 @media(max-width:1023px) and (prefers-reduced-transparency:reduce){.mnav{background:#0d1e1a!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){@media(max-width:1023px){.mnav{background:rgba(13,30,26,.94)!important}}}
+/* меню: размытие чуть легче — меньше работы видеокарте при прокрутке; слой меню отдельный */
+@media(max-width:1023px){
+  .mnav{-webkit-backdrop-filter:blur(16px) saturate(140%)!important;backdrop-filter:blur(16px) saturate(140%)!important;background:rgba(13,30,26,.6)!important;contain:paint}
+  .mnav-in{transform:translateZ(0)}
+  .mg-links{will-change:transform,opacity}
+}

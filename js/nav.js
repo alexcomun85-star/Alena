@@ -105,44 +105,43 @@
 })();
 
 /* Мобильное меню (01.11.2026): разделы раскрываются как выпадающие списки.
-   Открыт только один раздел; раскрытие и закрытие анимированы по высоте;
-   после раскрытия меню само прокручивается, чтобы были видны все подразделы. */
+   Открыт только один раздел; после раскрытия меню прокручивается, чтобы были видны все подразделы.
+   Плавность: высоту не анимируем (это пересчёт раскладки на каждом кадре). Раздел открывается сразу,
+   а движение изображается сдвигом (transform) и прозрачностью — их считает видеокарта. */
 (function(){
   var menu=document.getElementById('mnav');if(!menu)return;
   var groups=[].slice.call(menu.querySelectorAll('details.mg'));if(!groups.length)return;
   var reduce=window.matchMedia('(prefers-reduced-motion: reduce)');
-  var EASE='cubic-bezier(.2,.8,.25,1)';
-  function body(d){return d.querySelector('.mg-links')}
+  var EASE='cubic-bezier(.2,.8,.25,1)',running=[];
+  function stopAll(){running.forEach(function(a){try{a.finish()}catch(e){}});running=[]}
+  function anim(el,frames,opt){if(!el.animate)return;var a=el.animate(frames,opt);running.push(a);return a}
   function reveal(d){
-    /* прокрутить меню так, чтобы раздел целиком попал в видимую часть (заголовок не уходит вверх) */
-    var mr=menu.getBoundingClientRect(),r=d.getBoundingClientRect();
-    var dock=document.querySelector('.dock');var bottom=mr.bottom-(dock&&dock.offsetParent&&dock.getBoundingClientRect().top<mr.bottom?mr.bottom-dock.getBoundingClientRect().top:0)-8;
-    var delta=0;
+    var mr=menu.getBoundingClientRect(),r=d.getBoundingClientRect(),bottom=mr.bottom-8,delta=0;
     if(r.bottom>bottom)delta=r.bottom-bottom;
     if(r.top-delta<mr.top+8)delta=r.top-mr.top-8;
     if(Math.abs(delta)>1)menu.scrollBy({top:delta,behavior:reduce.matches?'auto':'smooth'});
   }
-  function close(d,instant){
-    var b=body(d);if(!d.open)return;
-    if(instant||reduce.matches||!b||!b.animate){d.open=false;return}
-    d.classList.add('mg-closing');
-    var h=b.offsetHeight;
-    var a=b.animate([{height:h+'px',opacity:1},{height:'0px',opacity:0}],{duration:220,easing:'ease-in'});
-    b.style.overflow='hidden';
-    a.onfinish=a.oncancel=function(){d.open=false;b.style.overflow='';d.classList.remove('mg-closing')};
-  }
-  function open(d){
-    groups.forEach(function(g){if(g!==d)close(g)});
-    d.open=true;var b=body(d);
-    if(reduce.matches||!b||!b.animate){reveal(d);return}
-    var h=b.scrollHeight;b.style.overflow='hidden';
-    var a=b.animate([{height:'0px',opacity:0,transform:'translateY(-6px)'},{height:h+'px',opacity:1,transform:'none'}],{duration:340,easing:EASE});
-    a.onfinish=a.oncancel=function(){b.style.overflow='';reveal(d)};
-    /* прокрутку начинаем вместе с раскрытием, а не после — движение одно */
-    setTimeout(function(){reveal(d)},120);
+  function toggle(d){
+    stopAll();
+    var s=d.querySelector('summary'),b=d.querySelector('.mg-links');
+    var opening=!d.open;
+    var inner=d.parentElement,kids=[].slice.call(inner.children);
+    /* FLIP: запоминаем положение всех пунктов, меняем раскладку разом, затем плавно «доезжаем» сдвигом */
+    var before=kids.map(function(k){return k.getBoundingClientRect().top});
+    var top0=s.getBoundingClientRect().top;
+    groups.forEach(function(g){if(g!==d&&g.open)g.open=false});
+    d.open=opening;
+    /* нажатый заголовок остаётся под пальцем */
+    menu.scrollTop+=s.getBoundingClientRect().top-top0;
+    if(!reduce.matches){
+      kids.forEach(function(k,i){var dy=before[i]-k.getBoundingClientRect().top;
+        if(Math.abs(dy)>1)anim(k,[{transform:'translateY('+dy+'px)'},{transform:'none'}],{duration:opening?340:260,easing:EASE})});
+      if(opening&&b)anim(b,[{opacity:0,transform:'translateY(-10px)'},{opacity:1,transform:'none'}],{duration:320,easing:EASE});
+    }
+    if(opening)setTimeout(function(){reveal(d)},reduce.matches?0:60);
   }
   groups.forEach(function(d){
     var s=d.querySelector('summary');if(!s)return;
-    s.addEventListener('click',function(e){e.preventDefault();if(d.open&&!d.classList.contains('mg-closing'))close(d);else open(d)});
+    s.addEventListener('click',function(e){e.preventDefault();toggle(d)});
   });
 })();
