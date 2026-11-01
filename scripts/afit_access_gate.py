@@ -3,6 +3,7 @@ import base64 as _af_b64
 import hashlib as _af_hash
 import hmac as _af_hmac
 import io as _af_io
+import ipaddress as _af_ip
 import re as _af_re
 import secrets as _af_secrets
 import sqlite3 as _af_sql
@@ -20,7 +21,18 @@ def _af_db():
     if 'used_day' not in [r[1] for r in db.execute('PRAGMA table_info(sessions)')]:
         db.execute('ALTER TABLE sessions ADD COLUMN used_day INTEGER NOT NULL DEFAULT -1')
     db.execute('CREATE TABLE IF NOT EXISTS login_attempts (id INTEGER PRIMARY KEY, sid TEXT NOT NULL, at INTEGER NOT NULL)')
+    db.execute('CREATE TABLE IF NOT EXISTS guest_chat_daily (actor TEXT NOT NULL, day INTEGER NOT NULL, used INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(actor, day))')
     return db
+
+def _af_guest_actor(handler):
+    peer = _af_ip.ip_address(handler.client_address[0])
+    address = str(peer)
+    if peer.is_private or peer.is_loopback:
+        forwarded = handler.headers.get('X-Real-IP') or handler.headers.get('X-Forwarded-For', '').split(',')[-1].strip()
+        if forwarded:
+            address = str(_af_ip.ip_address(forwarded))
+    # Only the keyed digest is stored; closing the widget or losing cookies cannot reset it.
+    return _af_hmac.new(_af_secret, ('guest-chat:'+address).encode(), _af_hash.sha256).hexdigest()
 
 def _af_session(handler):
     sid = None
@@ -39,7 +51,14 @@ def _af_session(handler):
         day = int(_af_time.time()) // 86400
         db.execute('UPDATE sessions SET used=0, used_day=? WHERE id=? AND used_day<>?', (day, sid, day))
         row = db.execute('SELECT used, member_until FROM sessions WHERE id=?', (sid,)).fetchone()
-    return sid, row[0], row[1] > int(_af_time.time())
+    member = row[1] > int(_af_time.time())
+    if not member:
+        with _af_db() as db:
+            actor = _af_guest_actor(handler)
+            db.execute('INSERT OR IGNORE INTO guest_chat_daily(actor,day,used) VALUES (?,?,?)', (actor,day,row[0]))
+            record = db.execute('SELECT used FROM guest_chat_daily WHERE actor=? AND day=?', (actor,day)).fetchone()
+        return sid, record[0] if record else 0, False
+    return sid, row[0], True
 
 _af_original_end = Handler.end_headers
 _af_original_get = Handler.do_GET
@@ -55,7 +74,7 @@ def _af_get(self):
     if self.path.split('?')[0] != '/session': return _af_original_get(self)
     try:
         sid, used, member = _af_session(self)
-        return self.send_json(200, {'remaining': max(0, 5-used), 'member': member, 'limit': 5})
+        return self.send_json(200, {'remaining': max(0, 5-used), 'member': member, 'limit': 5, 'counterScope': 'network', 'revision': 'guest-counter-v2'})
     except Exception:
         return self.send_json(503, {'error': 'Не удалось проверить доступ. Попробуйте позже.'})
 
@@ -104,9 +123,13 @@ def _af_post(self):
         if not member:
             with _af_db() as db:
                 db.execute('BEGIN IMMEDIATE')
-                used = db.execute('SELECT used FROM sessions WHERE id=?', (sid,)).fetchone()[0]
+                actor, day = _af_guest_actor(self), int(_af_time.time()) // 86400
+                db.execute('INSERT OR IGNORE INTO guest_chat_daily(actor,day) VALUES (?,?)', (actor, day))
+                used = db.execute('SELECT used FROM guest_chat_daily WHERE actor=? AND day=?', (actor,day)).fetchone()[0]
                 if used >= 5:
                     return self.send_json(401, {'error': 'Для продолжения войдите как участник ALENAFIT.', 'code': 'member_required', 'remaining': 0})
+                db.execute('UPDATE guest_chat_daily SET used=used+1 WHERE actor=? AND day=?', (actor,day))
+                db.execute('DELETE FROM guest_chat_daily WHERE day<?', (day-2,))
                 db.execute('UPDATE sessions SET used=used+1 WHERE id=?', (sid,))
     except Exception:
         return self.send_json(503, {'error': 'Не удалось проверить доступ. Попробуйте позже.'})

@@ -24,12 +24,13 @@ class GateTests(unittest.TestCase):
         self.thread=threading.Thread(target=self.http.serve_forever,daemon=True);self.thread.start()
     def stop(self):self.http.shutdown();self.http.server_close();self.thread.join()
     def tearDown(self):self.stop();self.tmp.cleanup()
-    def request(self,path,data=None,cookie=None,origin=None):
+    def request(self,path,data=None,cookie=None,origin=None,ip=None):
         conn=http.client.HTTPConnection('127.0.0.1',self.http.server_port)
         headers={'Content-Type':'application/json'}
         if cookie is None:cookie=self.cookie
         if cookie:headers['Cookie']=cookie
         if origin:headers['Origin']=origin
+        if ip:headers['X-Real-IP']=ip
         conn.request('GET' if data is None else 'POST',path,None if data is None else json.dumps(data),headers)
         res=conn.getresponse();body=json.loads(res.read());status=res.status
         header=res.getheader('Set-Cookie')
@@ -62,9 +63,34 @@ class GateTests(unittest.TestCase):
         self.assertEqual(self.Handler.calls,0)
     def test_daily_reset(self):
         for n in range(5):self.assertEqual(self.request('/chat',{'message':'x'})[0],200)
-        with self.scope['_af_db']() as db:db.execute('UPDATE sessions SET used_day=used_day-1')
+        with self.scope['_af_db']() as db:
+            db.execute('UPDATE guest_chat_daily SET day=day-1')
+            db.execute('UPDATE sessions SET used_day=used_day-1')
         self.assertEqual(self.request('/session')[1]['remaining'],5)
         self.assertEqual(self.request('/chat',{'message':'next day'})[0],200)
+    def test_closing_new_session_and_forged_cookies_do_not_reset(self):
+        for n in range(3):self.assertEqual(self.request('/chat',{'message':'hello'})[0],200)
+        self.assertEqual(self.request('/session',cookie='')[1]['remaining'],2)
+        self.assertEqual(self.request('/session',cookie='afit_session='+'a'*48+'.'+'b'*64)[1]['remaining'],2)
+        self.stop();self.start()
+        self.assertEqual(self.request('/session',cookie='')[1]['remaining'],2)
+        for n in range(2):self.assertEqual(self.request('/chat',{'message':'last'},cookie='')[0],200)
+        self.assertEqual(self.request('/chat',{'message':'blocked'},cookie='')[0],401)
+        self.assertEqual(self.Handler.calls,5)
+        with self.scope['_af_db']() as db:
+            actor=db.execute('SELECT actor FROM guest_chat_daily').fetchone()[0]
+            self.assertEqual(len(actor),64)
+            self.assertNotIn('127.0.0.1',actor)
+    def test_migration_preserves_current_session_usage(self):
+        self.request('/session')
+        with self.scope['_af_db']() as db:
+            db.execute('DELETE FROM guest_chat_daily')
+            db.execute('UPDATE sessions SET used=3')
+        self.assertEqual(self.request('/session')[1]['remaining'],2)
+    def test_forwarded_visitors_have_separate_counters(self):
+        for n in range(3):self.assertEqual(self.request('/chat',{'message':'x'},cookie='',ip='203.0.113.10')[0],200)
+        self.assertEqual(self.request('/session',cookie='',ip='203.0.113.10')[1]['remaining'],2)
+        self.assertEqual(self.request('/session',cookie='',ip='203.0.113.11')[1]['remaining'],5)
     def test_existing_routes_work(self):self.assertEqual(self.request('/health')[1]['status'],'ok')
 
 if __name__=='__main__':unittest.main()
