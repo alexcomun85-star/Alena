@@ -225,3 +225,25 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch,body.afit-chat-open .
   .dock-afit-glass{animation:afitDockIn .6s cubic-bezier(.2,.8,.25,1) .4s both,afitGlow 7s ease-in-out 1s infinite}
   @keyframes afitGlow{20%,40%{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 0 3px rgba(240,169,43,.2)}0%,70%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 0 3px rgba(240,169,43,.06)}}
 }
+
+/* ---------- все кнопки нижней панели в стиле Афиты (01.11.2026) ----------
+   Каждый значок — в стеклянном круге 34 px, как у Афиты. Обычные круги — с нейтральным светлым краем,
+   у Афиты — янтарный контур и рисующийся знак: она остаётся главной. Выбранный пункт — янтарный край. */
+.dock .home-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.dock-glass{display:grid;place-items:center;width:34px;height:34px;margin:-6px 0 -2px;border-radius:50%;flex:none;
+  background:linear-gradient(160deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,0) 55%,rgba(255,255,255,.04) 100%);
+  -webkit-backdrop-filter:blur(3px) saturate(130%);backdrop-filter:blur(3px) saturate(130%);
+  border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
+  transition:border-color .2s,background .2s,transform .15s}
+.dock-glass svg{display:block;width:18px;height:18px}
+.dock .dock-menu .dock-glass .burger{margin:0}
+.dock .home-btn>span{line-height:inherit}
+/* без заливки ячейки: состояние показывает сам круг */
+.dock .home-btn:active,.dock .home-btn[aria-current="page"],.dock .home-btn[aria-expanded="true"]{background:none}
+.dock .home-btn:active .dock-glass{transform:scale(.94)}
+.dock .home-btn[aria-current="page"] .dock-glass,.dock .home-btn[aria-expanded="true"] .dock-glass{border-color:rgba(240,169,43,.55);background:linear-gradient(160deg,rgba(240,169,43,.16),rgba(240,169,43,.04))}
+.dock .home-btn[aria-current="page"],.dock .home-btn[aria-expanded="true"]{color:var(--ink,#eef4f1)}
+/* Афита: свой, более яркий круг (правила выше в этом файле) */
+.dock .dock-afit .dock-glass{border-color:rgba(240,169,43,.5);background:linear-gradient(160deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.02) 55%,rgba(255,255,255,.06) 100%),rgba(13,30,26,.35)}
+.dock .dock-afit .dock-afit-glass{margin:-6px 0 -2px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.dock-glass{background:rgba(255,255,255,.06)}}
