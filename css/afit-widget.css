@@ -269,3 +269,15 @@ body.afit-chat-open .dock,body.afit-chat-open .afit-launch,body.afit-chat-open .
   .mnav-in{transform:translateZ(0)}
   .mg-links{will-change:transform,opacity}
 }
+
+/* ---------- пиктограммы в стиле логотипа (01.11.2026) ----------
+   Как в знаке ALENAFIT: основной штрих светлый, один элемент — янтарная «дуга». Штрих чуть толще и с круглыми концами. */
+svg .ac{stroke:var(--amber,#f0a92b)}
+svg .acf{fill:var(--amber,#f0a92b);stroke:none}
+.mg summary .ico,.dd-promo .ico,.m-zal-head svg,.zal-btn svg,.dock .zal-dock svg,.dock-glass svg{color:var(--ink,#eef4f1)}
+.mg summary .ico,.dd-promo .ico,.dock-glass svg{stroke-width:2.2}
+.dock .home-btn:not([aria-current="page"]):not([aria-expanded="true"]) .dock-glass svg{color:rgba(238,244,241,.88)}
+.dock .dock-menu .burger{background:var(--amber,#f0a92b)}
+.dock .dock-menu .burger::before,.dock .dock-menu .burger::after{background:var(--ink,#eef4f1)}
+.menu-open .dock .dock-menu .burger{background:transparent}
+.menu-open .dock .dock-menu .burger::before,.menu-open .dock .dock-menu .burger::after{background:var(--amber,#f0a92b)}

@@ -8,11 +8,11 @@ START = "https://t.me/Gym_mom1988"
 CHANNEL = "https://t.me/alena_gymmom"
 
 ICONS = {
-    "me": '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
-    "train": '<path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/>',
-    "food": '<path d="M7 3v8a2 2 0 0 0 4 0V3M9 11v10M17 3c-2 2-2.5 5-2.5 7.5S16 14 17 14V21"/>',
-    "know": '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20"/>',
-    "price": '<path d="M8 3h8l4 5-8 13L4 8z"/><path d="M4 8h16"/>',
+    "me": '<circle cx="12" cy="7.5" r="3.6"/><path class="ac" d="M4.5 20.5c1.2-3.6 4-5.6 7.5-5.6s6.3 2 7.5 5.6"/>',
+    "train": '<path d="M6.5 12h11"/><path class="ac" d="M6.5 7.5v9M17.5 7.5v9M3.5 10v4M20.5 10v4"/>',
+    "food": '<path d="M7 3v7.5a2 2 0 0 0 4 0V3M9 12.5V21"/><path class="ac" d="M17 3c-2.2 2.2-2.6 5-2.6 7.5S15.6 14 17 14v7"/>',
+    "know": '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20"/><path class="ac" d="M8.5 13.5c2.1-2.7 4.8-4.2 8.2-5"/>',
+    "price": '<path d="M8 3h8l4 5-8 13L4 8z"/><path class="ac" d="M4 8h16"/>',
 }
 
 # Пункт: (адрес, название, пояснение). Подзаголовок внутри группы: ("#", "Название подгруппы", None)

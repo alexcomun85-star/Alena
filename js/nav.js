@@ -38,7 +38,8 @@
   var menu=document.getElementById('mnav'),btn=document.getElementById('menuBtn');
   var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
   var home=path==='index.html'||path==='';
-  var I={home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/>',up:'<path d="M12 19V5M6 11l6-6 6 6"/>',back:'<path d="M15 5l-7 7 7 7"/>',tools:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>'};
+  /* пиктограммы в стиле логотипа: светлый штрих + один янтарный акцент (class="ac") */
+  var I={home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path class="ac" d="M10 20v-5h4v5"/>',up:'<path d="M12 6v14"/><path class="ac" d="M6 11l6-6 6 6"/>',back:'<path class="ac" d="M15 5l-7 7 7 7"/>',tools:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect class="ac" x="14" y="14" width="7" height="7" rx="1.5"/>',star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/><circle class="ac acf" cx="12" cy="12" r="1.7"/>'};
   function ico(d){return '<i class="dock-glass" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg></i>'}
   var first=home?'<button type="button" class="home-btn dock-top">'+ico(I.up)+'<span>Наверх</span></button>'
     :standalone?'<button type="button" class="home-btn dock-back">'+ico(I.back)+'<span>Назад</span></button>'
