@@ -2,7 +2,7 @@
    Страницы: сначала сеть (чтобы обновления приходили сразу), без сети — сохранённая копия,
    а если копии нет — страница «Нет интернета». Данные журналов (localStorage) кеш не затрагивает.
    Стили, скрипты, картинки: сначала из кэша, в фоне обновляются. */
-const VERSION = 'alenafit-release-20261101-v67-logo2';
+const VERSION = 'alenafit-release-20261101-v68-logo3';
 // CSS/JS адреса совпадают с подключениями страниц, включая версию кэша.
 const CORE = [
   "./css/pilot-review.css?v=2",
@@ -59,7 +59,7 @@ const CORE = [
   "./css/home-motion.css?v=20261028b",
   "./css/afit-widget.css?v=20261101ux",
   "./js/afit-widget.js?v=20261101ux",
-  "./css/site.css?v=20261101logo2",
+  "./css/site.css?v=20261101logo3",
   "./js/brand-pilot.js?v=1",
   "./js/card-reveal.js?v=20261031smooth1",
   "./js/cycle-diary.js?v=20261028d",

@@ -1243,19 +1243,19 @@ a .tg-ico{flex:none;display:inline-block;width:18px;height:18px;vertical-align:-
 .invite-action .tg-ico+span{white-space:nowrap;font-size:clamp(15px,4.4vw,17px)}
 
 /* ===== Логотип (01.11.2026): знак + ALENAFIT + «сила без перегибов» | ТРЕНИРОВКИ И ПИТАНИЕ =====
-   Надпись — один SVG (viewBox 725×140): масштабируется целиком, пропорции не меняются ни на одном экране.
+   Надпись — один SVG (viewBox 760×140): масштабируется целиком, пропорции не меняются ни на одном экране.
    Знак = 0,85 высоты надписи — как в эталоне. */
 .brand{display:flex;align-items:center;gap:10px;min-width:0;--lock:40px}
 .brand .brand-mark{height:calc(var(--lock)*.85);width:auto;flex:none}
-.brand-lock{display:block;flex:none;height:var(--lock);width:auto;aspect-ratio:725/140;overflow:visible}
+.brand-lock{display:block;flex:none;height:var(--lock);width:auto;aspect-ratio:760/140;overflow:visible}
 .brand-lock .bl-tag,.foot-lock .bl-tag{font:400 31px var(--body);fill:var(--muted)}
-.brand-lock .bl-desc,.foot-lock .bl-desc{font:600 44px var(--body);fill:var(--ink)}
+.brand-lock .bl-desc,.foot-lock .bl-desc{font:600 49px var(--body);fill:var(--ink)}
 @media (max-width:359px){.brand{--lock:34px;gap:8px}}
 @media (min-width:1024px){.brand{--lock:42px;gap:12px}}
 @media (min-width:1024px) and (max-width:1279px){.brand{--lock:36px;gap:9px}}
 
 /* подвал: тот же логотип одним рисунком, по ширине колонки */
-.foot-lock{display:block;width:min(100%,420px);height:auto;aspect-ratio:900/140;margin-bottom:12px}
+.foot-lock{display:block;width:min(100%,420px);height:auto;aspect-ratio:935/140;margin-bottom:12px}
 /* ПК до 1600 px: место под логотип целиком — кнопка Telegram в шапке становится круглой со значком (подпись остаётся для экранных читалок) */
 @media (min-width:1024px) and (max-width:1599px){
  .bar .w>.btn:has(.tg-ico){width:44px;min-width:44px;padding:0;justify-content:center;gap:0}
