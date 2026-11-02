@@ -1269,3 +1269,13 @@ a .tg-ico{flex:none;display:inline-block;width:18px;height:18px;vertical-align:-
 .zal-go b,.zal-go span{overflow-wrap:break-word}
 /* телефон: текст на всю ширину карточки, кнопки порядка — строкой справа снизу */
 @media (max-width:479px){.zal-item{flex-wrap:wrap;gap:0;padding:4px 4px 2px}.zal-go{flex:1 1 100%;padding:10px 12px 2px}.zal-ctl{margin-left:auto;gap:2px}.zal-ctl button{width:40px;height:40px}}
+
+/* План возвращения (02.11.2026): таблица упражнений помещается в экран телефона — без минимальной ширины,
+   кнопка «Как делать» переносится под название, колонка повторов узкая */
+@media (max-width:600px){
+  .ptbl{min-width:0;table-layout:auto}
+  .ptbl th,.ptbl td,.report-sec .ptbl td:first-child{white-space:normal}
+  .ptbl td:first-child{overflow-wrap:anywhere}
+  .ptbl td:last-child,.ptbl th:last-child{width:6.5em}
+  .ptbl .how-btn{display:flex;width:max-content;max-width:100%;margin:8px 0 2px}
+}

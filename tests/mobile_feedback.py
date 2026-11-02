@@ -77,6 +77,12 @@ def main():
         check('корзина: невыбранные продукты не попали в PDF',False,'Гречка' in txt)
         check('корзина: флажок читается без замены на вопрос',True,'[ ]' in txt and '?' not in txt)
         p.close()
+        # 02.11.2026: таблица плана возвращения не выходит за экран телефона ни в одном варианте
+        for vm in ('gym','dumb','home'):
+            for w in (320,390):
+                p=fresh(ctx,'vozvrat.html');p.set_viewport_size({'width':w,'height':844});p.click('label[for=vm'+vm[0]+']');p.click('#vGen');p.wait_for_selector('.ptbl')
+                over=p.evaluate("()=>[...document.querySelectorAll('.ptbl')].some(t=>t.getBoundingClientRect().right>innerWidth+0.5)||document.documentElement.scrollWidth>innerWidth")
+                check(f'план {vm} {w}px: таблица в пределах экрана',False,over);p.close()
         p=fresh(ctx,'index.html');p.click('#dockMenu')
         # 01.11.2026: меню прозрачнее (стекло); проверяем смысл, а не точное число
         bg=p.locator('#mnav').evaluate('(e)=>getComputedStyle(e).backgroundColor')
