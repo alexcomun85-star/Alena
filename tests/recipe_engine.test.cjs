@@ -8,4 +8,6 @@ r=find('авокадо киноа');ok(!r.exact.length&&!r.near.some(x=>/аво�
 r=find('нет продуктов');ok(!r.exact.length&&r.popular.length>0,'no ingredients gives starting suggestions');
 r=find('абракадабра');ok(!r.exact.length&&r.pantry.unknown.includes('абракадабра'),'unknown is not fabricated');
 for(const recipe of recipes){const result=find(recipe.required.map(id=>require('../js/recipe-engine.js').ingredients[id][0]).join(' '));ok(result.pantry.ids.length>=recipe.required.length,'all required aliases recognized '+recipe.id);ok(recipe.steps.length>=2&&recipe.title.length>5,'recipe has usable steps');ok(!recipe.required.some(x=>recipe.optional.includes(x)),'no duplicated required optional')}
+/* Фитнес-наборы ведут к своему рецепту книги */
+{global.window=global.window||{};const book=require('../js/recipe-book.js');const src=require('fs').readFileSync(require('path').join(__dirname,'../js/assistant-tools.js'),'utf8');const sets=JSON.parse(src.match(/const FITNESS_SETS=(\[.*?\]\]);/)[1].replace(/'/g,'"'));ok(sets.length===6,'six fitness sets');for(const [label,q,id] of sets){ok(book.some(x=>x.id===id),'set recipe in book '+id);ok(find(q).exact.some(x=>x.id===id),'set finds its recipe '+label)}}
 console.log(checks+' recipe engine checks passed');

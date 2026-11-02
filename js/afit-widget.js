@@ -16,7 +16,7 @@
  const tabs=document.createElement('nav');tabs.className='afit-tabs';tabs.setAttribute('aria-label','Режим помощника');
  ['Чат','Инструменты'].forEach((label,index)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.setAttribute('aria-pressed',String(index===0));
   b.onclick=()=>{if(b.getAttribute('aria-pressed')==='true')return;
-   if(index&&!tools.getAttribute('src'))tools.src='assistant-tools.html?embed=1&v=20261102nostart';
+   if(index&&!tools.getAttribute('src'))tools.src='assistant-tools.html?embed=1&v=20261102fit';
    frame.hidden=!!index;frame.style.display=index?'none':'';tools.hidden=!index;tools.style.display=index?'block':'none';
    if(loading)loading.hidden=!!index||frame.dataset.ready==='1';
    tabs.querySelectorAll('button').forEach((t,i)=>t.setAttribute('aria-pressed',String(i===index)));

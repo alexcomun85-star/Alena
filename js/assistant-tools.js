@@ -63,19 +63,25 @@ function onlineRecipes(box){
   })
  }).catch(e=>{if(sequence===recipeSequence&&section.isConnected&&state.recipe===captured)note.textContent=e.name==='AbortError'?'Открытый источник не ответил вовремя. Локальные варианты остаются доступны.':e.message}).finally(()=>clearTimeout(timer));
 }
+/* Быстрые наборы: классика фитнес-питания. Каждый набор ведёт к рецепту книги (КБЖУ — js/food-db.js, USDA FDC). */
+const FITNESS_SETS=[['Курица, гречка и овощи','курица гречка морковь','l-chicken-buckwheat'],['Творог, йогурт и ягоды','творог йогурт ягоды','b-curd-berries'],['Омлет с овощами','яйца помидоры болгарский перец','b-omelet-veg'],['Треска с брокколи','треска брокколи','d-cod-broccoli'],['Овсянка на кефире с бананом','овсянка кефир банан','b-lazy-oats'],['Тунец, яйцо и овощи','тунец яйца огурцы помидоры','d-tuna-salad']];
 function renderRecipes(){const box=work.querySelector('#recipe-results');if(!box)return;box.replaceChildren();
  function paragraph(text,cls){const p=document.createElement('p');p.textContent=text;if(cls)p.className=cls;box.append(p)}
- function starters(){paragraph('БЫСТРЫЕ НАБОРЫ','group-title');['Макароны и сосиски','Яйца помидоры сыр','Творог банан','Курица гречка','Капуста картошка морковь'].forEach(s=>{const b=document.createElement('button');b.className='starter';b.type='button';b.innerHTML=esc(s)+'<small>Выбрать</small>';b.onclick=()=>{state.recipe=s;state.submitted=true;work.querySelector('#ingredients').value=s;showRecipeResults()};box.append(b)})}
+ function starters(){paragraph('КЛАССИЧЕСКИЕ ФИТНЕС-НАБОРЫ','group-title');paragraph('Белок плюс крупа или овощи. КБЖУ на порцию посчитаны по USDA FoodData Central.','meta');
+  const book=window.AFITA_BOOK||[],fmt=x=>Number(x).toLocaleString('ru-RU',{maximumFractionDigits:0});
+  FITNESS_SETS.forEach(([label,query,id])=>{const r=book.find(x=>x.id===id),b=document.createElement('button');b.className='starter';b.type='button';b.dataset.set=id;
+   b.innerHTML='<span>'+esc(label)+(r?'<em>'+esc(r.mealName)+' · '+fmt(r.n.k)+' ккал · белок '+fmt(r.n.p)+' г</em>':'')+'</span><small>Выбрать</small>';
+   b.onclick=()=>{state.recipe=query;state.submitted=true;work.querySelector('#ingredients').value=query;showRecipeResults()};box.append(b)})}
  if(!state.submitted){starters();return}
  const found=engine.find(state.recipe,{excluded:state.excluded});
  const rank=r=>window.AfitaNutrition.assess({text:r.title,ids:[...r.required,...(r.availableOptional||[])],context:window.AfitaNutritionUI.context}).level;found.exact.sort((a,b)=>rank(a)-rank(b));found.near.sort((a,b)=>rank(a)-rank(b));
  if(found.pantry.labels.length){paragraph('РАСПОЗНАННЫЕ ПРОДУКТЫ','group-title');const chips=document.createElement('div');chips.className='chips';found.pantry.ids.forEach(id=>{const c=document.createElement('span');c.className='chip';c.textContent=ingredient(id);chips.append(c)});box.append(chips)}
  if(found.pantry.unknown.length)paragraph('Не удалось распознать: '+found.pantry.unknown.join(', ')+'. Уточните названия в поле выше.','hint');
- if(!found.pantry.ids.length){paragraph('Пока не удалось определить продукты для блюда. Выберите быстрый набор — покажу состав и приготовление.','hint');starters();if(found.pantry.unknown.length)onlineRecipes(box);return}
+ if(!found.pantry.ids.length){paragraph('Пока не удалось определить продукты для блюда. Выберите фитнес-набор ниже — покажу состав и приготовление.','hint');starters();if(found.pantry.unknown.length)onlineRecipes(box);return}
  if(found.exact.length){paragraph('МОЖНО ПРИГОТОВИТЬ СЕЙЧАС','group-title');found.exact.forEach(r=>box.append(recipeCard(r,'exact')))}
  else paragraph('Полного набора для этих блюд пока нет. Ниже — варианты с небольшим списком покупок.','hint');
  if(found.near.length){const d=document.createElement('details');d.className='alternatives';d.open=!found.exact.length;d.innerHTML='<summary>Если добавить 1–2 продукта</summary>';found.near.forEach(r=>d.append(recipeCard(r,'near')));box.append(d)}
- if(!found.exact.length&&!found.near.length){paragraph('В этой подборке пока нет сочетания для ваших продуктов. Попробуйте быстрые наборы ниже.','hint');starters()}
+ if(!found.exact.length&&!found.near.length){paragraph('В этой подборке пока нет сочетания для ваших продуктов. Попробуйте фитнес-наборы ниже.','hint');starters()}
  if(!found.exact.length||found.pantry.unknown.length)onlineRecipes(box);
  paragraph('Это подбор из проверяемых шаблонов домашней кухни, а не генерация произвольного рецепта. Состав и аллергены сверяйте с упаковками.','meta');
 }
